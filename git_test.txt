@@ -1,1 +1,3 @@
 This is a git test
+
+Now I've added some more text to it, but only locally. Soon it will be in space. 
