@@ -10,7 +10,7 @@ from textblob import TextBlob
 import datetime
 
 #Import all Twitter credentials
-import tweepy_cred as cred
+import app.tweepy_cred as cred
 
 
 ##Set up database functions
@@ -42,6 +42,27 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
 #POST TABLE: If tweet ID not already in database, add to Post table
 
     if session.query(Post).filter(Post.post_id == post_id).count() == 0:
+
+
+        #USER table
+        #If User already in User table, update dynamic elements, associate with this post
+        this_user = session.query(User).filter(User.user_id == user_id).first()
+        if this_user != None:
+            this_user.user_location = user_location
+            this_user.user_followers = user_followers
+            this_user.user_friends = user_friends
+            this_user.user_statuses = user_statuses
+            session.add(this_user)
+
+        #Otherise, add User to user table, associate with this post
+        else:
+            this_user = User(user_id, user_scrname, user_name, user_location, user_created, user_followers, user_friends, user_statuses)
+            session.add(this_user)    ##NOTE: dynamic elements must change: location, followers, friends, statuses
+
+
+        #POST table
+
+
         new_post = Post(post_id, user_id, text, created_at, reply_to_user_id,
             reply_to_scrname, reply_to_status_id, retweet_count,
             favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
@@ -73,9 +94,9 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
 
 #DISTRICT TABLE
             #capture District_id from 1st query term:
-        state = query[1:3]
-        district = query[3:5]
-        district_name = query[1:5]
+        state = query[2:4]
+        district = query[4:6]
+        district_name = query[2:6]
 
         #Check if district is in DB, add if not
         district_search = session.query(District).filter(District.district_name == district_name).first()
@@ -109,23 +130,9 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
 
 
 
+        #associate user with post
+        this_user.user_posts.append(new_post)
 
-
-
-        #If User already in User table, update dynamic elements, associate with this post
-        this_user = session.query(User).filter(User.user_id == user_id).first()
-        if this_user != None:
-            this_user.user_location = user_location
-            this_user.user_followers = user_followers
-            this_user.user_friends = user_friends
-            this_user.user_statuses = user_statuses
-            session.add(this_user)
-            this_user.user_posts.append(new_post)
-        #Otherise, add User to user table, associate with this post
-        else:
-            new_user = User(user_id, user_scrname, user_name, user_location, user_created, user_followers, user_friends, user_statuses)
-            session.add(new_user)    ##NOTE: dynamic elements must change: location, followers, friends, statuses
-            new_user.user_posts.append(new_post)
 
 
 
@@ -283,8 +290,8 @@ def twitter_search(query):
 
 if __name__ == "__main__":
 
-    #open_database('sqlite:///compdists_test.db')
-    engine = create_engine('sqlite:///compdists_test2.db')   #FOR NOW: mysql+pymysql://pollchat:KotikaZu@localhost/pollchat_db2?charset=utf8mb4?
+    #open_database('sqlite:///compdists_test.db')sqlite:///compdists_test2.db
+    engine = create_engine('mysql+pymysql://pollchat:KotikaZu@localhost/pollchat_db3?charset=utf8mb4?')   #FOR NOW:
 
     DBSession = sessionmaker()
     DBSession.configure(bind=engine)
@@ -293,7 +300,7 @@ if __name__ == "__main__":
     session = DBSession()
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
-    with open('app/comp_races_parsed_short.csv', 'r') as f:
+    with open('app/comp_races_parsed.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
