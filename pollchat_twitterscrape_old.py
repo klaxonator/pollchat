@@ -1,0 +1,311 @@
+import os
+import csv
+import sys
+import tweepy
+import time
+from app.helpers import skip_list, get_tweet
+
+#import preprocessor as p
+from textblob import TextBlob
+import datetime
+
+#Import all Twitter credentials
+import tweepy_cred as cred
+
+
+##Set up database functions
+from azmodels import User, Post, Hashtag, District, Url, Base, posthash_assoc, posturl_assoc, postdist_assoc
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+#Instantiate SQLalchemy database connection
+
+def open_database(database_name):
+    engine = create_engine(database_name)   #FOR NOW: sqlite:///compdists_test2.db
+
+    DBSession = sessionmaker()
+    DBSession.configure(bind=engine)
+    Base.metadata.create_all(engine)
+
+#Write Twitter variables to DB
+def write_database(post_id, user_id, text, created_at, reply_to_user_id,
+        reply_to_scrname, reply_to_status_id, retweet_count,
+        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+        original_text, original_tweet_created_at, original_tweet_likes,
+        original_author_id, original_author_scrname, polarity,
+        polarity_val, tag_list, url_list, user_scrname, user_name,
+        user_location, user_created, user_followers, user_friends,
+        user_statuses, query):
+
+
+
+#POST TABLE: If tweet ID not already in database, add to Post table
+
+    if session.query(Post).filter(Post.post_id == post_id).count() == 0:
+        new_post = Post(post_id, user_id, text, created_at, reply_to_user_id,
+            reply_to_scrname, reply_to_status_id, retweet_count,
+            favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+            original_text, original_tweet_created_at, original_tweet_likes,
+            original_author_id, original_author_scrname, polarity, polarity_val)
+        session.add(new_post)
+
+        #If original tweet is in database, update its retweeted count. If not, do nothing
+        if original_tweet_id != None:
+            orig_tweet = session.query(Post).filter(Post.post_id == original_tweet_id).first()
+            if orig_tweet != None:
+                orig_tweet.retweet_count = original_tweet_retweets
+                session.add(orig_tweet)
+
+#HASHTAG TABLE
+        #If tweet is being added, iterate through tag/url list, and create a Hashtag/Url table row for each tag
+        for item in tag_list:
+            #If hashtag is not already in Hashtag table, create new row
+            hash_search = session.query(Hashtag).filter(Hashtag.hashtag == item).first()
+            if hash_search == None:
+                new_hashtag = Hashtag(item)
+                session.add(new_hashtag)
+            else:
+                new_hashtag = hash_search
+            #Add association to posthash_assoc_table
+            new_post.hashtags.append(new_hashtag)
+            #session.add(posthash_assoc.hashtag)
+
+
+#DISTRICT TABLE
+            #capture District_id from 1st query term:
+        state = query[1:3]
+        district = query[3:5]
+        district_name = query[1:5]
+
+        #Check if district is in DB, add if not
+        district_search = session.query(District).filter(District.district_name == district_name).first()
+        if district_search == None:
+            new_district = District(state, district, district_name)
+            session.add(new_district)
+        else:
+            new_district = district_search
+
+        #Add association to postdist_assoc_table
+        new_post.districts.append(new_district)
+
+
+
+#URL TABLE
+
+        #if URLS exist, add to db
+        if len(url_list) > 0:
+            for item in url_list:
+                url_search = session.query(Url).filter(Url.url == item).first()
+                if url_search == None:
+                    new_url = Url(item)
+                    session.add(new_url)
+                else:
+                    new_url = url_search
+
+
+                #Add association to postDistAssoc_table
+            new_post.urls.append(new_url)
+
+
+
+
+
+
+
+        #If User already in User table, update dynamic elements, associate with this post
+        this_user = session.query(User).filter(User.user_id == user_id).first()
+        if this_user != None:
+            this_user.user_location = user_location
+            this_user.user_followers = user_followers
+            this_user.user_friends = user_friends
+            this_user.user_statuses = user_statuses
+            session.add(this_user)
+            this_user.user_posts.append(new_post)
+        #Otherise, add User to user table, associate with this post
+        else:
+            new_user = User(user_id, user_scrname, user_name, user_location, user_created, user_followers, user_friends, user_statuses)
+            session.add(new_user)    ##NOTE: dynamic elements must change: location, followers, friends, statuses
+            new_user.user_posts.append(new_post)
+
+
+
+def twitter_search(query):
+
+
+
+    #Iterate over tweets returned by Tweepy Cursor, with query contained in 'q'
+
+    count = 0
+
+    try:
+        for tweet in tweepy.Cursor(
+                cred.api.search,
+                q=query,
+                lang='en',
+                count=100,
+                include_entities=True,
+                tweet_mode="extended").items():
+
+
+
+
+            #Create variables from JSON data
+            #User table variables
+            user_id = tweet.user.id_str
+            user_scrname = tweet.user.screen_name
+            user_name = tweet.user.name
+            user_location = tweet.user.location
+            user_created = tweet.user.created_at
+            user_followers = tweet.user.followers_count
+            user_friends = tweet.user.friends_count
+            user_statuses = tweet.user.statuses_count
+
+
+            #Post table variables: always in place
+            post_id = tweet.id_str
+            text = tweet.full_text
+            created_at = tweet.created_at                #NOTE: UTC time
+
+            #Post table variables: Nullable
+            reply_to_user_id = tweet.in_reply_to_user_id_str
+            reply_to_scrname = tweet.in_reply_to_screen_name
+            reply_to_status_id = tweet.in_reply_to_status_id_str
+            retweet_count = tweet.retweet_count
+
+
+            favorite_count = tweet.favorite_count
+
+            #Retweet status variables: from "retweeted status: Tweet object
+            #TAGS/URLS included here, because may only be included in retweeted status entities
+
+            tag_list = []
+            url_list = []
+
+
+
+            try:
+                if tweet.retweeted_status:
+                    is_retweet = True
+                    original_tweet_id = tweet.retweeted_status.id_str
+                    original_tweet_retweets = tweet.retweeted_status.retweet_count
+                    original_text = tweet.retweeted_status.full_text
+
+                    original_tweet_created_at = tweet.retweeted_status.created_at
+                    original_tweet_likes = tweet.retweeted_status.favorite_count
+                    original_author_id = tweet.retweeted_status.user.id_str
+                    original_author_scrname = tweet.retweeted_status.user.screen_name
+
+
+                    for dict in tweet.retweeted_status.entities['hashtags']:        #Get full list of hashtags in retweeted entities
+                        tag_list.append(dict['text'].lower())
+                    for dict in tweet.retweeted_status.entities['urls']:        #Get full list of urls in retweeted entities
+                        url_list.append(dict['expanded_url'])
+            except AttributeError as ae:
+                print("Error raised: {0}".format(ae))
+                is_retweet = False
+                original_tweet_id = None
+                original_tweet_retweets = None
+                original_text = None
+                original_tweet_created_at = None
+                original_tweet_likes = None
+                original_author_id = None
+                original_author_scrname = None
+
+                for hashtag in tweet.entities["hashtags"]:                          #Get simple list of hashtags in top-level (non-RT) tweet
+                    tag_list.append(hashtag["text"].lower())
+                for link in tweet.entities["urls"]:                          #Get simple list of urls in top-level (non-RT) tweet
+                    url_list.append(link['expanded_url'])
+
+            #TextBlob analysis of tweet sentiment
+            analysis = TextBlob(tweet.full_text)
+            polarity = analysis.sentiment.polarity
+            print(polarity)
+
+            if polarity > 0:
+                polarity_val = 'positive'
+            elif polarity < 0:
+                polarity_val = 'negative'
+            else:
+                polarity_val = 'neutral'
+
+                #####todo: URLs, ######
+                ####todo: increment dynmic variables for retweets, replies*
+
+            #NOTE: Taeks to long, take out until online. cut from:"
+            # in pollchat_twitter:
+            #     write_database,
+            #     new_post
+            #     write_database
+            #
+            # in az_models
+            #     def_init
+
+            # try:
+            #     tweet_html = get_tweet(post_id)
+            # except:
+            #     pass
+
+            print(tweet.user.screen_name, "\n", tweet.id_str, "\n", tweet.full_text, "\n")
+            print(original_tweet_id)
+            print(original_tweet_retweets)
+            # print(tweet_html)
+            # print(polarity_val)
+
+
+            for tag in skip_list:
+                if tag in tag_list or original_author_scrname == tag:
+                    pass
+            else:
+
+                write_database(post_id, user_id, text, created_at, reply_to_user_id,
+                        reply_to_scrname, reply_to_status_id, retweet_count,
+                        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                        original_text, original_tweet_created_at, original_tweet_likes,
+                        original_author_id, original_author_scrname, polarity,
+                        polarity_val, tag_list, url_list, user_scrname, user_name,
+                        user_location, user_created, user_followers, user_friends,
+                        user_statuses, query)
+
+                count += 1
+
+                if count % 1000 == 0:
+                    session.commit()
+                    print("{} items added to database so far".format(count))
+
+    except tweepy.error.TweepError as err:
+        print("Error raised: {0}".format(err))
+        time.sleep(5 * 60)
+        print("I waited, I waited, and what's the point?")
+
+
+
+
+
+if __name__ == "__main__":
+
+    #open_database('sqlite:///compdists_test.db')
+    engine = create_engine('sqlite:///compdists_test2.db')   #FOR NOW: mysql+pymysql://pollchat:KotikaZu@localhost/pollchat_db2?charset=utf8mb4?
+
+    DBSession = sessionmaker()
+    DBSession.configure(bind=engine)
+    Base.metadata.create_all(engine)
+
+    session = DBSession()
+
+    #Open csv file of competitive districts, iterate through it, searching for each row/district
+    with open('app/comp_races_parsed_short.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            #Create search query with quotation marks, to limit to exact matches
+            if row[4] != "":
+                q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
+            else:
+                q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
+            print(q)
+            twitter_search(q)
+            session.commit()
+
+    session.close()
+    print(datetime.datetime.now())
