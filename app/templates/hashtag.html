@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block left_sidenav_content %}
+<li class="active"><a href="#top">Hashtag overview</a></li>
+<li><a href="#where">Where used?</a></li>
+<li><a href="#who">Who uses?</a></li>
+<li><a href="#retweets">Top retweets</a></li>
+
+{% endblock %}
+
+{% block app_content %}
+
+
+<div id="top" class="titlebox">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="py-5 text-center">
+                <h1 class="display-4">Hashtag: #{{ dynamic }}</h1>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <hr class="my-4">
+            <div class="py-5 text-left">
+                {% if top_districts[0] %}
+                <h4><p>Used most often in: <em>{{ top_districts[0][2] }}
+                    {{ top_districts[0][3] }}</em></p></h4>
+                {% endif %}
+                {% if top_districts[0] %}
+                <h4><p>Used most often by: <em>@{{ top_users[0][0]}}</em></h4></p>
+                {% endif %}
+            </div>
+            <div class="dropdown text-right">
+
+                <button class="btn btn-default btn-sm dropdown-toggle"
+                 type="button" id="changeTimeButton" data-toggle="dropdown"
+                 aria-haspopup="true" aria-expanded="true">
+
+                    {{ time_delta }}-day view
+
+                    <span class="caret"></span>
+                </button>
+                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="changeTimeButton">
+
+                            <li role="presentation"><a role="menuitem" tabindex="-1"
+                                href="{{ url }}?time_delta=1">Last 24 hours</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1"
+                                href="{{ url }}?time_delta=2">Last 48 hours</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1"
+                                href="{{ url }}?time_delta=7">Last 7 days</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1"
+                                href="{{ url }}?time_delta=28">Last 28 days</a></li>
+
+                    </ul>
+            </div>
+
+            <hr class="my-4">
+        </div>
+        <div class="col-sm-2"></div>
+    </div>
+</div>
+
+
+<div id="graphs">
+    <div class="row text-center">
+        <div class="col-sm-12">
+            <div id="piechart1" class="chart"></div>
+        </div>
+    </div>
+</div>
+<br>
+
+<div id="where"></div>
+<div>
+    <div class="table=responsive">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Where is this hashtag used most often?</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>District</th>
+                            <th>Appearances</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_districts[0:20] %}
+                        <tr>
+                            <td><a href={{ url_for('district', dynamic=item[0],
+                                time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h2 id="who">Who uses this hashtag most often?</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Screenname</th>
+                            <th>Appearances</th>
+                            <th><a tabindex="0" data-toggle="popover" data-trigger="focus"
+                                data-placement="top" data-content="According to the IUNI/CetS
+                                Botometer Project, &quot;the probability, according
+                                to our models, that this account is completely automated, i.e.,
+                                a bot.&quot; For details, see &quot;How to use this site&quot;
+                                (link above).">Botometer score</a> (%)</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_users[0:20] %}
+                        <tr>
+                            <td><a href={{ url_for('screen_name', dynamic=item[0],
+                                 time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                            <td>{{ item[2] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include '_tweet_table.html' %}
+
+<!-- {#
+<div>
+    <div class="table=responsive">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="retweets">Most retweeted Tweets</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Ranking</th>
+                            <th>Original poster (OP)</th>
+                            <th>Number of retweets</th>
+                            <th>Tweet text</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in most_retweeted_tweets[0:5] %}
+
+                            <tr>
+                                <td>
+                                    {{ loop.index }}
+                                    <div id="{{ item[0] }}">
+
+                                    </div>
+
+                                </td>
+                                <td><a href={{ url_for('screen_name', dynamic=item[0],
+                                     time_delta=time_delta) }}>{{ item[1] }}</a></td>
+                                <td>{{ item[2] }}</td>
+                                <td>
+                                    <blockquote class="twitter-tweet">
+                                        {{ item[3] }}
+TO BE FIXED IN POSTGRES}                 {% if item[4] %}
+
+                                        <a href="https://twitter.com/{{ item[1] }}/status/{{ item[5] }}">
+                                             {{ moment(get_tweet_datetime(item[4])).format('LL') }}
+                                        </a></blockquote>
+                                        {% endif %}
+
+                                </td>
+
+
+
+
+
+                            </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+#} -->
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawPieChart1);
+
+      function drawPieChart1() {
+
+        var data = google.visualization.arrayToDataTable(
+            {{ valences_datatable|tojson }}
+        );
+
+        var options = {
+          title: 'Do Tweets using this hashtag most often use a positive, negative, or neutral tone?'
+        };
+
+        var chart1 = new google.visualization.PieChart(document.getElementById('piechart1'));
+
+        chart1.draw(data, options);
+      }
+
+      $(window).resize(function(){
+          drawPieChart1()();
+      });
+
+    </script>
+
+
+{% endblock %}

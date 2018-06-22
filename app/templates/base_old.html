@@ -1,0 +1,153 @@
+{% extends 'bootstrap/base.html' %}
+{% block body_attribs %}
+
+data-spy="scroll" data-target="#myScrollspy" data-offset="80"
+
+
+{% endblock %}
+
+{% block title %}
+    {% if title %} {{ title }} {% else %}Welcome to PollChatter{% endif %}
+{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+{% endblock %}
+
+
+{% block metas %}
+    {{ super() }}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+
+
+
+{% block navbar %}
+
+
+
+
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pc-navbar-collapse1" aria-expanded="false">
+
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('index') }}">PollChatter</a>
+
+            </div>
+
+            <div class="collapse navbar-collapse" id="pc-navbar-collapse1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('about') }}">About</a></li>
+                    <li><a hef="">How to use this site</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+{% endblock %}
+
+{% block content %}
+    <div id="main" class="container-fluid text-center">
+
+        <div class="row content">
+
+
+            <nav class="col-sm-2 text-left" id="myScrollspy">
+                 <ul class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="100">
+
+
+
+
+
+                    {% block left_sidenav_content %}{% endblock %}
+
+                </ul>
+            </nav>
+
+
+
+
+
+
+            <div id="main-wrapper" class="col-sm-8 text-left">
+                <div id="main" class="clearfix main-content">
+
+{#
+                <!-- {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %} -->
+#}
+
+                    {% block app_content %}{% endblock %}
+                </div>
+
+            </div>
+
+
+
+
+            <div class="col-sm-2 sidenav"></div>
+
+        </div>
+
+
+
+
+    </div>
+
+
+
+    {% block footer %}
+    <footer class="container-fluid text-center">
+        <p>PollChatter is a Mayfly Research project</p>
+    </footer>
+    {% endblock %}
+
+{# End content block #}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        var acc = document.getElementsByClassName("accordion_sidenav");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
+
+{% endblock %}

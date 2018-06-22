@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block left_sidenav_content %}
+<li class="active"><a href="#top">Overview</a></li>
+<li><a href="#hashtags">Hashtags used</a></li>
+<li><a href="#districts">Districts referenced</a></li>
+<li><a href="#retweets_who">Retweets who</a></li>
+<li><a href="#who_retweeted">Retweeted by</a></li>
+
+
+{% endblock %}
+
+{% block app_content %}
+
+<div class="titlebox" id="top">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="py-5 text-center">
+                <h1 class="display-4">Twitter screen name: @{{ dynamic }}</h1>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <hr class="my-4">
+            <div class="py-5 text-left">
+                <h4><p><a tabindex="0" data-toggle="popover" data-trigger="focus"
+                    data-placement="top" data-content="According to the IUNI/CetS
+                    Botometer Project, &quot;the probability, according
+                    to our models, that this account is completely automated, i.e.,
+                    a bot.&quot; For details, see &quot;How to use this site&quot;
+                    (link above).">Botometer score</a>:
+                    <em>{{ user_obj.user_cap_perc }}%</em></p></h4>
+                <h4><p>Total Tweets (lifetime): <em>{{ user_obj.user_statuses }}</em></p></h4>
+                <h4><p>Number of followers): <em>{{ user_obj.user_followers }}</em></h4></p>
+                {% if retweeted_users_total %}
+                <h4><p>Most often retweets: <em>@{{ retweeted_users_total[0][0] }}</em></h4></p>
+                {% endif %}
+                <h4><p>User created: <em>{{ moment(user_created_date, 'YYYY-MM-DD hh:mm:ss').fromNow() }}</em></h4></p>
+
+            </div>
+            <div class="py-5 text-right">
+                <div class="dropdown text-right">
+
+                    <button class="btn btn-default btn-sm dropdown-toggle"
+                     type="button" id="changeTimeButton" data-toggle="dropdown"
+                     aria-haspopup="true" aria-expanded="true">
+
+                        {{ time_delta }}-day view
+
+                        <span class="caret"></span>
+                    </button>
+                        <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="changeTimeButton">
+
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url }}?time_delta=1">Last 24 hours</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url }}?time_delta=2">Last 48 hours</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url }}?time_delta=7">Last 7 days</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url }}?time_delta=28">Last 28 days</a></li>
+
+                        </ul>
+                </div>
+            </div>
+
+            <hr class="my-4">
+        </div>
+        <div class="col-sm-2"></div>
+    </div>
+</div>
+
+<div id="graphs">
+    <div class="row text-center">
+        <div class="col-sm-12">
+            <div id="chart1" class="chart"></div>
+        </div>
+    </div>
+</div>
+<br>
+
+<div id="hashtags"></div>
+<div>
+    <div class="table=responsive">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Most frequently used hashtags</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Hashtag</th>
+                            <th>Appearances</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_hashtags[0:20] %}
+                        <tr>
+                            <td><a href={{ url_for('hashtag', dynamic=item[0], time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h2 id="districts">Most frequently referenced districts</h2>
+                <table class="table table-striped">
+                    <thead>
+                            <th>District</th>
+                            <th>Appearances</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_districts[0:20] %}
+                        <tr>
+                            <td><a href={{ url_for('district', dynamic=item[0], time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="retweets_who"></div>
+    <div class="table=responsive">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Most frequently retweeted users</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Screen name</th>
+                            <th>Retweets</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in retweeted_users_period[0:10] %}
+                        <tr>
+                            <td><a href={{ url_for('screen_name', dynamic=item[0], time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-striped">
+                    <h2 id="who_retweeted">Retweeted most frequently by</h2>
+                    <thead>
+                        <tr>
+                            <th>Screen name</th>
+                            <th>Retweets</th>
+                        <tr>
+                    </thead>
+                    <tbody>
+                        {% for item in who_retweets[0:10] %}
+                        <tr>
+                            <td><a href={{ url_for('screen_name', dynamic=item[0], time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include '_tweet_table.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        google.charts.load('current', {'packages':['line', 'corechart']});
+          google.charts.setOnLoadCallback(drawChart1);
+
+        function drawChart1() {
+
+          var button = document.getElementById('change-chart');
+          var chartDiv = document.getElementById('chart1');
+
+          var data = new google.visualization.DataTable();
+          data.addColumn('string', 'Week of');
+          data.addColumn('number', "Original posts");
+          data.addColumn('number', "Retweets");
+
+          data.addRows(
+              {{ scrname_chart|tojson }}
+          );
+
+          var materialOptions = {
+            chart: {
+              title: 'Number of original posts and retweets relating to competitive districts'
+            },
+
+
+            series: {
+              // Gives each series an axis name that matches the Y-axis below.
+              0: {axis: 'Posts'},
+              1: {axis: 'Retweets'}
+            },
+            axes: {
+              // Adds labels to each axis; they don't have to match the axis names.
+              y: {
+                Temps: {label: 'No. original posts'},
+                Daylight: {label: 'No. retweets'}
+              }
+            }
+          };
+
+          var classicOptions = {
+            title: 'Number of original posts and retweets relating to competitive districts',
+
+            // Gives each series an axis that matches the vAxes number below.
+            series: {
+              0: {targetAxisIndex: 0},
+              1: {targetAxisIndex: 1}
+            },
+            vAxes: {
+              // Adds titles to each axis.
+              0: {title: 'Number of original posts'},
+              1: {title: 'Number of retweets'}
+            },
+            hAxis: {
+              ticks: {{ hticks|tojson }}
+            },
+            vAxis: {
+              viewWindowMode: 'pretty'
+            }
+          };
+
+          function drawMaterialChart() {
+            var materialChart = new google.charts.Line(chartDiv);
+            materialChart.draw(data, materialOptions);
+
+          }
+
+          function drawClassicChart() {
+            var classicChart = new google.visualization.LineChart(chartDiv);
+            classicChart.draw(data, classicOptions);
+
+          }
+
+          drawClassicChart();
+        }
+
+        $(window).resize(function(){
+            drawChart1();
+        });
+
+    </script>
+
+{% endblock %}

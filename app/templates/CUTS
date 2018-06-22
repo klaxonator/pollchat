@@ -1,0 +1,247 @@
+<!-- <div class="dropdown">
+    <button class="btn btn-light dropdown-toggle" type="button" id="congdistDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Choose a district
+    </button>
+    <div class="dropdown-menu" aria-labelledby="congdistDropdownButton">
+        <a class="dropdown-item" href="#">Arizona 09</a>
+        <a class="dropdown-item" href="#">Connecticut 09</a>
+        <a class="dropdown-item" href="#">Indiana 09</a>
+        <a class="dropdown-item" href="#">West Virginia 09e</a>
+    </div>
+</div> -->
+
+<!-- <form name="district_form" action="{{ url_for('district') }}" method="post">
+    <div class="form-group">
+        <label for="congdistDropdownMenu">Choose a congressional district race</label>
+        <select multiple class="form-control" id="congdistDropdownMenu">
+            <option>Arizona 09</option>
+            <option>Connecticut 05</option>
+            <option>Another one</option>
+            <option>Another one</option>
+            <option>Another one</option>
+        </select>
+        <input type="submit">
+    </div>
+</form> -->
+
+
+
+    <form name="h_search" action="{{ url_for('hashtag_search') }}" method="post">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputHashtag">Hashtag</label>
+                <input type="text" class="form-control" id="inputHashtag" placeholder="Hashtag">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="chooseTimePeriod">Time period</label>
+                <select id="chooseTimePeriod" class="form-control">
+                    <option selected>Last 24 hours</option>
+                    <option selected>Last 48 hours</option>
+                    <option selected>Last week</option>
+                    <option selected>Last 4 weeks</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- {{ h_form.hashtag_search.label }}<br>
+    {{ h_form.hashtag_search(size=32) }}<br>
+    {% for error in h_form.hashtag_search.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %} -->
+
+
+
+
+    NEW:
+
+    <div class="container">
+        <div class="table=responsive">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Where is this hashtag used most often?</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Number of appearances</th>
+                            <tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_districts[0:20] %}
+                            <tr>
+                                <td><a href={{ url_for('district', district_name=item[0]) }}>{{ item[0] }}</a></td>
+                                <td>{{ item[1] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2>Where is this hashtag used most often?</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Number of appearances</th>
+                            <tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_districts[0:20] %}
+                            <tr>
+                                <td><a href={{ url_for('district', district_name=item[0]) }}>{{ item[0] }}</a></td>
+                                <td>{{ item[1] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+CALL TWITTER CODE
+
+<div id="tweet{{ loop.index }}" tweetID="{{ item[0] }}"></div>
+<script sync src="https://platform.twitter.com/widgets.js"></script>
+
+<script>
+
+  window.onload = (function(){
+
+    var tweet = document.getElementById("tweet{{ loop.index }}");
+    var id = tweet.getAttribute("tweetID");
+
+    twttr.widgets.createTweet(
+      id, tweet,
+      {
+        conversation : 'none',    // or all
+        cards        : 'hidden',  // or visible
+        linkColor    : '#cc0000', // default is blue
+        theme        : 'light'    // or dark
+      })
+    .then (function (el) {
+      el.contentDocument.querySelector(".footer").style.display = "none";
+    });
+
+  });
+
+</script>
+
+
+CHANGETIME FORM:
+{#
+    <div>
+        <form class="form" name="t_form" action="{{ url_for('change_time') }}" method="post" role="form">
+            <div class="form-group">
+
+
+                {{ t_form.csrf_token }}
+
+
+                {{ wtf.form_field(t_form.scope_field, value=dynamic) }}
+                {{ wtf.form_field(t_form.url_field, value=url) }}
+
+                {{ wtf.form_errors(t_form, hiddens=True) }}
+
+            </div>
+            <div class="form-group">
+                {{ wtf.form_field(t_form.change_time_delta) }}
+            </div>
+            <div class="form-group">
+
+            </div>
+            <div class="form-group">
+                {{ wtf.form_field(t_form.submit_change_time) }}
+            </div>
+        </form>
+    </div>
+#}
+
+TWITTER CODE:
+<script>
+
+
+    $(function() {
+        var timer = null;
+        var xhr = null;
+        $('.tweet_popup').hover(
+            function(event) {
+                // mouse in event handler
+                var elem = $(event.currentTarget);
+                timer = setTimeout(function() {
+                    timer = null;
+                    xhr = $.ajax(
+                        '/tweet/'+ elem.first().text().trim() + '/tweet_popup').done(
+                            function(data) {
+                                xhr = null;
+                                elem.popover({
+                                    trigger: 'manual',
+                                    html: true,
+                                    animation: false,
+                                    container: elem,
+                                    content: data
+                                }).popover('show');
+                            }
+                        );
+                }, 1000);
+            },
+            function(event) {
+                // mouse out event handler
+                var elem = $(event.currentTarget);
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                else if (xhr) {
+                    xhr.abort();
+                    xhr = null;
+                }
+                else {
+                    elem.popover('destroy');
+                }
+            }
+        );
+    });
+</script>
+{#
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+            html : true,
+            content: function() {
+                var content = $(this).attr("data-popover-content");
+                setTimeout(function(){ console.log('execute'); },500);
+                return $(content).children(".popover-body").html();
+            },
+            title: function() {
+                var title = $(this).attr("data-popover-content");
+                return $(title).children(".popover-heading").html();
+            }
+    });
+</script>
+#}
+
+<script>window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));</script>
+
+<script id="twitter-wjs" type="text/javascript" async defer src="//platform.twitter.com/widgets.js"></script>
+
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>

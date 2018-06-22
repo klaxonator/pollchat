@@ -1,0 +1,252 @@
+
+body { padding-top: 70px;
+    padding-bottom: 50px;
+    position: relative;
+  }
+
+/* FROM NAVBAR
+body {
+    margin: 0px;
+    padding: 0px;
+  }
+
+*/
+
+footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+      bottom:0;
+      width:100%;
+}
+
+.content-wrap {
+    margin-bottom: -50px;
+}
+
+.content-wrap:after {
+    content: " ";
+    display: block;
+}
+
+footer, .content-wrap:after {
+    height: 50px;
+}
+
+
+
+
+
+
+div.left-table::before {
+    display: block;
+    content: " ";
+    margin-top: -40px;
+    height: 40px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+.content {
+    overflow:hidden;
+}
+
+a:link {
+    color: #1B6186;
+    text-decoration: none;
+  }
+
+
+a:visited {
+      color: #1B6186;
+      text-decoration: none;
+  }
+
+a:hover {
+      text-decoration: underline;
+  }
+
+a:active {
+      text-decoration: underline;
+  }
+
+
+ li:active {
+      color: #1B6186;
+  }
+
+  /* Adjust for 70px header on in-page targets */
+:target:before {
+        content:"";
+        display:block;
+        height:70px; /* fixed header height*/
+        margin:-70px 0 0; /* negative fixed header height */
+        visibility: hidden; /* keep from blocking links above */
+        pointer-events: none;
+   }
+
+.chart {
+       width: 100%;
+       min-height: 500px;
+   }
+
+.row {
+       margin:0 !important;
+   }
+
+/* Remove the navbar's default margin-bottom and rounded borders */
+.navbar {
+   margin-bottom: 0;
+   border-radius: 0;
+   z-index: 9999;
+}
+
+#main-wrapper {
+    display: block;
+}
+
+/* @media screen and (max-width: 992px) {
+  #main  {
+      margin-left: 170px;
+  }
+} */
+.row.content {
+    height:auto;
+}
+
+
+
+
+
+/* SIDE NAVBAR CSS HERE */
+
+.nav-side-menu {
+  overflow: auto;
+  font-size: 12px;
+  font-weight: 200;
+  background-color: #FFFFFF;
+  position: fixed;
+  top: 50px;
+  width: 180px;
+  height: auto;
+  color: #353737;
+}
+
+
+.nav-side-menu a:link a:visited {
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-side-menu .brand {
+  background-color: #FFFFFF;
+  line-height: 50px;
+  display: block;
+  text-align: center;
+  font-size: 14px;
+}
+.nav-side-menu .toggle-btn {
+  display: none;
+}
+
+.navbar-collapse-in {
+    z-index:100;
+}
+
+@media (min-width: 767px) {
+  .nav-side-menu .menu-list .menu-content {
+    display: block;
+  }
+#shell {
+  	width:calc(100% - 180px);
+  	float: right;
+  }
+}
+
+@media (max-width: 767px) {
+    .nav-side-menu {
+        /* position: relative; */
+        width: 100%;
+        margin-bottom: 10px;
+        background-color: #FFFFFF;
+    }
+    .nav-side-menu .toggle-btn {
+        display: block;
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index: 10 !important;
+        padding: 3px;
+        color: #000;
+        width: 40px;
+        text-align: center;
+    }
+    .brand {
+        text-align: left !important;
+        font-size: 22px;
+        padding-left: 20px;
+        line-height: 50px !important;
+        background-color: #FFFFFF;
+    }
+      .content-wrap {
+        margin-top: -20px;
+    }
+    #shell {
+        padding-top: 50px;
+        }
+    .affix {
+        top: 50px;
+        width: 100%;
+        z-index: 9998 !important;
+    }
+    .chart {
+           width: 100%;
+           min-height: 400px;
+    }
+
+}
+
+@media (max-width: 576px) {
+    .chart {
+           width: 100%;
+           min-height: 350px;
+    }
+
+}
+
+/* Set Tweet repost style */
+blockquote.twitter-tweet {
+    display: inline-block;
+    font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 16px;
+    border-color: #eee #ddd #bbb;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    margin: 10px 5px;
+    padding: 0 16px 16px 16px;
+    max-width: 468px;
+}
+
+blockquote.twitter-tweet p {
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 20px;
+}
+
+blockquote.twitter-tweet a {
+    color: inherit;
+    font-weight: normal;
+    text-decoration: none;
+    outline: 0 none;
+}
+
+blockquote.twitter-tweet a:hover,
+blockquote.twitter-tweet a:focus {
+    text-decoration: underline;
+}
