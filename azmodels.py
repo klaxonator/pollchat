@@ -8,19 +8,23 @@ Base = declarative_base()
 postdist_assoc = Table('postdist_assoc', Base.metadata,
         Column('post_id', String, ForeignKey('Post.post_id')),
         Column('district_name', String, ForeignKey('District.district_name')),
-        Index('postdist_assoc_idx', 'district_name', 'post_id')
+        Index('postdist_postdist_idx', 'post_id', 'district_name'),
+        Index('postdist_distpost_idx', 'district_name', 'post_id')
         )
 
 
 posthash_assoc = Table('posthash_assoc', Base.metadata,
             Column('post_id', String, ForeignKey('Post.post_id')),
             Column('hashtag', String, ForeignKey('Hashtag.hashtag')),
-            Index('posthash_assoc_idx', 'hashtag', 'post_id')
+            Index('posthash_posthash_idx', 'post_id', 'hashtag'),
+            Index('posthash_posthash_idx', 'hashtag', 'post_id')
             )
 
 posturl_assoc = Table('posturl_assoc', Base.metadata,
             Column('post_id', String, ForeignKey('Post.post_id')),
-            Column('url', String, ForeignKey('Url.url'))
+            Column('url_id', String, ForeignKey('Url.url_id')),
+            Index('posturl_posturl_idx', 'post_id', 'url_id'),
+            Index('posthash_posturl_idx', 'url_id', 'post_id')
             )
 
 
