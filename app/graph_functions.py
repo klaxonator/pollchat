@@ -159,14 +159,14 @@ def get_all_hashrows():
             filter(Post.created_at > beg_date[0]).filter(Post.created_at <= end_date).first()
 
             new_row.append(date_hash_num[0])
-            # print('Finished with hashtag: {}'.format(this_hashtag))
+            print('Finished with hashtag: {}'.format(this_hashtag))
 
         #Add new row to rows, reset new_row, move end-time back a day
         rows.append(new_row)
         new_row = []
         end_date = beg_date[0]
         shrt_end_date = beg_date[1]
-        # print('Finished with day -{}'.format(x))
+        print('Finished with day -{}'.format(x))
 
 
 
@@ -219,7 +219,7 @@ def get_hash_rows(this_district):
         new_row = []
         end_date = beg_date[0]
         shrt_end_date = beg_date[1]
-        # print('Finished with day -{}'.format(x))
+        print('Finished with day -{}'.format(x))
 
 
 
@@ -422,7 +422,7 @@ def botweather_chart():
         new_row = []
         end_date = beg_date[0]
         shrt_end_date = beg_date[1]
-        # print('Finished with day -{}'.format(x))
+        print('Finished with day -{}'.format(x))
 
 
 
@@ -481,7 +481,7 @@ def scrname_chart(screen_name):
         new_row = []
         end_date = beg_date[0]
         shrt_end_date = beg_date[1]
-        # print('Finished with day -{}'.format(x))
+        print('Finished with day -{}'.format(x))
 
 
 
