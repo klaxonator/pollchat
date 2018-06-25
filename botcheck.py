@@ -5,7 +5,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 import sqlalchemy
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///compdists_test2.db')
+engine = create_engine(os.environ.get('DATABASE_URL'))
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
