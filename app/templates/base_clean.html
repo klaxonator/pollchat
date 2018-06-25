@@ -64,7 +64,9 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
 
 <div class="clearfix content-wrap">
 
-
+{#
+{% if url in ["/district/<dynamic>", "/hashtag/<dynamic>", "/overview/<dynamic>",
+     "/botspy/<dynamic>"] %}
     <nav class="nav-side-menu" data-spy="affix" data-offset-top="0">
         <div class="clearfix brand"><span class="navbar-brand">Page content</span></div>
         <i class="fa fa-chevron-circle-down fa-2x toggle-btn" data-toggle="collapse"
@@ -76,7 +78,8 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
             </ul>
         </div>
     </nav>
-
+{% endif %}
+#}
 
     <div id="shell" class="container-fluid text-center">
 
