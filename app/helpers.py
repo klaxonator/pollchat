@@ -271,5 +271,7 @@ skip_list = [
     "carcamera",
     "dashcrash",
     "hshq",
-    "HSHQ"
+    "HSHQ",
+    "thewarrior",
+    "TheWarrior"
     ]
