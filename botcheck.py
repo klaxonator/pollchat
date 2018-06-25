@@ -1,4 +1,4 @@
-from tweepy_cred import *
+from app.tweepy_cred import *
 import botometer
 import time
 from decimal import Decimal, ROUND_HALF_UP
