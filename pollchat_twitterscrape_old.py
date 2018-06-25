@@ -290,8 +290,8 @@ def twitter_search(query):
 
 if __name__ == "__main__":
 
-    #open_database('sqlite:///compdists_test.db')sqlite:///compdists_test2.db
-    engine = create_engine('mysql+pymysql://pollchat:KotikaZu@localhost/pollchat_db3?charset=utf8mb4?')   #FOR NOW:
+    
+    engine = create_engine(os.environ.get('DATABASE_URL'))   #FOR NOW:
 
     DBSession = sessionmaker()
     DBSession.configure(bind=engine)
