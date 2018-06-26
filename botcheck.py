@@ -61,7 +61,7 @@ for item in users[11500:13700]:
                 session.commit()
         except tweepy.error.TweepError as err:
             print("Error raised: {0}".format(err))
-            # time.sleep(2 * 60)
+            time.sleep(4 * 60)
         except botometer.NoTimelineError as err:
             print("Error raised: {0}".format(err))
     else:
