@@ -19,9 +19,8 @@ from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=engine)
 session = Session()
 
-users = session.query(User).\
-join(Post.user).\
-group_by(User.user_scrname).order_by(func.count(User.user_scrname).desc()).all()
+#GET ALL USER OBJECTS
+users = session.query(User).all()
 
 bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **twitter_app_auth)
 
