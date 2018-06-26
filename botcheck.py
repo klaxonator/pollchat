@@ -1,3 +1,4 @@
+import os
 from app.tweepy_cred import *
 import botometer
 import time
