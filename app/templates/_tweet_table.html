@@ -1,56 +1,54 @@
-<div>
-    <div class="table=responsive">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 id="retweets">Most retweeted Tweets</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Ranking</th>
-                            <th>Original poster (OP)</th>
-                            <th>Number of retweets</th>
-                            <th>Tweet</th>
-                            <th><a tabindex="0" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" data-content="According to the IUNI/CetS
-                                Botometer Project, &quot;the probability, according
-                                to our models, that this account is completely automated, i.e.,
-                                a bot.&quot; For details, see &quot;How to use this site&quot;
-                                (link above).">Botometer score</a> (%)
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if most_retweeted_tweet_list[0] %}
-                            {% for item in most_retweeted_tweet_list %}
-                                <tr>
-                                    <td>
-                                        {{ loop.index }}
-                                    </td>
-                                    <td>
-                                        {{ item[1] }}
-                                    </td>
-                                    <td>{{ item[2] }}</td>
-                                    <td>
-                                        {{ item[3]|safe}}
-
-                                    </td>
-                                    <td>
-                                        {{ item[4] }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
+<div class="table-responsive">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 id="retweets">Most retweeted Tweets</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ranking</th>
+                        <th class="hidden-xs">Original poster (OP)</th>
+                        <th class="hidden-xs">Number of retweets</th>
+                        <th>Tweet</th>
+                        <th class="hidden-xs"><a tabindex="0" data-toggle="popover" data-trigger="focus"
+                            data-placement="top" data-content="According to the IUNI/CetS
+                            Botometer Project, &quot;the probability, according
+                            to our models, that this account is completely automated, i.e.,
+                            a bot.&quot; For details, see &quot;How to use this site&quot;
+                            (link above).">Botometer score</a> (%)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if most_retweeted_tweet_list[0] %}
+                        {% for item in most_retweeted_tweet_list %}
                             <tr>
                                 <td>
-                                    No retweeted Tweets in database
+                                    {{ loop.index }}
+                                </td>
+                                <td class="hidden-xs">
+                                    {{ item[1] }}
+                                </td>
+                                <td class="hidden-xs">{{ item[2] }}</td>
+                                <td>
+                                    {{ item[3]|safe}}
+
+                                </td>
+                                <td class="hidden-xs">
+                                    {{ item[4] }}
                                 </td>
                             </tr>
-                        {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td>
+                                No retweeted Tweets in database
+                            </td>
+                        </tr>
+                    {% endif %}
 
 
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

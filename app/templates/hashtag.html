@@ -29,9 +29,9 @@
                 {% if top_districts[0] %}
                 <h4><p>Used most often in: <em>{{ top_districts[0][2] }}
                     {{ top_districts[0][3] }}</em></p></h4>
-                {% endif %}
-                {% if top_districts[0] %}
                 <h4><p>Used most often by: <em>@{{ top_users[0][0]}}</em></h4></p>
+                {% else %}
+                <h4><p>No appearances in this time period.</p></h4>
                 {% endif %}
             </div>
             <div class="dropdown text-right">
@@ -64,73 +64,73 @@
     </div>
 </div>
 
-
-<div id="graphs">
-    <div class="row text-center">
-        <div class="col-sm-12">
-            <div id="piechart1" class="chart"></div>
-        </div>
-    </div>
-</div>
-<br>
-
-<div id="where"></div>
-<div>
-    <div class="table=responsive">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Where is this hashtag used most often?</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>District</th>
-                            <th>Appearances</th>
-                        <tr>
-                    </thead>
-                    <tbody>
-                        {% for item in top_districts[0:20] %}
-                        <tr>
-                            <td><a href={{ url_for('district', dynamic=item[0],
-                                time_delta=time_delta) }}>{{ item[0] }}</a></td>
-                            <td>{{ item[1] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <h2 id="who">Who uses this hashtag most often?</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Screenname</th>
-                            <th>Appearances</th>
-                            <th><a tabindex="0" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" data-content="According to the IUNI/CetS
-                                Botometer Project, &quot;the probability, according
-                                to our models, that this account is completely automated, i.e.,
-                                a bot.&quot; For details, see &quot;How to use this site&quot;
-                                (link above).">Botometer score</a> (%)</th>
-                        <tr>
-                    </thead>
-                    <tbody>
-                        {% for item in top_users[0:20] %}
-                        <tr>
-                            <td><a href={{ url_for('screen_name', dynamic=item[0],
-                                 time_delta=time_delta) }}>{{ item[0] }}</a></td>
-                            <td>{{ item[1] }}</td>
-                            <td>{{ item[2] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+{% if top_districts[0] %}
+    <div id="graphs">
+        <div class="row text-center">
+            <div class="col-sm-12">
+                <div id="piechart1" class="chart"></div>
             </div>
         </div>
     </div>
-</div>
+    <br>
 
-{% include '_tweet_table.html' %}
+    <div id="where"></div>
+    <div>
+        <div class="table=responsive">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Where is this hashtag used most often?</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Appearances</th>
+                            <tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_districts[0:20] %}
+                            <tr>
+                                <td><a href={{ url_for('district', dynamic=item[0],
+                                    time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                                <td>{{ item[1] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2 id="who">Who uses this hashtag most often?</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Screenname</th>
+                                <th>Appearances</th>
+                                <th><a tabindex="0" data-toggle="popover" data-trigger="focus"
+                                    data-placement="top" data-content="According to the IUNI/CetS
+                                    Botometer Project, &quot;the probability, according
+                                    to our models, that this account is completely automated, i.e.,
+                                    a bot.&quot; For details, see &quot;How to use this site&quot;
+                                    (link above).">Botometer score</a> (%)</th>
+                            <tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_users[0:20] %}
+                            <tr>
+                                <td><a href={{ url_for('screen_name', dynamic=item[0],
+                                     time_delta=time_delta) }}>{{ item[0] }}</a></td>
+                                <td>{{ item[1] }}</td>
+                                <td>{{ item[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    {% include '_tweet_table.html' %}
+{% endif %}
 <!-- {#
 <div>
     <div class="table=responsive">

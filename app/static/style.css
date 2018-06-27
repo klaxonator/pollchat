@@ -1,7 +1,21 @@
 
-body { padding-top: 70px;
-    padding-bottom: 50px;
+html,
+.content-wrap {
+    margin: 0;
+    padding: 0px;
+    height: 100%;
+    /*padding-bottom: 50px; */
+
+  }
+
+#full-container {
+    min-height: 100%;
     position: relative;
+}
+
+.content-wrap {
+      padding: 10px;
+      padding-bottom: 50px;
   }
 
 /* FROM NAVBAR
@@ -13,16 +27,16 @@ body {
 */
 
 footer {
-      background-color: #555;
-      color: white;
-      padding: 15px;
-      bottom:0;
-      width:100%;
+    position: absolute;
+    background-color: #555;
+    color: white;
+    padding: 15px;
+    bottom:0;
+    width:100%;
+    height: 50px;
 }
 
-.content-wrap {
-    margin-bottom: -50px;
-}
+
 
 .content-wrap:after {
     content: " ";
@@ -99,11 +113,12 @@ li:active {
 .navbar {
    margin-bottom: 0;
    border-radius: 0;
-   z-index: 9000;
+   z-index: 9999;
 }
 
 #main-wrapper {
     display: block;
+    overflow: auto;
 }
 
 /* @media screen and (max-width: 992px) {
@@ -151,7 +166,7 @@ li:active {
 }
 
 .navbar-collapse-in {
-    z-index:100;
+    z-index:9990;
 }
 
 @media (min-width: 767px) {
@@ -177,7 +192,7 @@ li:active {
         position: absolute;
         right: 10px;
         top: 10px;
-        z-index: 9999 !important;
+        z-index: 9990 !important;
         padding: 3px;
         color: #000;
         width: 40px;
@@ -190,7 +205,8 @@ li:active {
         line-height: 50px !important;
         background-color: #FFFFFF;
     }
-      .content-wrap {
+
+    .content-wrap {
         margin-top: -20px;
     }
     #shell {
@@ -199,7 +215,7 @@ li:active {
     .affix {
         top: 50px;
         width: 100%;
-        z-index: 9998 !important;
+        z-index: 9990 !important;
     }
     .chart {
            width: 100%;
