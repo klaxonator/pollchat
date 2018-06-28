@@ -152,7 +152,7 @@ def twitter_search(query):
                 lang='en',
                 count=100,
                 include_entities=True,
-                tweet_mode="extended").items(1):
+                tweet_mode="extended").items():
 
 
 
