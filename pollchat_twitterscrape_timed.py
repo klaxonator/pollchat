@@ -318,5 +318,5 @@ def run_twitterscrape():
     db.session.close()
     print(datetime.datetime.now())
     time = datetime.datetime.now()
-    with open('app/twitterscrape_log.txt', 'a') as f:
-        f.write('added {0} items to database, finished at {1}'.format(count, time))
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('added items to database, finished at {}'.format(time))

@@ -7,16 +7,16 @@ from time import sleep
 from apscheduler.schedulers.blocking import BlockingScheduler
 import pollchat_twitterscrape_timed as pt
 
-sched = BlockingScheduler()
+
 
 
 
 
 
 def main():
+    sched = BlockingScheduler()
 
-
-    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=22, minute=35)
+    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=22, minute=49)
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     try:
