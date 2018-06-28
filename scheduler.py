@@ -16,7 +16,7 @@ sched = BlockingScheduler()
 def main():
 
 
-    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=22, minute=30)
+    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=22, minute=35)
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     try:
