@@ -16,7 +16,7 @@ import pollchat_twitterscrape_timed as pt
 def main():
     sched = BlockingScheduler()
 
-    job = sched.add_job(pt.run_twitterscrape, 'interval', hours=24)
+    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=7, minute=5)
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
 
     try:
