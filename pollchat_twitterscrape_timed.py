@@ -319,4 +319,4 @@ def run_twitterscrape():
     print(datetime.datetime.now())
     time = datetime.datetime.now()
     with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('added items to database, finished at {}'.format(time))
+        f.write('added items to database, finished at {}\n\n'.format(time))
