@@ -290,6 +290,8 @@ def twitter_search(query):
 
 
 def run_twitterscrape():
+        with open('logs/twitterscrape_log.txt', 'a') as f:
+            f.write('started twitterscrape')
 
     # #instantiate db engine
     # engine = create_engine(os.environ.get('DATABASE_URL'))   #FOR NOW:
