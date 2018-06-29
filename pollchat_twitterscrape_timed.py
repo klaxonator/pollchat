@@ -303,7 +303,7 @@ def run_twitterscrape():
     # session = DBSession()
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
-    with open('app/comp_races_parsed_short.csv', 'r') as f:
+    with open('app/comp_races_parsed.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
