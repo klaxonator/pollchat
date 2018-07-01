@@ -28,74 +28,137 @@ def get_tweet(post_id, omit_script=True, hide_media=True):
             return _("Error: the call to Twitter's service failed.")
     return json.loads(r.content.decode('utf-8-sig'))['html']
 
+
+def check_district_relevance(db_tweet):
+
+    #Search district associations with post
+
+    referenced_districts = db.session.query(District.district_name).\
+    join(Post.districts).\
+    filter(Post.post_id == db_tweet[0]).all()
+
+    # Create list of districts associated with post - generally only one,
+    # but someitmes multiple mentions
+
+    district_list = []
+
+    for distref in referenced_districts:
+        district_list.append(distref[0])
+
+    # print(district_list)
+
+
+    # iterate through district_list, get dist_aliases from dictionary,
+
+
+
+
+
+
+    for named_district in district_list:
+        # print(distdict[named_district])
+
+        for district_alias in distdict_short[named_district]:
+
+    # check if any of district aliases are included in tweet text;
+            # if finds a match, return True
+
+            #NOTE: too many variations of search found by twitter in scr_name
+            # if district_alias in db_tweet[1].lower() or \
+            #   district_alias in db_tweet[4].lower():
+            #     return False
+
+            if district_alias in db_tweet[6]:
+                return True
+    #
+    #if no match found, return False
+
+    return False
+
+    # return True
+
 def get_tweet_list(db_search_object):
 
-    # produce list of [post_id, original screen name, retweet count, original_tweet_id,
-    # orig_tweet_html]
-    #
+    # produce list of (Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
+    # Post.tweet_html, Post.text)
+
 
     most_retweeted_tweets = db_search_object
-    original_tweets = []                 #list of tweets used to avoid repeats
-    most_retweeted_tweet_list = []
-    count = 0
+    original_tweets = []                #list of tweets used to avoid duplicates
+    most_retweeted_tweet_list = []      #list of retweets for site
+    count = 0                           #count to get total of 5
 
-    for item in most_retweeted_tweets:
-        #if the tweet id has been seen, skip
-        # print(original_tweets)
-        if item[3] in original_tweets or item[0] in original_tweets:
-            pass
+    for db_tweet in most_retweeted_tweets:
+
+        #if the tweet id has already been seen, skip
+
+        if db_tweet[3] in original_tweets or db_tweet[0] in original_tweets:
+            continue
+        original_tweets.append(db_tweet[0])
+        if db_tweet[3]:
+            original_tweets.append(db_tweet[3])
+
+        #Check if district name is in text
+        check = check_district_relevance(db_tweet)
+
+        if check == False:
+            # print("Skipping tweet_id {}".format(db_tweet[0]))
+            # print("Screenname was: {}".format(db_tweet[4]))
+            continue
+
+        #create actual tweet list
+
+
+        tweet = []
+        tweet.append(db_tweet[0])       #post_id: list [db_tweet0]
+
+        if db_tweet[1]:                     #if retweet
+            tweet.append(db_tweet[1])   #original_author_scrname : list db_tweet[1]
+
+        else:                           # or if original tweet
+            tweet.append(db_tweet[4])   #original poster
+
+        tweet.append(db_tweet[2])       #retweet count; list db_tweet[2]
+            #if loop: if tweet_html exists, don't go looking for it
+        if db_tweet[5]:
+            tweet.append(db_tweet[5])         #tweet_html: list db_tweet[5]
+
+            #if no tweet_html, then go to Twitter for the Tweet
         else:
-            tweet = []
-            original_tweets.append(item[0])
-            tweet.append(item[0])       #post_id: list [item0]
-            if item[1]:                     #if retweet
-                tweet.append(item[1])   #original_author_scrname : list item[1]
-
-            else:                           # or if original tweet
-                tweet.append(item[4])   #original poster
-
-            tweet.append(item[2])       #retweet count; list item[2]
-                #if loop: if tweet_html exists, don't go looking for it
-            if item[5]:
-                tweet.append(item[5])         #tweet_text: list item[3]
-                if item[3]:
-                    original_tweets.append(item[3])
-                #if no tweet_html, then go to Twitter for the Tweet
+            #if RT (if original_tweet_id exists)
+            if db_tweet[3]:
+                try:
+                    tweet_html = get_tweet(db_tweet[3]) #get html of original tweet
+                    tweet.append(tweet_html)   #tweet_text: list db_tweet[3]
+                except:
+                    tweet.append("Can't retrieve Tweet")
+            #if not RT (no original_tweet_id), use post ID
             else:
-                #if RT (if original_tweet_id exists)
-                if item[3]:
-                    original_tweets.append(item[3])
-                    try:
-                        tweet_text = get_tweet(item[3]) #get text of tweet
-                        tweet.append(tweet_text)   #tweet_text: list item[3]
-                    except:
-                        tweet.append("Can't retrieve Tweet")
-                #if not RT (no original_tweet_id), use post ID
-                else:
-                    try:
-                        tweet_text = get_tweet(item[0]) #get text of tweet
-                        tweet.append(tweet_text)   #tweet_text: list item[3]
-                    except:
-                        tweet.append("Can't retrieve Tweet")
+                try:
+                    tweet_html = get_tweet(db_tweet[0]) #get html of base tweet
+                    tweet.append(tweet_html)
+                except:
+                    tweet.append("Can't retrieve Tweet")
 
-            #Get botscore for original poster using tweet[1]: either
-            #original_author (if RT) or post author (if not RT)
-            botscore = db.session.query(User.user_cap_perc).\
-            filter(User.user_scrname==tweet[1]).first()
+        #Get botscore for original poster using tweet[1]: either
+        #original_author (if RT) or post author (if not RT)
+        botscore = db.session.query(User.user_cap_perc).\
+        filter(User.user_scrname==tweet[1]).first()
 
-            if botscore:
-                tweet.append(botscore[0])           #list item[4]
-            else:
-                tweet.append("Not yet in database")
-            if item[3]:
-                tweet.append("ORIGINAL_ID:{}".format(item[3]))
-            else:
-                tweet.append("ORIGINAL TWEET")
-            # print(tweet)
-            most_retweeted_tweet_list.append(tweet)
-            count += 1
-            if count == 5:
-                break
+        if botscore:
+            tweet.append(botscore[0])           #list db_tweet[4]
+        else:
+            tweet.append("Not yet in database")
+        if db_tweet[3]:
+            tweet.append("ORIGINAL_ID:{}".format(db_tweet[3]))
+        else:
+            tweet.append("ORIGINAL TWEET")
+        # print(tweet)
+        most_retweeted_tweet_list.append(tweet)
+        count += 1
+        if count == 5:
+            break
 
     return most_retweeted_tweet_list
 
@@ -275,3 +338,210 @@ skip_list = [
     "thewarrior",
     "TheWarrior"
     ]
+
+distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9'],
+             'ca07': ['ca07', 'ca-07', '#ca07', '#ca-07', '#ca7'],
+             'ct05': ['ct05', 'ct-05', '#ct05', '#ct-05', '#ct5'],
+             'fl07': ['fl07', 'fl-07', '#fl07', '#fl-07', '#fl7'],
+             'mn07': ['mn07', 'mn-07', '#mn07', '#mn-07', '#mn7'],
+             'nh02': ['nh02', 'nh-02', '#nh02', '#nh-02', '#nh2'],
+             'nj05': ['nj05', 'nj-05', '#nj05', '#nj-05', '#nj5'],
+             'nv04': ['nv04', 'nv-04', '#nv04', '#nv-04', '#nv4'],
+             'pa05': ['pa05', 'pa-05', '#pa05', '#pa-05', '#pa5'],
+             'pa06': ['pa06', 'pa-06', '#pa06', '#pa-06', '#pa6'],
+             'pa08': ['pa08', 'pa-08', '#pa08', '#pa-08', '#pa8'],
+             'wi03': ['wi03', 'wi-03', '#wi03', '#wi-03', '#wi3'],
+             'az01': ['az01', 'az-01', '#az01', '#az-01', '#az1'],
+             'az02': ['az02', 'az-02', '#az02', '#az-02', '#az2'],
+             'ca39': ['ca39', 'ca-39', '#ca39', '#ca-39'],
+             'ca49': ['ca49', 'ca-49', '#ca49', '#ca-49'],
+             'fl27': ['fl27', 'fl-27', '#fl27', '#fl-27'],
+             'nh01': ['nh01', 'nh-01', '#nh01', '#nh-01', '#nh1'],
+             'nj02': ['nj02', 'nj-02', '#nj02', '#nj-02', '#nj2'],
+             'nv03': ['nv03', 'nv-03', '#nv03', '#nv-03', '#nv3'],
+             'pa07': ['pa07', 'pa-07', '#pa07', '#pa-07', '#pa7'],
+             'mn01': ['mn01', 'mn-01', '#mn01', '#mn-01', '#mn1'],
+             'mn08': ['mn08', 'mn-08', '#mn08', '#mn-08', '#mn8'],
+             'ca10': ['ca10', 'ca-10', '#ca10', '#ca-10'],
+             'ca25': ['ca25', 'ca-25', '#ca25', '#ca-25'],
+             'ca48': ['ca48', 'ca-48', '#ca48', '#ca-48'],
+             'co06': ['co06', 'co-06', '#co06', '#co-06', '#co6'],
+             'fl26': ['fl26', 'fl-26', '#fl26', '#fl-26'],
+             'ia01': ['ia01', 'ia-01', '#ia01', '#ia-01', '#ia1'],
+             'il06': ['il06', 'il-06', '#il06', '#il-06', '#il6'],
+             'il12': ['il12', 'il-12', '#il12', '#il-12'],
+             'mi11': ['mi11', 'mi-11', '#mi11', '#mi-11'],
+             'mn02': ['mn02', 'mn-02', '#mn02', '#mn-02', '#mn2'],
+             'mn03': ['mn03', 'mn-03', '#mn03', '#mn-03', '#mn3'],
+             'ne02': ['ne02', 'ne-02', '#ne02', '#ne-02', '#ne2'],
+             'nj07': ['nj07', 'nj-07', '#nj07', '#nj-07', '#nj7'],
+             'nj11': ['nj11', 'nj-11', '#nj11', '#nj-11'],
+             'ny19': ['ny19', 'ny-19', '#ny19', '#ny-19'],
+             'ny22': ['ny22', 'ny-22', '#ny22', '#ny-22'],
+             'oh12': ['oh12', 'oh-12', '#oh12', '#oh-12'],
+             'pa01': ['pa01', 'pa-01', '#pa01', '#pa-01', '#pa1'],
+             'pa17': ['pa17', 'pa-17', '#pa17', '#pa-17'],
+             'tx07': ['tx07', 'tx-07', '#tx07', '#tx-07', '#tx7'],
+             'va10': ['va10', 'va-10', '#va10', '#va-10'],
+             'wa08': ['wa08', 'wa-08', '#wa08', '#wa-08', '#wa8'],
+             'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2'],
+             'ca21': ['ca21', 'ca-21', '#ca21', '#ca-21'],
+             'ca45': ['ca45', 'ca-45', '#ca45', '#ca-45'],
+             'fl18': ['fl18', 'fl-18', '#fl18', '#fl-18'],
+             'ga06': ['ga06', 'ga-06', '#ga06', '#ga-06', '#ga6'],
+             'ia03': ['ia03', 'ia-03', '#ia03', '#ia-03', '#ia3'],
+             'il14': ['il14', 'il-14', '#il14', '#il-14'],
+             'ks02': ['ks02', 'ks-02', '#ks02', '#ks-02', '#ks2'],
+             'ks03': ['ks03', 'ks-03', '#ks03', '#ks-03', '#ks3'],
+             'ky06': ['ky06', 'ky-06', '#ky06', '#ky-06', '#ky6'],
+             'me02': ['me02', 'me-02', '#me02', '#me-02', '#me2'],
+             'mi08': ['mi08', 'mi-08', '#mi08', '#mi-08', '#mi8'],
+             'nc09': ['nc09', 'nc-09', '#nc09', '#nc-09', '#nc9'],
+             'nc13': ['nc13', 'nc-13', '#nc13', '#nc-13'],
+             'nj03': ['nj03', 'nj-03', '#nj03', '#nj-03', '#nj3'],
+             'nm02': ['nm02', 'nm-02', '#nm02', '#nm-02', '#nm2'],
+             'ny11': ['ny11', 'ny-11', '#ny11', '#ny-11'],
+             'oh01': ['oh01', 'oh-01', '#oh01', '#oh-01', '#oh1'],
+             'tx23': ['tx23', 'tx-23', '#tx23', '#tx-23'],
+             'tx32': ['tx32', 'tx-32', '#tx32', '#tx-32'],
+             'ut04': ['ut04', 'ut-04', '#ut04', '#ut-04', '#ut4'],
+             'va02': ['va02', 'va-02', '#va02', '#va-02', '#va2'],
+             'va05': ['va05', 'va-05', '#va05', '#va-05', '#va5'],
+             'va07': ['va07', 'va-07', '#va07', '#va-07', '#va7'],
+             'wa05': ['wa05', 'wa-05', '#wa05', '#wa-05', '#wa5'],
+             'wi01': ['wi01', 'wi-01', '#wi01', '#wi-01', '#wi1'],
+             'az06': ['az06', 'az-06', '#az06', '#az-06', '#az6'],
+             'ca04': ['ca04', 'ca-04', '#ca04', '#ca-04', '#ca4'],
+             'ca50': ['ca50', 'ca-50', '#ca50', '#ca-50'],
+             'fl15': ['fl15', 'fl-15', '#fl15', '#fl-15'],
+             'fl16': ['fl16', 'fl-16', '#fl16', '#fl-16'],
+             'fl25': ['fl25', 'fl-25', '#fl25', '#fl-25'],
+             'ga07': ['ga07', 'ga-07', '#ga07', '#ga-07', '#ga7'],
+             'il13': ['il13', 'il-13', '#il13', '#il-13'],
+             'in02': ['in02', 'in-02', '#in02', '#in-02', '#in2'],
+             'mi01': ['mi01', 'mi-01', '#mi01', '#mi-01', '#mi1'],
+             'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06', '#mi6'],
+             'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7'],
+             'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2'],
+             'mtAL': ['mtAL', 'mt-AL', '#mtAL', '#mt-AL'],
+             'nc02': ['nc02', 'nc-02', '#nc02', '#nc-02', '#nc2'],
+             'nc08': ['nc08', 'nc-08', '#nc08', '#nc-08', '#nc8'],
+             'ny01': ['ny01', 'ny-01', '#ny01', '#ny-01', '#ny1'],
+             'ny24': ['ny24', 'ny-24', '#ny24', '#ny-24'],
+             'oh10': ['oh10', 'oh-10', '#oh10', '#oh-10'],
+             'oh14': ['oh14', 'oh-14', '#oh14', '#oh-14'],
+             'oh15': ['oh15', 'oh-15', '#oh15', '#oh-15'],
+             'pa10': ['pa10', 'pa-10', '#pa10', '#pa-10'],
+             'pa14': ['pa14', 'pa-14', '#pa14', '#pa-14'],
+             'pa16': ['pa16', 'pa-16', '#pa16', '#pa-16'],
+             'sc01': ['sc01', 'sc-01', '#sc01', '#sc-01', '#sc1'],
+             'sc05': ['sc05', 'sc-05', '#sc05', '#sc-05', '#sc5'],
+             'tx21': ['tx21', 'tx-21', '#tx21', '#tx-21'],
+             'wa03': ['wa03', 'wa-03', '#wa03', '#wa-03', '#wa3'],
+             'wi06': ['wi06', 'wi-06', '#wi06', '#wi-06', '#wi6'],
+             'wi07': ['wi07', 'wi-07', '#wi07', '#wi-07', '#wi7'],
+             'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3']
+             }
+
+distdict = {'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar2'],
+            'az01': ['az01', 'az-01', '#az01', '#az-01', '#az1', 'az1'],
+            'az02': ['az02', 'az-02', '#az02', '#az-02', '#az2', 'az2'],
+            'az06': ['az06', 'az-06', '#az06', '#az-06', '#az6', 'az6'],
+            'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az9'],
+            'ca04': ['ca04', 'ca-04', '#ca04', '#ca-04', '#ca4', 'ca4'],
+            'ca07': ['ca07', 'ca-07', '#ca07', '#ca-07', '#ca7', 'ca7'],
+            'ca10': ['ca10', 'ca-10', '#ca10', '#ca-10'],
+            'ca21': ['ca21', 'ca-21', '#ca21', '#ca-21'],
+            'ca25': ['ca25', 'ca-25', '#ca25', '#ca-25'],
+            'ca39': ['ca39', 'ca-39', '#ca39', '#ca-39'],
+            'ca45': ['ca45', 'ca-45', '#ca45', '#ca-45'],
+            'ca48': ['ca48', 'ca-48', '#ca48', '#ca-48'],
+            'ca49': ['ca49', 'ca-49', '#ca49', '#ca-49'],
+            'ca50': ['ca50', 'ca-50', '#ca50', '#ca-50'],
+            'co06': ['co06', 'co-06', '#co06', '#co-06', '#co6', 'co6'],
+            'ct05': ['ct05', 'ct-05', '#ct05', '#ct-05', '#ct5', 'ct5'],
+            'fl07': ['fl07', 'fl-07', '#fl07', '#fl-07', '#fl7', 'fl7'],
+            'fl15': ['fl15', 'fl-15', '#fl15', '#fl-15'],
+            'fl16': ['fl16', 'fl-16', '#fl16', '#fl-16'],
+            'fl18': ['fl18', 'fl-18', '#fl18', '#fl-18'],
+            'fl25': ['fl25', 'fl-25', '#fl25', '#fl-25'],
+            'fl26': ['fl26', 'fl-26', '#fl26', '#fl-26'],
+            'fl27': ['fl27', 'fl-27', '#fl27', '#fl-27'],
+            'ga06': ['ga06', 'ga-06', '#ga06', '#ga-06', '#ga6', 'ga6'],
+            'ga07': ['ga07', 'ga-07', '#ga07', '#ga-07', '#ga7', 'ga7'],
+            'ia01': ['ia01', 'ia-01', '#ia01', '#ia-01', '#ia1', 'ia1'],
+            'ia03': ['ia03', 'ia-03', '#ia03', '#ia-03', '#ia3', 'ia3'],
+            'il06': ['il06', 'il-06', '#il06', '#il-06', '#il6', 'il6'],
+            'il12': ['il12', 'il-12', '#il12', '#il-12'],
+            'il13': ['il13', 'il-13', '#il13', '#il-13'],
+            'il14': ['il14', 'il-14', '#il14', '#il-14'],
+            'in02': ['in02', 'in-02', '#in02', '#in-02', '#in2', 'in2'],
+            'ks02': ['ks02', 'ks-02', '#ks02', '#ks-02', '#ks2', 'ks2'],
+            'ks03': ['ks03', 'ks-03', '#ks03', '#ks-03', '#ks3', 'ks3'],
+            'ky06': ['ky06', 'ky-06', '#ky06', '#ky-06', '#ky6', 'ky6'],
+            'me02': ['me02', 'me-02', '#me02', '#me-02', '#me2', 'me2'],
+            'mi01': ['mi01', 'mi-01', '#mi01', '#mi-01', '#mi1', 'mi1'],
+            'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06', '#mi6', 'mi6'],
+            'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7', 'mi7'],
+            'mi08': ['mi08', 'mi-08', '#mi08', '#mi-08', '#mi8', 'mi8'],
+            'mi11': ['mi11', 'mi-11', '#mi11', '#mi-11'],
+            'mn01': ['mn01', 'mn-01', '#mn01', '#mn-01', '#mn1', 'mn1'],
+            'mn02': ['mn02', 'mn-02', '#mn02', '#mn-02', '#mn2', 'mn2'],
+            'mn03': ['mn03', 'mn-03', '#mn03', '#mn-03', '#mn3', 'mn3'],
+            'mn07': ['mn07', 'mn-07', '#mn07', '#mn-07', '#mn7', 'mn7'],
+            'mn08': ['mn08', 'mn-08', '#mn08', '#mn-08', '#mn8', 'mn8'],
+            'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2', 'mo2'],
+            'mtAL': ['mtAL', 'mt-AL', '#mtAL', '#mt-AL'],
+            'nc02': ['nc02', 'nc-02', '#nc02', '#nc-02', '#nc2', 'nc2'],
+            'nc08': ['nc08', 'nc-08', '#nc08', '#nc-08', '#nc8', 'nc8'],
+            'nc09': ['nc09', 'nc-09', '#nc09', '#nc-09', '#nc9', 'nc9'],
+            'nc13': ['nc13', 'nc-13', '#nc13', '#nc-13'],
+            'ne02': ['ne02', 'ne-02', '#ne02', '#ne-02', '#ne2', 'ne2'],
+            'nh01': ['nh01', 'nh-01', '#nh01', '#nh-01', '#nh1', 'nh1'],
+            'nh02': ['nh02', 'nh-02', '#nh02', '#nh-02', '#nh2', 'nh2'],
+            'nj02': ['nj02', 'nj-02', '#nj02', '#nj-02', '#nj2', 'nj2'],
+            'nj03': ['nj03', 'nj-03', '#nj03', '#nj-03', '#nj3', 'nj3'],
+            'nj05': ['nj05', 'nj-05', '#nj05', '#nj-05', '#nj5', 'nj5'],
+            'nj07': ['nj07', 'nj-07', '#nj07', '#nj-07', '#nj7', 'nj7'],
+            'nj11': ['nj11', 'nj-11', '#nj11', '#nj-11'],
+            'nm02': ['nm02', 'nm-02', '#nm02', '#nm-02', '#nm2', 'nm2'],
+            'nv03': ['nv03', 'nv-03', '#nv03', '#nv-03', '#nv3', 'nv3'],
+            'nv04': ['nv04', 'nv-04', '#nv04', '#nv-04', '#nv4', 'nv4'],
+            'ny01': ['ny01', 'ny-01', '#ny01', '#ny-01', '#ny1', 'ny1'],
+            'ny11': ['ny11', 'ny-11', '#ny11', '#ny-11'],
+            'ny19': ['ny19', 'ny-19', '#ny19', '#ny-19'],
+            'ny22': ['ny22', 'ny-22', '#ny22', '#ny-22'],
+            'ny24': ['ny24', 'ny-24', '#ny24', '#ny-24'],
+            'oh01': ['oh01', 'oh-01', '#oh01', '#oh-01', '#oh1', 'oh1'],
+            'oh10': ['oh10', 'oh-10', '#oh10', '#oh-10'],
+            'oh12': ['oh12', 'oh-12', '#oh12', '#oh-12'],
+            'oh14': ['oh14', 'oh-14', '#oh14', '#oh-14'],
+            'oh15': ['oh15', 'oh-15', '#oh15', '#oh-15'],
+            'pa01': ['pa01', 'pa-01', '#pa01', '#pa-01', '#pa1', 'pa1'],
+            'pa05': ['pa05', 'pa-05', '#pa05', '#pa-05', '#pa5', 'pa5'],
+            'pa06': ['pa06', 'pa-06', '#pa06', '#pa-06', '#pa6', 'pa6'],
+            'pa07': ['pa07', 'pa-07', '#pa07', '#pa-07', '#pa7', 'pa7'],
+            'pa08': ['pa08', 'pa-08', '#pa08', '#pa-08', '#pa8', 'pa8'],
+            'pa10': ['pa10', 'pa-10', '#pa10', '#pa-10'],
+            'pa14': ['pa14', 'pa-14', '#pa14', '#pa-14'],
+            'pa16': ['pa16', 'pa-16', '#pa16', '#pa-16'],
+            'pa17': ['pa17', 'pa-17', '#pa17', '#pa-17'],
+            'sc01': ['sc01', 'sc-01', '#sc01', '#sc-01', '#sc1', 'sc1'],
+            'sc05': ['sc05', 'sc-05', '#sc05', '#sc-05', '#sc5', 'sc5'],
+            'tx07': ['tx07', 'tx-07', '#tx07', '#tx-07', '#tx7', 'tx7'],
+            'tx21': ['tx21', 'tx-21', '#tx21', '#tx-21'],
+            'tx23': ['tx23', 'tx-23', '#tx23', '#tx-23'],
+            'tx32': ['tx32', 'tx-32', '#tx32', '#tx-32'],
+            'ut04': ['ut04', 'ut-04', '#ut04', '#ut-04', '#ut4', 'ut4'],
+            'va02': ['va02', 'va-02', '#va02', '#va-02', '#va2', 'va2'],
+            'va05': ['va05', 'va-05', '#va05', '#va-05', '#va5', 'va5'],
+            'va07': ['va07', 'va-07', '#va07', '#va-07', '#va7', 'va7'],
+            'va10': ['va10', 'va-10', '#va10', '#va-10'],
+            'wa03': ['wa03', 'wa-03', '#wa03', '#wa-03', '#wa3', 'wa3'],
+            'wa05': ['wa05', 'wa-05', '#wa05', '#wa-05', '#wa5', 'wa5'],
+            'wa08': ['wa08', 'wa-08', '#wa08', '#wa-08', '#wa8', 'wa8'],
+            'wi01': ['wi01', 'wi-01', '#wi01', '#wi-01', '#wi1', 'wi1'],
+            'wi03': ['wi03', 'wi-03', '#wi03', '#wi-03', '#wi3', 'wi3'],
+            'wi06': ['wi06', 'wi-06', '#wi06', '#wi-06', '#wi6', 'wi6'],
+            'wi07': ['wi07', 'wi-07', '#wi07', '#wi-07', '#wi7', 'wi7'],
+            'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3', 'wv3']}

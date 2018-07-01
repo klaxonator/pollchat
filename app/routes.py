@@ -7,7 +7,8 @@ from sqlalchemy import func, Date, cast
 from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
-test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list
+test_usergraph_data, distlist, get_tweet_datetime #get_tweet_list
+from app.helpers_new import get_tweet_list
 import app.graph_functions as gf
 
 
@@ -88,10 +89,11 @@ def district(dynamic):
 
     #Rewrite of most-retweeted tweets
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html).\
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.text).\
     join(Post.districts).join(Post.user).\
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
-    group_by(Post.post_id).order_by(Post.retweet_count.desc()).all()
+    order_by(Post.retweet_count.desc()).all()
 
     # Use helper function to Get botscore for top five most-retweeted tweets,
     # create list of [post_id, name,retweet numbers, botscore]
@@ -178,7 +180,8 @@ def hashtag(dynamic):
         valences_datatable.append([item[0], item[1]])
 
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html).\
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.text).\
     join(Post.hashtags).join(Post.user).\
     filter(Hashtag.hashtag==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
@@ -268,7 +271,8 @@ def overview(dynamic):
     print("got retweeted users")
 
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html).\
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
+    Post.text).\
     join(Post.user).\
     filter(Post.created_at >= str_time_range).\
     group_by(Post.post_id).order_by(Post.retweet_count.desc()).all()
@@ -337,7 +341,8 @@ def screen_name(dynamic):
     #idea: filtering by orig_author, only getting retweets, always with dynamic
     #screenname. Thus no User needed. Remove?)
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html).\
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.text).\
     join(Post.user).\
     filter(Post.original_author_scrname==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
@@ -425,7 +430,8 @@ def botspy(dynamic):
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html).\
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.text).\
     join(Post.user).\
     filter(User.user_cap_perc >= 60.0).filter(Post.created_at >= str_time_range).\
     filter(Post.is_retweet == 0).\
