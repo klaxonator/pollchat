@@ -47,13 +47,7 @@ def check_district_relevance(db_tweet):
 
     # print(district_list)
 
-
     # iterate through district_list, get dist_aliases from dictionary,
-
-
-
-
-
 
     for named_district in district_list:
         # print(distdict[named_district])
@@ -68,8 +62,12 @@ def check_district_relevance(db_tweet):
             #   district_alias in db_tweet[4].lower():
             #     return False
 
-            if district_alias in db_tweet[6]:
-                return True
+            if db_tweet[7]:
+                if district_alias in db_tweet[7]:
+                    return True
+            else:
+                if district_alias in db_tweet[7]:
+                    return True
     #
     #if no match found, return False
 
