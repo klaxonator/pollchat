@@ -253,9 +253,9 @@ def twitter_search(query):
             # except:
             #     pass
 
-            print(tweet.user.screen_name, "\n", tweet.id_str, "\n", tweet.full_text, "\n")
+            # print(tweet.user.screen_name, "\n", tweet.id_str, "\n", tweet.full_text, "\n")
             print(original_tweet_id)
-            print(original_tweet_retweets)
+            # print(original_tweet_retweets)
             # print(tweet_html)
             # print(polarity_val)
 
