@@ -32,6 +32,7 @@ def get_tweet(post_id, omit_script=True, hide_media=True):
 def check_district_relevance(db_tweet):
 
     #Search district associations with post
+    db_tweet = db_tweet
 
     referenced_districts = db.session.query(District.district_name).\
     join(Post.districts).\
@@ -66,7 +67,7 @@ def check_district_relevance(db_tweet):
                 if district_alias in db_tweet[7]:
                     return True
             else:
-                if district_alias in db_tweet[7]:
+                if district_alias in db_tweet[6]:
                     return True
     #
     #if no match found, return False
