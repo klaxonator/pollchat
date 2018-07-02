@@ -239,6 +239,11 @@ def twitter_search(query):
                         check = True
             if check == False:
                 print("Tweet rejected, no district reference")
+
+                if original_text:
+                    print(original_text)
+                else:
+                    print(text)
                 continue
 
 
