@@ -276,7 +276,7 @@ def twitter_search(query):
 
                 count += 1
 
-                if count % 1000 == 0:
+                if count % 200 == 0:
                     db.session.commit()
                     print("{} items added to database so far".format(count))
 

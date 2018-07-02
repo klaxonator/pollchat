@@ -20,12 +20,12 @@ from sqlalchemy.orm import sessionmaker
 
 #Instantiate SQLalchemy database connection
 
-def open_database(database_name):
-    engine = create_engine(database_name)   #FOR NOW: sqlite:///compdists_test2.db
-
-    DBSession = sessionmaker()
-    DBSession.configure(bind=engine)
-    Base.metadata.create_all(engine)
+# def open_database(database_name):
+#     engine = create_engine(database_name)   #FOR NOW: sqlite:///compdists_test2.db
+#
+#     DBSession = sessionmaker()
+#     DBSession.configure(bind=engine)
+#     Base.metadata.create_all(engine)
 
 #Write Twitter variables to DB
 def write_database(post_id, user_id, text, created_at, reply_to_user_id,
@@ -275,7 +275,7 @@ def twitter_search(query):
 
                 count += 1
 
-                if count % 1000 == 0:
+                if count % 200 == 0:
                     session.commit()
                     print("{} items added to database so far".format(count))
 
@@ -290,7 +290,7 @@ def twitter_search(query):
 
 if __name__ == "__main__":
 
-    
+
     engine = create_engine(os.environ.get('DATABASE_URL'))   #FOR NOW:
 
     DBSession = sessionmaker()
