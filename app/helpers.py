@@ -76,6 +76,53 @@ def check_district_relevance(db_tweet):
 
     # return True
 
+def check_district_relevance_st(db_tweet):
+
+    #Search district associations with post
+    db_tweet = db_tweet
+
+    referenced_districts = db.session.query(District.district_name).\
+    join(Post.districts).\
+    filter(Post.post_id == db_tweet[0]).all()
+
+    # Create list of districts associated with post - generally only one,
+    # but someitmes multiple mentions
+
+    district_list = []
+
+    for distref in referenced_districts:
+        district_list.append(distref[0])
+
+    # print(district_list)
+
+    # iterate through district_list, get dist_aliases from dictionary,
+
+    for named_district in district_list:
+        # print(distdict[named_district])
+
+        for district_alias in distdict_short[named_district]:
+
+    # check if any of district aliases are included in tweet text;
+            # if finds a match, return True
+
+            #NOTE: too many variations of search found by twitter in scr_name
+            # if district_alias in db_tweet[1].lower() or \
+            #   district_alias in db_tweet[4].lower():
+            #     return False
+
+            if db_tweet[2]:
+                if district_alias in db_tweet[2]:
+                    return True
+            else:
+                if district_alias in db_tweet[1]:
+                    return True
+    #
+    #if no match found, return False
+
+    return False
+
+    # return True
+
 def get_tweet_list(db_search_object):
 
     # produce list of (Post.post_id, Post.original_author_scrname, \
