@@ -232,7 +232,7 @@ def twitter_search(query):
                 else:
                     if district_alias in text:
                         check = True
-            if check = False:
+            if check == False:
                 print("Tweet rejected, no district reference")
                 continue
 

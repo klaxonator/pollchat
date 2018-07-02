@@ -237,8 +237,10 @@ def twitter_search(query):
                 else:
                     if district_alias in text:
                         check = True
-            if check = False:
-                print("Tweet
+            if check == False:
+                print("Tweet rejected, no district reference")
+                continue
+
 
             #TextBlob analysis of tweet sentiment
             analysis = TextBlob(tweet.full_text)
@@ -278,7 +280,7 @@ def twitter_search(query):
 
             for tag in skip_list:
                 if tag in tag_list or original_author_scrname == tag:
-                    pass
+                    continue
             else:
 
                 write_database(post_id, user_id, text, created_at, reply_to_user_id,
@@ -292,7 +294,7 @@ def twitter_search(query):
 
                 count += 1
 
-                if count % 200 == 0:
+                if count % 150 == 0:
                     session.commit()
                     print("{} items added to database so far".format(count))
 
