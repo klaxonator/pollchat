@@ -232,10 +232,10 @@ def twitter_search(query):
 
             for district_alias in distdict_short[district_name]:
                 if original_text:
-                    if district_alias in original_text:
+                    if district_alias in original_text.lower():
                         check = True
                 else:
-                    if district_alias in text:
+                    if district_alias in text.lower():
                         check = True
             if check == False:
                 print("Tweet rejected, no district reference")
