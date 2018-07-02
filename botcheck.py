@@ -26,7 +26,7 @@ bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **tw
 
 x = 0
 
-for item in users[11500:13700]:
+for item in users[0:3000]:
     if not item.user_botprob_cap:
         to_search = "@{}".format(item.user_scrname)
         print("searching user: {}".format(to_search))
@@ -64,6 +64,9 @@ for item in users[11500:13700]:
             time.sleep(4 * 60)
         except botometer.NoTimelineError as err:
             print("Error raised: {0}".format(err))
+        except:
+            session.rollback()
+            continue
     else:
         #Convert CAP into string, then a decimal rounded to 0.0001
         clean_cap = Decimal(str(item.user_botprob_cap)).quantize(Decimal('0.0001'),\
