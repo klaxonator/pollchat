@@ -3,7 +3,7 @@ import csv
 import sys
 import tweepy
 import time
-from app.helpers import skip_list, get_tweet
+from app.helpers import skip_list, get_tweet, distdict_short
 from app import app, db
 
 #import preprocessor as p
@@ -21,12 +21,6 @@ from sqlalchemy.orm import sessionmaker
 
 #Instantiate SQLalchemy database connection
 
-# def open_database(database_name):
-#     engine = create_engine(database_name)   #FOR NOW: sqlite:///compdists_test2.db
-#
-#     DBSession = sessionmaker()
-#     DBSession.configure(bind=engine)
-#     Base.metadata.create_all(engine)
 
 #Write Twitter variables to DB
 def write_database(post_id, user_id, text, created_at, reply_to_user_id,
@@ -219,10 +213,29 @@ def twitter_search(query):
                 original_author_id = None
                 original_author_scrname = None
 
-                for hashtag in tweet.entities["hashtags"]:                          #Get simple list of hashtags in top-level (non-RT) tweet
+                for hashtag in tweet.entities["hashtags"]:   #Get simple list of hashtags in top-level (non-RT) tweet
                     tag_list.append(hashtag["text"].lower())
-                for link in tweet.entities["urls"]:                          #Get simple list of urls in top-level (non-RT) tweet
+                for link in tweet.entities["urls"]:       #Get simple list of urls in top-level (non-RT) tweet
                     url_list.append(link['expanded_url'])
+
+            district_name = query[2:6]
+
+            # Check Tweet text for district name to filter out irrelvancies;
+            # skip rest of for loop if district name (or aliases) not found
+
+            check = False
+
+            for district_alias in distdict_short[district_name]:
+                if original_text:
+                    if district_alias in original_text:
+                        check = True
+                else:
+                    if district_alias in text:
+                        check = True
+            if check = False:
+                print("Tweet rejected, no district reference")
+                continue
+
 
             #TextBlob analysis of tweet sentiment
             analysis = TextBlob(tweet.full_text)
@@ -293,14 +306,6 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape\n')
 
-    # #instantiate db engine
-    # engine = create_engine(os.environ.get('DATABASE_URL'))   #FOR NOW:
-    #
-    # DBSession = sessionmaker()
-    # DBSession.configure(bind=engine)
-    # Base.metadata.create_all(engine)
-    #
-    # session = DBSession()
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
     with open('app/comp_races_parsed.csv', 'r') as f:

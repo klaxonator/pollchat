@@ -223,6 +223,23 @@ def twitter_search(query):
                 for link in tweet.entities["urls"]:                          #Get simple list of urls in top-level (non-RT) tweet
                     url_list.append(link['expanded_url'])
 
+            district_name = query[2:6]
+
+            # Check Tweet text for district name to filter out irrelvancies;
+            # skip rest of for loop if district name (or aliases) not found
+
+            check = False
+
+            for district_alias in distdict_short[district_name]:
+                if original_text:
+                    if district_alias in original_text:
+                        check = True
+                else:
+                    if district_alias in text:
+                        check = True
+            if check = False:
+                print("Tweet
+
             #TextBlob analysis of tweet sentiment
             analysis = TextBlob(tweet.full_text)
             polarity = analysis.sentiment.polarity
