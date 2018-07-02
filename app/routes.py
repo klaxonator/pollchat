@@ -89,7 +89,7 @@ def district(dynamic):
     #Rewrite of most-retweeted tweets
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
-    Post.text).\
+    Post.text, Post.original_text).\
     join(Post.districts).join(Post.user).\
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
