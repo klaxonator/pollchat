@@ -285,11 +285,11 @@ def overview(dynamic):
 
     return render_template('overview.html', t_form=ChangeTimeForm(), \
     all_form=AllCongSearchForm(), dynamic=dynamic, time_delta=time_delta, \
-    url=url, all_hashes=all_hashes, top_tweeters=top_tweeters, \
-    retweeted_users=retweeted_users, hashes_no_dists=hashes_no_dists, \
+    url=url, all_hashes=all_hashes,  hashes_no_dists=hashes_no_dists, \
     hashtable_all=hashtable_all, all_tweets=all_tweets\
     # most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
     # most_retweeted_tweet_list=most_retweeted_tweet_list\
+    # top_tweeters=top_tweeters, retweeted_users=retweeted_users,
     # most_active=most_active\
     )
 
