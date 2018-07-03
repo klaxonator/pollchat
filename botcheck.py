@@ -20,15 +20,23 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 #GET ALL USER OBJECTS
-users = session.query(User).all()
+users = session.query(User.user_scrname, func.count(User.user_scrname)).\
+join(Post.user).\
+group_by(User.user_scrname).\
+order_by(func.count(User.user_scrname).desc()).all()
 
 bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **twitter_app_auth)
 
 x = 0
 
 for item in users[0:3000]:
-    if not item.user_botprob_cap:
-        to_search = "@{}".format(item.user_scrname)
+
+    this_user = session.query(User).\
+    filter(User.user_scrname==item[0]).first()
+
+#If no botprob has been found in previous rounds
+    if not this_user.user_botprob_cap:
+        to_search = "@{}".format(this_user.user_scrname)
         print("searching user: {}".format(to_search))
 
         try:
@@ -38,24 +46,24 @@ for item in users[0:3000]:
 
             print("user {0}'s bot-or-not-score (0=no, 5=yes) is {1}".format(to_search, end_result_cap))
 
-            # to_change = session.query(User).filter(User.user_scrname==item[0]).first()
 
-            item.user_botprob = end_result_display
-            item.user_botprob_cap = end_result_cap
+
+            this_user.user_botprob = end_result_display
+            this_user.user_botprob_cap = end_result_cap
 
             #Convert CAP into string, then a decimal rounded to 0.0001
-            clean_cap = Decimal(str(item.user_botprob_cap)).quantize(Decimal('0.0001'),\
+            clean_cap = Decimal(str(this_user.user_botprob_cap)).quantize(Decimal('0.0001'),\
             rounding = ROUND_HALF_UP)
 
             #Convert CAP into percentage (and store as 00.01 float)
             str_clean_cap = str(clean_cap)
             user_cap = float(str_clean_cap[2:4] + "." + str_clean_cap[4:])
 
-            item.user_cap_perc = user_cap
+            this_user.user_cap_perc = user_cap
 
-            session.add(item)
+            session.add(this_user)
 
-            print("updating user{}".format(item.user_scrname))
+            print("updating user{}".format(this_user.user_scrname))
             x += 1
             if x % 25 == 0:
                 session.commit()
@@ -69,15 +77,15 @@ for item in users[0:3000]:
             continue
     else:
         #Convert CAP into string, then a decimal rounded to 0.0001
-        clean_cap = Decimal(str(item.user_botprob_cap)).quantize(Decimal('0.0001'),\
+        clean_cap = Decimal(str(this_user.user_botprob_cap)).quantize(Decimal('0.0001'),\
         rounding = ROUND_HALF_UP)
 
         #Convert CAP into percentage (and store as 00.01 float)
         str_clean_cap = str(clean_cap)
         user_cap = float(str_clean_cap[2:4] + "." + str_clean_cap[4:])
 
-        item.user_cap_perc = user_cap
+        this_user.user_cap_perc = user_cap
 
-        session.add(item)
+        session.add(this_user)
 session.commit()
 session.close()
