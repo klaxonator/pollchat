@@ -242,15 +242,16 @@ def overview(dynamic):
 
     print("got all tweets")
 
-    #Get list of most active districts
-    most_active = db.session.query(District.district_name,\
-    func.count(District.district_name)).\
-    join(Post.districts).\
-    filter(Post.created_at >= str_time_range).\
-    group_by(District.district_name).\
-    order_by(func.count(District.district_name).desc()).all()
 
-    print("got most_active")
+    # #Get list of most active districts
+    # most_active = db.session.query(District.district_name,\
+    # func.count(District.district_name)).\
+    # join(Post.districts).\
+    # filter(Post.created_at >= str_time_range).\
+    # group_by(District.district_name).\
+    # order_by(func.count(District.district_name).desc()).all()
+    #
+    # print("got most_active")
 
     #Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
     top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname), \
