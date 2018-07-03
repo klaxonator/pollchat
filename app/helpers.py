@@ -64,10 +64,10 @@ def check_district_relevance(db_tweet):
             #     return False
 
             if db_tweet[7]:
-                if district_alias in db_tweet[7]:
+                if district_alias in db_tweet[7].lower():
                     return True
             else:
-                if district_alias in db_tweet[6]:
+                if district_alias in db_tweet[6].lower():
                     return True
     #
     #if no match found, return False
@@ -111,10 +111,10 @@ def check_district_relevance_st(db_tweet):
             #     return False
 
             if db_tweet[2]:
-                if district_alias in db_tweet[2]:
+                if district_alias in db_tweet[2].lower():
                     return True
             else:
-                if district_alias in db_tweet[1]:
+                if district_alias in db_tweet[1].lower():
                     return True
     #
     #if no match found, return False
