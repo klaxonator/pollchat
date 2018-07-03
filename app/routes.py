@@ -347,7 +347,7 @@ def screen_name(dynamic):
     order_by(Post.retweet_count.desc()).all()
 
     most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
-    print(most_retweeted_tweet_list)
+
 
     #Get data for double-7 chart
     scrname_chart = gf.scrname_chart(dynamic)
@@ -438,12 +438,6 @@ def botspy(dynamic):
 
     most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
 
-    # NOTE: needs subquery to enable grouping by user_scrname
-    # bot_districts = db.session.query(District.district_name, User.user_scrname, \
-    # func.count(User.user_scrname).\
-    # join(Post.districts).join(Post.user).\
-    # filter(User.user_cap_perc >= 60.0).filter(Post.created_at >= str_time_range).\
-    # group_by(District.district_name).order_by(func.count(User.user_scrname)).all()
 
     popular_bot = db.session.query(User.user_scrname, User.user_followers,\
     User.user_id).\
