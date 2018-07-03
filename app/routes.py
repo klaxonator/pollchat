@@ -253,43 +253,43 @@ def overview(dynamic):
     #
     # print("got most_active")
 
-    #Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
-    top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname), \
-    User.user_cap_perc, User.user_id).\
-    join(Post.user).\
-    filter(Post.created_at >= str_time_range).\
-    group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
-
-    print("got top_tweeters")
-
-    retweeted_users = db.session.query(Post.original_author_scrname, \
-    func.count(Post.original_author_scrname)).\
-    filter(Post.original_author_scrname != "").filter(Post.created_at >= str_time_range).\
-    group_by(Post.original_author_scrname).order_by(func.count(Post.original_author_scrname).\
-    desc()).all()
-
-    print("got retweeted users")
-
-    most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
-    Post.text, Post.original_text).\
-    join(Post.user).\
-    filter(Post.created_at >= str_time_range).\
-    group_by(Post.post_id).order_by(Post.retweet_count.desc()).all()
-
-    print("got most retweeted tweets")
-
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
-
-    print("got tweet list")
+    # #Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
+    # top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname), \
+    # User.user_cap_perc, User.user_id).\
+    # join(Post.user).\
+    # filter(Post.created_at >= str_time_range).\
+    # group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
+    #
+    # print("got top_tweeters")
+    #
+    # retweeted_users = db.session.query(Post.original_author_scrname, \
+    # func.count(Post.original_author_scrname)).\
+    # filter(Post.original_author_scrname != "").filter(Post.created_at >= str_time_range).\
+    # group_by(Post.original_author_scrname).order_by(func.count(Post.original_author_scrname).\
+    # desc()).all()
+    #
+    # print("got retweeted users")
+    #
+    # most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
+    # Post.text, Post.original_text).\
+    # join(Post.user).\
+    # filter(Post.created_at >= str_time_range).\
+    # group_by(Post.post_id).order_by(Post.retweet_count.desc()).all()
+    #
+    # print("got most retweeted tweets")
+    #
+    # most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+    #
+    # print("got tweet list")
 
     return render_template('overview.html', t_form=ChangeTimeForm(), \
     all_form=AllCongSearchForm(), dynamic=dynamic, time_delta=time_delta, \
     url=url, all_hashes=all_hashes, top_tweeters=top_tweeters, \
     retweeted_users=retweeted_users, hashes_no_dists=hashes_no_dists, \
-    hashtable_all=hashtable_all, all_tweets=all_tweets,\
-    most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list\
+    hashtable_all=hashtable_all, all_tweets=all_tweets\
+    # most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
+    # most_retweeted_tweet_list=most_retweeted_tweet_list\
     # most_active=most_active\
     )
 
