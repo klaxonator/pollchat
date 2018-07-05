@@ -211,223 +211,349 @@ class District(Base):
         return "District object with district {0}".format(self.district_name)
 
 
-###INDEXES
+## SUMMARY/ROLLUP (CACHE) TABLES for OVERVIEW PAGE
 
 
 
+class Dist_Activity_1(Base):
+    __tablename__ =  'dist_activity_1'
+    rank = Column(Integer, primary_key=True)
+    district_name = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
 
-class DateData(Base):
-    __tablename__="DateData"
-    date_str = Column(String, primary_key=True)
-    az01_hashdict = Column(String)
-    az01_userdict = Column(String)
-    az02_hashdict = Column(String)
-    az02_userdict = Column(String)
-    az06_hashdict = Column(String)
-    az06_userdict = Column(String)
-    az09_hashdict = Column(String)
-    az09_userdict = Column(String)
-    ar02_hashdict = Column(String)
-    ar02_userdict = Column(String)
-    ca04_hashdict = Column(String)
-    ca04_userdict = Column(String)
-    ca07_hashdict = Column(String)
-    ca07_userdict = Column(String)
-    ca10_hashdict = Column(String)
-    ca10_userdict = Column(String)
-    ca21_hashdict = Column(String)
-    ca21_userdict = Column(String)
-    ca25_hashdict = Column(String)
-    ca25_userdict = Column(String)
-    ca39_hashdict = Column(String)
-    ca39_userdict = Column(String)
-    ca45_hashdict = Column(String)
-    ca45_userdict = Column(String)
-    ca48_hashdict = Column(String)
-    ca48_userdict = Column(String)
-    ca49_hashdict = Column(String)
-    ca49_userdict = Column(String)
-    ca50_hashdict = Column(String)
-    ca50_userdict = Column(String)
-    co06_hashdict = Column(String)
-    co06_userdict = Column(String)
-    ct05_hashdict = Column(String)
-    ct05_userdict = Column(String)
-    fl07_hashdict = Column(String)
-    fl07_userdict = Column(String)
-    fl15_hashdict = Column(String)
-    fl15_userdict = Column(String)
-    fl16_hashdict = Column(String)
-    fl16_userdict = Column(String)
-    fl18_hashdict = Column(String)
-    fl18_userdict = Column(String)
-    fl25_hashdict = Column(String)
-    fl25_userdict = Column(String)
-    fl26_hashdict = Column(String)
-    fl26_userdict = Column(String)
-    fl27_hashdict = Column(String)
-    fl27_userdict = Column(String)
-    ga06_hashdict = Column(String)
-    ga06_userdict = Column(String)
-    ga07_hashdict = Column(String)
-    ga07_userdict = Column(String)
-    ia01_hashdict = Column(String)
-    ia01_userdict = Column(String)
-    ia03_hashdict = Column(String)
-    ia03_userdict = Column(String)
-    il06_hashdict = Column(String)
-    il06_userdict = Column(String)
-    il12_hashdict = Column(String)
-    il12_userdict = Column(String)
-    il13_hashdict = Column(String)
-    il13_userdict = Column(String)
-    il14_hashdict = Column(String)
-    il14_userdict = Column(String)
-    in02_hashdict = Column(String)
-    in02_userdict = Column(String)
-    ks02_hashdict = Column(String)
-    ks02_userdict = Column(String)
-    ks03_hashdict = Column(String)
-    ks03_userdict = Column(String)
-    ky06_hashdict = Column(String)
-    ky06_userdict = Column(String)
-    me02_hashdict = Column(String)
-    me02_userdict = Column(String)
-    mi01_hashdict = Column(String)
-    mi01_userdict = Column(String)
-    mi06_hashdict = Column(String)
-    mi06_userdict = Column(String)
-    mi07_hashdict = Column(String)
-    mi07_userdict = Column(String)
-    mi08_hashdict = Column(String)
-    mi08_userdict = Column(String)
-    mi11_hashdict = Column(String)
-    mi11_userdict = Column(String)
-    mn01_hashdict = Column(String)
-    mn01_userdict = Column(String)
-    mn02_hashdict = Column(String)
-    mn02_userdict = Column(String)
-    mn03_hashdict = Column(String)
-    mn03_userdict = Column(String)
-    mn07_hashdict = Column(String)
-    mn07_userdict = Column(String)
-    mn08_hashdict = Column(String)
-    mn08_userdict = Column(String)
-    mo02_hashdict = Column(String)
-    mo02_userdict = Column(String)
-    mt00_hashdict = Column(String)
-    mt00_userdict = Column(String)
-    nc02_hashdict = Column(String)
-    nc02_userdict = Column(String)
-    nc08_hashdict = Column(String)
-    nc08_userdict = Column(String)
-    nc09_hashdict = Column(String)
-    nc09_userdict = Column(String)
-    nc13_hashdict = Column(String)
-    nc13_userdict = Column(String)
-    ne02_hashdict = Column(String)
-    ne02_userdict = Column(String)
-    nh01_hashdict = Column(String)
-    nh01_userdict = Column(String)
-    nh02_hashdict = Column(String)
-    nh02_userdict = Column(String)
-    nj02_hashdict = Column(String)
-    nj02_userdict = Column(String)
-    nj03_hashdict = Column(String)
-    nj03_userdict = Column(String)
-    nj05_hashdict = Column(String)
-    nj05_userdict = Column(String)
-    nj07_hashdict = Column(String)
-    nj07_userdict = Column(String)
-    nj11_hashdict = Column(String)
-    nj11_userdict = Column(String)
-    nm02_hashdict = Column(String)
-    nm02_userdict = Column(String)
-    nv03_hashdict = Column(String)
-    nv03_userdict = Column(String)
-    nv04_hashdict = Column(String)
-    nv04_userdict = Column(String)
-    ny01_hashdict = Column(String)
-    ny01_userdict = Column(String)
-    ny11_hashdict = Column(String)
-    ny11_userdict = Column(String)
-    ny19_hashdict = Column(String)
-    ny19_userdict = Column(String)
-    ny22_hashdict = Column(String)
-    ny22_userdict = Column(String)
-    ny24_hashdict = Column(String)
-    ny24_userdict = Column(String)
-    oh01_hashdict = Column(String)
-    oh01_userdict = Column(String)
-    oh10_hashdict = Column(String)
-    oh10_userdict = Column(String)
-    oh12_hashdict = Column(String)
-    oh12_userdict = Column(String)
-    oh14_hashdict = Column(String)
-    oh14_userdict = Column(String)
-    oh15_hashdict = Column(String)
-    oh15_userdict = Column(String)
-    pa01_hashdict = Column(String)
-    pa01_userdict = Column(String)
-    pa05_hashdict = Column(String)
-    pa05_userdict = Column(String)
-    pa06_hashdict = Column(String)
-    pa06_userdict = Column(String)
-    pa07_hashdict = Column(String)
-    pa07_userdict = Column(String)
-    pa08_hashdict = Column(String)
-    pa08_userdict = Column(String)
-    pa10_hashdict = Column(String)
-    pa10_userdict = Column(String)
-    pa14_hashdict = Column(String)
-    pa14_userdict = Column(String)
-    pa16_hashdict = Column(String)
-    pa16_userdict = Column(String)
-    pa17_hashdict = Column(String)
-    pa17_userdict = Column(String)
-    sc01_hashdict = Column(String)
-    sc01_userdict = Column(String)
-    sc05_hashdict = Column(String)
-    sc05_userdict = Column(String)
-    tx07_hashdict = Column(String)
-    tx07_userdict = Column(String)
-    tx21_hashdict = Column(String)
-    tx21_userdict = Column(String)
-    tx23_hashdict = Column(String)
-    tx23_userdict = Column(String)
-    tx32_hashdict = Column(String)
-    tx32_userdict = Column(String)
-    ut04_hashdict = Column(String)
-    ut04_userdict = Column(String)
-    va02_hashdict = Column(String)
-    va02_userdict = Column(String)
-    va05_hashdict = Column(String)
-    va05_userdict = Column(String)
-    va07_hashdict = Column(String)
-    va07_userdict = Column(String)
-    va10_hashdict = Column(String)
-    va10_userdict = Column(String)
-    wa03_hashdict = Column(String)
-    wa03_userdict = Column(String)
-    wa05_hashdict = Column(String)
-    wa05_userdict = Column(String)
-    wa08_hashdict = Column(String)
-    wa08_userdict = Column(String)
-    wi01_hashdict = Column(String)
-    wi01_userdict = Column(String)
-    wi03_hashdict = Column(String)
-    wi03_userdict = Column(String)
-    wi06_hashdict = Column(String)
-    wi06_userdict = Column(String)
-    wi07_hashdict = Column(String)
-    wi07_userdict = Column(String)
-    wv03_hashdict = Column(String)
-    wv03_userdict = Column(String)
-    overview_hashdict = Column(String)
-    overview_userdict = Column(String)
-
-    def __init__(self, date_str):
-        self.date_str = date_str
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
 
     def __repr__(self):
-        return "Datedata object with date {0}, and data dictionaries for districts and overview".format(self.date_str)
+        return "Object: 1 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+
+class Dist_Activity_2(Base):
+    __tablename__ =  'dist_activity_2'
+    rank = Column(Integer, primary_key=True)
+    district_name = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+class Dist_Activity_7(Base):
+    __tablename__ =  'dist_activity_7'
+    rank = Column(Integer, primary_key=True)
+    district_name = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+class Dist_Activity_28(Base):
+    __tablename__ =  'dist_activity_28'
+    rank = Column(Integer, primary_key=True)
+    district_name = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+
+#HASHTAG Activity summary tables, split up by time period
+
+class Hash_Activity_1(Base):
+    __tablename__ =  'hash_activity_1'
+    rank = Column(Integer, primary_key=True)
+    hash_id = Column(Integer, nullable=False)
+    hashtag = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+
+class Hash_Activity_2(Base):
+    __tablename__ =  'hash_activity_2'
+    rank = Column(Integer, primary_key=True)
+    hash_id = Column(Integer, nullable=False)
+    hashtag = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+class Hash_Activity_7(Base):
+    __tablename__ =  'hash_activity_7'
+    rank = Column(Integer, primary_key=True)
+    hash_id = Column(Integer, nullable=False)
+    hashtag = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+class Hash_Activity_28(Base):
+    __tablename__ =  'hash_activity_28'
+    rank = Column(Integer, primary_key=True)
+    hash_id = Column(Integer, nullable=False)
+    hashtag = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+
+# Summary tables for Top_tweeters function (overview.html)
+
+class Top_Tweeters_1(Base):
+    __tablename__ =  'top_tweeters_1'
+    rank = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
+    user_scrname = Column(String, nullable=False)
+    user_cap_perc = Column(Float, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+
+class Top_Tweeters_2(Base):
+    __tablename__ =  'top_tweeters_2'
+    rank = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
+    user_scrname = Column(String, nullable=False)
+    user_cap_perc = Column(Float, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Top_Tweeters_7(Base):
+    __tablename__ =  'top_tweeters_7'
+    rank = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
+    user_scrname = Column(String, nullable=False)
+    user_cap_perc = Column(Float, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Top_Tweeters_28(Base):
+    __tablename__ =  'top_tweeters_28'
+    rank = Column(Integer, primary_key=True)
+    user_id = Column(String, nullable=False)
+    user_scrname = Column(String, nullable=False)
+    user_cap_perc = Column(Float, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Retweeted_Users_1(Base):
+    __tablename__ =  'retweeted_users_1'
+    rank = Column(Integer, primary_key=True)
+    original_author_scrname = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+
+class Retweeted_Users_2(Base):
+    __tablename__ =  'retweeted_users_2'
+    rank = Column(Integer, primary_key=True)
+    original_author_scrname = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrnamee)
+
+class Retweeted_Users_7(Base):
+    __tablename__ =  'retweeted_users_7'
+    rank = Column(Integer, primary_key=True)
+    original_author_scrname = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+class Retweeted_Users_28(Base):
+    __tablename__ =  'retweeted_users_28'
+    rank = Column(Integer, primary_key=True)
+    original_author_scrname = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+class Retweeted_Tweets_1(Base):
+    __tablename__ =  'retweeted_tweets_1'
+    rank = Column(Integer, primary_key=True)
+    post_id = Column(String, nullable=False)
+    original_post_id = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+
+class Retweeted_Tweets_2(Base):
+    __tablename__ =  'retweeted_tweets_2'
+    rank = Column(Integer, primary_key=True)
+    post_id = Column(String, nullable=False)
+    original_post_id = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+class Retweeted_Tweets_7(Base):
+    __tablename__ =  'retweeted_tweets_7'
+    rank = Column(Integer, primary_key=True)
+    post_id = Column(String, nullable=False)
+    original_post_id = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+class Retweeted_Tweets_28(Base):
+    __tablename__ =  'retweeted_tweets_28'
+    rank = Column(Integer, primary_key=True)
+    post_id = Column(String, nullable=False)
+    original_post_id = Column(String, nullable=False)
+    count = Column(Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)

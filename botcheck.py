@@ -12,7 +12,7 @@ Base = declarative_base()
 
 
 from sqlalchemy import Column, Integer, String, Float, func
-from azmodels import User, Post, Hashtag, District, Url, Base, DateData
+from azmodels import User, Post, Hashtag, District, Url, Base
 Base.metadata.create_all(engine)
 
 from sqlalchemy.orm import sessionmaker
@@ -29,7 +29,7 @@ bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **tw
 
 x = 0
 
-for item in users[0:3000]:
+for item in users[4000:6000]:
 
     this_user = session.query(User).\
     filter(User.user_scrname==item[0]).first()
