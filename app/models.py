@@ -350,7 +350,7 @@ class Top_Tweeters_1(db.Model):
     rank = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(25), nullable=False)
     user_scrname = db.Column(db.String(50), nullable=False)
-    user_cap_perc = db.Column(db.Float, nullable=False)
+    user_cap_perc = db.Column(db.Float)
     count = db.Column(db.Integer, nullable=False)
 
     def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
@@ -370,7 +370,7 @@ class Top_Tweeters_2(db.Model):
     rank = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(25), nullable=False)
     user_scrname = db.Column(db.String(50), nullable=False)
-    user_cap_perc = db.Column(db.Float, nullable=False)
+    user_cap_perc = db.Column(db.Float)
     count = db.Column(db.Integer, nullable=False)
 
     def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
@@ -389,7 +389,7 @@ class Top_Tweeters_7(db.Model):
     rank = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(25), nullable=False)
     user_scrname = db.Column(db.String(50), nullable=False)
-    user_cap_perc = db.Column(db.Float, nullable=False)
+    user_cap_perc = db.Column(db.Float)
     count = db.Column(db.Integer, nullable=False)
 
     def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
@@ -408,7 +408,7 @@ class Top_Tweeters_28(db.Model):
     rank = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(25), nullable=False)
     user_scrname = db.Column(db.String(50), nullable=False)
-    user_cap_perc = db.Column(db.Float, nullable=False)
+    user_cap_perc = db.Column(db.Float)
     count = db.Column(db.Integer, nullable=False)
 
     def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
