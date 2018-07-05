@@ -29,7 +29,7 @@ posturl_assoc = db.Table('posturl_assoc',
 class User(db.Model):
     __tablename__='User'
     user_id = db.Column(db.String, primary_key=True)
-    user_scrname = db.Column(db.String, nullable=False)
+    user_scrname = db.Column(db.String, index=True, nullable=False)
     user_name = db.Column(db.String)
     user_location = db.Column(db.String)
     user_created = db.Column(db.String)
@@ -38,25 +38,17 @@ class User(db.Model):
     user_statuses = db.Column(db.Integer)
     user_botprob = db.Column(db.Float)
     user_botprob_cap = db.Column(db.Float)
-    user_cap_perc = db.Column(db.Float)
+    user_cap_perc = db.Column(db.Float, index=True)
 
     user_posts = db.relationship("Post", back_populates="user")
 
-    user_user_scrname_index = db.Index('user_user_scrname_idx', 'user_scrname')
-    user_user_cap_perc_index = db.Index('user_user_cap_perc_idx', 'user_scrname')
+#    user_user_scrname_index = db.Index('user_user_scrname_idx', 'user_scrname')
+#    user_user_cap_perc_index = db.Index('user_user_cap_perc_idx', 'user_scrname')
 
-    # def __init__(self, user_id, user_scrname, user_name, user_location, user_created, user_followers, user_friends, user_statuses):
-    #     self.user_id = user_id
-    #     self.user_scrname = user_scrname
-    #     self.user_name = user_name
-    #     self.user_location = user_location
-    #     self.user_created = user_created
-    #     self.user_followers = user_followers
-    #     self.user_friends = user_friends
-    #     self.user_statuses = user_statuses
 
     def __repr__(self):
-        return "Object: Twitter User with id {0!r} and screen name {1!r}".format(self.user_id, self.user_scrname)
+        return "Object: Twitter User with id {0!r} and screen name {1!r}".\
+        format(self.user_id, self.user_scrname)
 
 
 
@@ -65,7 +57,7 @@ class Post(db.Model):
     post_id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('User.user_id'), nullable=False)
     text = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.String, nullable=False, index=True)
     reply_to_user_id = db.Column(db.String)
     reply_to_scrname = db.Column(db.String)
     reply_to_status_id = db.Column(db.String)
@@ -79,7 +71,7 @@ class Post(db.Model):
     original_tweet_created_at = db.Column(db.String)
     original_tweet_likes = db.Column(db.Integer)
     original_author_id = db.Column(db.String)
-    original_author_scrname = db.Column(db.String)
+    original_author_scrname = db.Column(db.String, index=True)
 
     polarity = db.Column(db.Integer)
     polarity_val = db.Column(db.String)
@@ -104,9 +96,9 @@ class Post(db.Model):
         back_populates = "url_posts"
         )
 
-    post_created_at_index = db.Index('post_created_at_idx', 'created_at')
-    post_original_author_scrname_index = db.Index('post_original_author_scrname_idx',
-        'original_author_scrname')
+#    post_created_at_index = db.Index('post_created_at_idx', 'created_at')
+#    post_original_author_scrname_index = db.Index('post_original_author_scrname_idx',
+#        'original_author_scrname')
 
 
     def __init__(self, post_id, user_id, text, created_at, reply_to_user_id,
@@ -140,14 +132,14 @@ class Post(db.Model):
 class Hashtag(db.Model):
     __tablename__='Hashtag'
     hash_id = db.Column(db.Integer, primary_key=True)
-    hashtag = db.Column(db.String)
-    #post_id = db.Column(db.String, db.ForeignKey('Post.post_id'))
+    hashtag = db.Column(db.String, index=True)
+
     hashtag_posts = db.relationship(
             "Post",
             secondary = posthash_assoc,
             back_populates = "hashtags"
         )
-    hashtag_hashtag_index = db.Index('hashtag_hashtag_idx','hashtag')
+#    hashtag_hashtag_index = db.Index('hashtag_hashtag_idx','hashtag')
 
     def __init__(self, hashtag):
         self.hashtag = hashtag
@@ -182,7 +174,7 @@ class District(db.Model):
     #post_id = db.Column(db.String, db.ForeignKey('Post.post_id'))
     state = db.Column(db.String)
     district = db.Column(db.String)
-    district_name = db.Column(db.String)
+    district_name = db.Column(db.String, index=True)
     incumbent = db.Column(db.String)
     trump_2016 = db.Column(db.Float)
     clinton_2016 = db.Column(db.Float)
@@ -197,7 +189,7 @@ class District(db.Model):
         back_populates = "districts"
     )
 
-    district_district_name_index = db.Index('district_district_name_idx', 'district_name')
+#    district_district_name_index = db.Index('district_district_name_idx', 'district_name')
 
     #TO ADD IN LATER VERSION: Also possible array of candidates, so don't limit to 2-party
     # district_type = db.Column(db.Integer)
