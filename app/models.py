@@ -204,3 +204,350 @@ class District(db.Model):
 
     def __repr__(self):
         return "District object with district {0}".format(self.district_name)
+
+
+
+### HERE BEGINS SUMMARY/ROLLUP TABLES SERVING AS CACHE FOR OVERVIEW ##
+
+class Dist_Activity_1(db.Model):
+    __tablename__ =  'dist_activity_1'
+    rank = db.Column(db.Integer, primary_key=True)
+    district_name = db.Column(db.String(12), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+
+class Dist_Activity_2(db.Model):
+    __tablename__ =  'dist_activity_2'
+    rank = db.Column(db.Integer, primary_key=True)
+    district_name = db.Column(db.String(12), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+class Dist_Activity_7(db.Model):
+    __tablename__ =  'dist_activity_7'
+    rank = db.Column(db.Integer, primary_key=True)
+    district_name = db.Column(db.String(12), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+class Dist_Activity_28(db.Model):
+    __tablename__ =  'dist_activity_28'
+    rank = db.Column(db.Integer, primary_key=True)
+    district_name = db.Column(db.String(12), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, district_name, count):
+        self.rank = rank
+        self.district_name = district_name
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for district: {}".\
+        format(self.district_name)
+
+
+#HASHTAG Activity summary tables, split up by time period
+
+class Hash_Activity_1(db.Model):
+    __tablename__ =  'hash_activity_1'
+    rank = db.Column(db.Integer, primary_key=True)
+    hash_id = db.Column(db.Integer, nullable=False)
+    hashtag = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+
+class Hash_Activity_2(db.Model):
+    __tablename__ =  'hash_activity_2'
+    rank = db.Column(db.Integer, primary_key=True)
+    hash_id = db.Column(db.Integer, nullable=False)
+    hashtag = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+class Hash_Activity_7(db.Model):
+    __tablename__ =  'hash_activity_7'
+    rank = db.Column(db.Integer, primary_key=True)
+    hash_id = db.Column(db.Integer, nullable=False)
+    hashtag = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+class Hash_Activity_28(db.Model):
+    __tablename__ =  'hash_activity_28'
+    rank = db.Column(db.Integer, primary_key=True)
+    hash_id = db.Column(db.Integer, nullable=False)
+    hashtag = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, hash_id, hashtag, count):
+        self.rank = rank
+        self.hash_id = hash_id
+        self.hashtag = hashtag
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for hashtag: {}".\
+        format(self.hashtag)
+
+
+# Summary tables for Top_tweeters function (overview.html)
+
+class Top_Tweeters_1(db.Model):
+    __tablename__ =  'top_tweeters_1'
+    rank = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(25), nullable=False)
+    user_scrname = db.Column(db.String(50), nullable=False)
+    user_cap_perc = db.Column(db.Float, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+
+class Top_Tweeters_2(db.Model):
+    __tablename__ =  'top_tweeters_2'
+    rank = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(25), nullable=False)
+    user_scrname = db.Column(db.String(50), nullable=False)
+    user_cap_perc = db.Column(db.Float, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Top_Tweeters_7(db.Model):
+    __tablename__ =  'top_tweeters_7'
+    rank = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(25), nullable=False)
+    user_scrname = db.Column(db.String(50), nullable=False)
+    user_cap_perc = db.Column(db.Float, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Top_Tweeters_28(db.Model):
+    __tablename__ =  'top_tweeters_28'
+    rank = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(25), nullable=False)
+    user_scrname = db.Column(db.String(50), nullable=False)
+    user_cap_perc = db.Column(db.Float, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, user_id, user_scrname, user_cap_perc, count):
+        self.rank = rank
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_cap_perc = user_cap_perc
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for user: {}".\
+        format(self.user_scrname)
+
+class Retweeted_Users_1(db.Model):
+    __tablename__ =  'retweeted_users_1'
+    rank = db.Column(db.Integer, primary_key=True)
+    original_author_scrname = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+
+class Retweeted_Users_2(db.Model):
+    __tablename__ =  'retweeted_users_2'
+    rank = db.Column(db.Integer, primary_key=True)
+    original_author_scrname = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrnamee)
+
+class Retweeted_Users_7(db.Model):
+    __tablename__ =  'retweeted_users_7'
+    rank = db.Column(db.Integer, primary_key=True)
+    original_author_scrname = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+class Retweeted_Users_28(db.Model):
+    __tablename__ =  'retweeted_users_28'
+    rank = db.Column(db.Integer, primary_key=True)
+    original_author_scrname = db.Column(db.String(50), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, original_author_scrname, count):
+        self.rank = rank
+        self.original_author_scrname = original_author_scrname
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for user: {}".\
+        format(self.original_author_scrname)
+
+class Retweeted_Tweets_1(db.Model):
+    __tablename__ =  'retweeted_tweets_1'
+    rank = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.String(25), nullable=False)
+    original_post_id = db.Column(db.String(25), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 1 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+
+class Retweeted_Tweets_2(db.Model):
+    __tablename__ =  'retweeted_tweets_2'
+    rank = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.String(25), nullable=False)
+    original_post_id = db.Column(db.String(25), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 2 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+class Retweeted_Tweets_7(db.Model):
+    __tablename__ =  'retweeted_tweets_7'
+    rank = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.String(25), nullable=False)
+    original_post_id = db.Column(db.String(25), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 7 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
+
+class Retweeted_Tweets_28(db.Model):
+    __tablename__ =  'retweeted_tweets_28'
+    rank = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.String(25), nullable=False)
+    original_post_id = db.Column(db.String(25), nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, rank, post_id, original_post_id, count):
+        self.rank = rank
+        self.post_id = post_id
+        self.original_post_id = original_post_id
+        self.count = count
+
+    def __repr__(self):
+        return "Object: 28 day activity summary (# of tweets) for tweet: {}".\
+        format(self.post_id)
