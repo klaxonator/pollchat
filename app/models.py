@@ -487,14 +487,21 @@ class Retweeted_Tweets_1(db.Model):
     __tablename__ =  'retweeted_tweets_1'
     rank = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(25), nullable=False)
-    original_post_id = db.Column(db.String(25), nullable=False)
-    count = db.Column(db.Integer, nullable=False)
+    original_poster = db.Column(db.String(50), nullable=False)
+    retweet_count = db.Column(db.Integer, nullable=False)
+    post_html = db.Column(db.Text, nullable=False)
+    botscore = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, rank, post_id, original_post_id, count):
+
+    def __init__(self, rank, post_id, original_poster, \
+    retweet_count, post_html, botscore):
         self.rank = rank
         self.post_id = post_id
-        self.original_post_id = original_post_id
-        self.count = count
+        self.original_poster = original_poster
+        self.retweet_count = retweet_count
+        self.post_html = post_html
+        self.botscore = botscore
+
 
     def __repr__(self):
         return "Object: 1 day activity summary (# of tweets) for tweet: {}".\
@@ -505,14 +512,19 @@ class Retweeted_Tweets_2(db.Model):
     __tablename__ =  'retweeted_tweets_2'
     rank = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(25), nullable=False)
-    original_post_id = db.Column(db.String(25), nullable=False)
-    count = db.Column(db.Integer, nullable=False)
+    original_poster = db.Column(db.String(50), nullable=False)
+    retweet_count = db.Column(db.Integer, nullable=False)
+    post_html = db.Column(db.Text, nullable=False)
+    botscore = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, rank, post_id, original_post_id, count):
+    def __init__(self, rank, post_id, original_poster, \
+    retweet_count, post_html, botscore):
         self.rank = rank
         self.post_id = post_id
-        self.original_post_id = original_post_id
-        self.count = count
+        self.original_poster = original_poster
+        self.retweet_count = retweet_count
+        self.post_html = post_html
+        self.botscore = botscore
 
     def __repr__(self):
         return "Object: 2 day activity summary (# of tweets) for tweet: {}".\
@@ -522,14 +534,19 @@ class Retweeted_Tweets_7(db.Model):
     __tablename__ =  'retweeted_tweets_7'
     rank = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(25), nullable=False)
-    original_post_id = db.Column(db.String(25), nullable=False)
-    count = db.Column(db.Integer, nullable=False)
+    original_poster = db.Column(db.String(50), nullable=False)
+    retweet_count = db.Column(db.Integer, nullable=False)
+    post_html = db.Column(db.Text, nullable=False)
+    botscore = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, rank, post_id, original_post_id, count):
+    def __init__(self, rank, post_id, original_poster, \
+    retweet_count, post_html, botscore):
         self.rank = rank
         self.post_id = post_id
-        self.original_post_id = original_post_id
-        self.count = count
+        self.original_poster = original_poster
+        self.retweet_count = retweet_count
+        self.post_html = post_html
+        self.botscore = botscore
 
     def __repr__(self):
         return "Object: 7 day activity summary (# of tweets) for tweet: {}".\
@@ -539,14 +556,19 @@ class Retweeted_Tweets_28(db.Model):
     __tablename__ =  'retweeted_tweets_28'
     rank = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(25), nullable=False)
-    original_post_id = db.Column(db.String(25), nullable=False)
-    count = db.Column(db.Integer, nullable=False)
+    original_poster = db.Column(db.String(50), nullable=False)
+    retweet_count = db.Column(db.Integer, nullable=False)
+    post_html = db.Column(db.Text, nullable=False)
+    botscore = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, rank, post_id, original_post_id, count):
+    def __init__(self, rank, post_id, original_poster, \
+    retweet_count, post_html, botscore):
         self.rank = rank
         self.post_id = post_id
-        self.original_post_id = original_post_id
-        self.count = count
+        self.original_poster = original_poster
+        self.retweet_count = retweet_count
+        self.post_html = post_html
+        self.botscore = botscore
 
     def __repr__(self):
         return "Object: 28 day activity summary (# of tweets) for tweet: {}".\
