@@ -489,17 +489,17 @@ class Retweeted_Tweets_1(db.Model):
     post_id = db.Column(db.String(25), nullable=False)
     original_poster = db.Column(db.String(50), nullable=False)
     retweet_count = db.Column(db.Integer, nullable=False)
-    post_html = db.Column(db.Text, nullable=False)
+    # post_html = db.Column(db.Text)
     botscore = db.Column(db.String(50), nullable=False)
 
 
     def __init__(self, rank, post_id, original_poster, \
-    retweet_count, post_html, botscore):
+    retweet_count, botscore):
         self.rank = rank
         self.post_id = post_id
         self.original_poster = original_poster
         self.retweet_count = retweet_count
-        self.post_html = post_html
+        # self.post_html = post_html
         self.botscore = botscore
 
 
@@ -514,16 +514,16 @@ class Retweeted_Tweets_2(db.Model):
     post_id = db.Column(db.String(25), nullable=False)
     original_poster = db.Column(db.String(50), nullable=False)
     retweet_count = db.Column(db.Integer, nullable=False)
-    post_html = db.Column(db.Text, nullable=False)
+    # post_html = db.Column(db.Text)
     botscore = db.Column(db.String(50), nullable=False)
 
     def __init__(self, rank, post_id, original_poster, \
-    retweet_count, post_html, botscore):
+    retweet_count, botscore):
         self.rank = rank
         self.post_id = post_id
         self.original_poster = original_poster
         self.retweet_count = retweet_count
-        self.post_html = post_html
+        # self.post_html = post_html
         self.botscore = botscore
 
     def __repr__(self):
@@ -536,16 +536,16 @@ class Retweeted_Tweets_7(db.Model):
     post_id = db.Column(db.String(25), nullable=False)
     original_poster = db.Column(db.String(50), nullable=False)
     retweet_count = db.Column(db.Integer, nullable=False)
-    post_html = db.Column(db.Text, nullable=False)
+    # post_html = db.Column(db.Text, nullable=False)
     botscore = db.Column(db.String(50), nullable=False)
 
     def __init__(self, rank, post_id, original_poster, \
-    retweet_count, post_html, botscore):
+    retweet_count, botscore):
         self.rank = rank
         self.post_id = post_id
         self.original_poster = original_poster
         self.retweet_count = retweet_count
-        self.post_html = post_html
+        # self.post_html = post_html
         self.botscore = botscore
 
     def __repr__(self):
@@ -558,16 +558,16 @@ class Retweeted_Tweets_28(db.Model):
     post_id = db.Column(db.String(25), nullable=False)
     original_poster = db.Column(db.String(50), nullable=False)
     retweet_count = db.Column(db.Integer, nullable=False)
-    post_html = db.Column(db.Text, nullable=False)
+    # post_html = db.Column(db.Text, nullable=False)
     botscore = db.Column(db.String(50), nullable=False)
 
     def __init__(self, rank, post_id, original_poster, \
-    retweet_count, post_html, botscore):
+    retweet_count, botscore):
         self.rank = rank
         self.post_id = post_id
         self.original_poster = original_poster
         self.retweet_count = retweet_count
-        self.post_html = post_html
+        # self.post_html = post_html
         self.botscore = botscore
 
     def __repr__(self):
