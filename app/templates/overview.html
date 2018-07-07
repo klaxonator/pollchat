@@ -30,13 +30,13 @@
             <div class="py-5 text-left">
 
                 <h4><p>Total tweets in time period: <em>{{ all_tweets[0] }}</em></p></h4>
-{#                {% if most_active[0] %}
+                {% if most_active[0] %}
                 <h4><p>Most active district: <em>{{ most_active[0][0] }}</em>
                 {% endif %}
 
                 <h4><p>Most active tweeter: <em>{{ top_tweeters[0][0] }}</em></h4></p>
                 <h4><p>Most often retweeted: <em>{{ retweeted_users[0][0] }}</em></h4></p>
-#}
+
             </div>
             <div class="py-5">
                 <div class="dropdown text-right">
@@ -121,7 +121,7 @@
         </div>
         <div id="tweeters" class="left-table"></div>
 
-{#
+
         <div class="row">
             <div class="col-md-6">
                 <h2>Most active Tweeters</h2>
@@ -169,12 +169,12 @@
                 </table>
             </div>
         </div>
-#}
+
     </div>
 </div>
-{#
+
 {% include '_tweet_table.html' %}
-#}
+
 {% endblock %}
 
 {% block scripts %}

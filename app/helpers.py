@@ -7,8 +7,8 @@ from app.models import User, Post, District, Hashtag, Url
 def stringtime(time_delta):
     if time_delta == None:
         time_delta = "7"
-    time_range = datetime.now() - timedelta(days=int(time_delta))
-    str_time_range = time_range.strftime('%Y-%m-%d %H:%M:%S')
+    time_range = datetime.today() - timedelta(days=int(time_delta))
+    str_time_range = time_range.strftime('%Y-%m-%d')
     return str_time_range
 
 def get_tweet_datetime(stringtime, format='%Y-%m-%d %H:%M:%S'):
@@ -76,14 +76,16 @@ def check_district_relevance(db_tweet):
 
     # return True
 
-def check_district_relevance_st(db_tweet):
+def check_district_relevance_st(tweet_texts):
+
+    #Incoming db object has Post_id, Post.text, Post.original_text
 
     #Search district associations with post
-    db_tweet = db_tweet
+    tweet_texts = tweet_texts
 
     referenced_districts = db.session.query(District.district_name).\
     join(Post.districts).\
-    filter(Post.post_id == db_tweet[0]).all()
+    filter(Post.post_id == tweet_texts[0]).all()
 
     # Create list of districts associated with post - generally only one,
     # but someitmes multiple mentions
@@ -100,28 +102,132 @@ def check_district_relevance_st(db_tweet):
     for named_district in district_list:
         # print(distdict[named_district])
 
+        # check if any of district aliases are included in tweet text;
+        # if finds a match, return True
         for district_alias in distdict_short[named_district]:
 
-    # check if any of district aliases are included in tweet text;
-            # if finds a match, return True
-
-            #NOTE: too many variations of search found by twitter in scr_name
-            # if district_alias in db_tweet[1].lower() or \
-            #   district_alias in db_tweet[4].lower():
-            #     return False
-
-            if db_tweet[2]:
-                if district_alias in db_tweet[2].lower():
+            if tweet_texts[2]:
+                if district_alias in tweet_texts[2].lower():
                     return True
             else:
-                if district_alias in db_tweet[1].lower():
+                if district_alias in tweet_texts[1].lower():
                     return True
-    #
-    #if no match found, return False
+
+    # if no match found, return False
 
     return False
 
-    # return True
+
+
+
+
+
+def get_tweet_list_ids(db_search_object):
+
+    # produce list of top retweeted ids for fill. Db object is
+    # Post_post_id, Post.original_tweet_id, Post.retweet_count
+
+    most_retweeted_tweets = db_search_object
+    seen_tweets = []                    #list of tweets used to avoid duplicates
+    tweet_id_list = []                   #list of retweets to return
+    count = 0
+
+    skipped_tweets = []
+    for db_tweet in most_retweeted_tweets:
+
+        #if the tweet id/original tweet_id has already been seen, skip
+
+        if db_tweet[0] in seen_tweets or db_tweet[1] in seen_tweets:
+            continue
+
+        # Add IDs to seen_tweets list
+
+        seen_tweets.append(db_tweet[0])
+        if db_tweet[1]:
+            seen_tweets.append(db_tweet[1])
+
+
+        #Get text items for comparison
+
+        tweet_texts = db.session.query(Post.post_id, Post.text, Post.original_text,\
+        User.user_scrname, Post.tweet_html, Post.original_tweet_id).\
+        join(Post.user).\
+        filter(Post.post_id==db_tweet[0]).first()
+
+        check = check_district_relevance_st(tweet_texts)
+
+
+        if check == False:
+            # print("skipping tweet_id {0}, \ntext: {1}\n full_text: {2}\nscreen name: {3}\n\n".\
+            # format(tweet_texts[0], tweet_texts[1], tweet_texts[2], tweet_texts[3]))
+
+            skipped_tweets.append(tweet_texts[0])
+
+            continue
+
+        # Add ID to list of tweet to return, increment counter
+
+        tweet_id_list.append([db_tweet[0], tweet_texts[3], \
+        db_tweet[2], tweet_texts[4], tweet_texts[5]])
+        count += 1
+        # print("The Seen_Tweets list has {} items".format(len(seen_tweets)))
+        # print("The Skipped_Tweets list has {} items".format(len(skipped_tweets)))
+        if count == 20:
+            return tweet_id_list
+    return tweet_id_list
+
+
+def populate_tweet_list(tweet_list):
+
+    # tweet_list is list of 20 tweets, with each row including:
+    # [Post.post_id, relevant screen name, retweet_count, tweet_html (if exists),
+    # original_tweet_id]
+    populated_list = []
+
+    for item in tweet_list:
+        tweet = []
+
+        # LIST POSITION [0]: Base post ID
+        tweet.append(item[0])                               # Post.post_id
+
+        # LIST POSITION [1]: Screen name
+        tweet.append(item[1])                               # relevant screen name
+
+        # LIST POSITION [2]: Retweet Count
+        tweet.append(item[2])                               # retweet_count
+
+        # LIST POSITION [3]: Post HTML for Tweet display
+        if item[3]:
+            tweet.append(item[3])                           # tweet_html
+        else:
+            if item[4]:
+                try:
+                    tweet_html = get_tweet(item[4])         # get html of original tweet
+                    tweet.append(tweet_html)                # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+            #if not RT (no original_tweet_id), use post ID
+            else:
+                try:
+                    tweet_html = get_tweet(item[0])         # get html of base tweet
+                    tweet.append(tweet_html)                # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+        # LIST POSITION [4]: User Botscore
+        botscore = db.session.query(User.user_cap_perc).\
+        filter(User.user_scrname==tweet[1]).first()
+
+        if botscore[0]:
+            tweet.append(botscore[0])                       # append botscore
+        else:
+            tweet.append("Not yet in database")
+
+        populated_list.append(tweet)
+
+    return populated_list
+
 
 def get_tweet_list(db_search_object):
 
@@ -131,19 +237,19 @@ def get_tweet_list(db_search_object):
 
 
     most_retweeted_tweets = db_search_object
-    original_tweets = []                #list of tweets used to avoid duplicates
+    seen_tweets = []                #list of tweets used to avoid duplicates
     most_retweeted_tweet_list = []      #list of retweets for site
     count = 0                           #count to get total of 5
 
     for db_tweet in most_retweeted_tweets:
 
-        #if the tweet id has already been seen, skip
+        #if the tweet id/original tweet_id has already been seen, skip
 
-        if db_tweet[3] in original_tweets or db_tweet[0] in original_tweets:
+        if db_tweet[3] in seen_tweets or db_tweet[0] in seen_tweets:
             continue
-        original_tweets.append(db_tweet[0])
+        seen_tweets.append(db_tweet[0])
         if db_tweet[3]:
-            original_tweets.append(db_tweet[3])
+            seen_tweets.append(db_tweet[3])
 
         #Check if district name is in text
         check = check_district_relevance(db_tweet)
@@ -153,53 +259,64 @@ def get_tweet_list(db_search_object):
             # print("Screenname was: {}".format(db_tweet[4]))
             continue
 
+
+
         #create actual tweet list
-
-
         tweet = []
+
+        # LIST POSITION [0]: Post.post_id
         tweet.append(db_tweet[0])       #post_id: list [db_tweet0]
 
+        # LIST POSITION [1]: Author screen name (orig author if RT)
         if db_tweet[1]:                     #if retweet
-            tweet.append(db_tweet[1])   #original_author_scrname : list db_tweet[1]
+            tweet.append(db_tweet[1])           #post originak author
 
         else:                           # or if original tweet
-            tweet.append(db_tweet[4])   #original poster
+            tweet.append(db_tweet[4])       #User.user_scrname
 
-        tweet.append(db_tweet[2])       #retweet count; list db_tweet[2]
-            #if loop: if tweet_html exists, don't go looking for it
+        # LIST POSITION [2]: Retweet Count
+        tweet.append(db_tweet[2])
+
+
+        # LIST POSITION [3]: Post HTML (to call Tweet)
+            #if loop: if tweet_html already exists
         if db_tweet[5]:
-            tweet.append(db_tweet[5])         #tweet_html: list db_tweet[5]
+            tweet.append(db_tweet[5])         #tweet_html
 
-            #if no tweet_html, then go to Twitter for the Tweet
+            #if no tweet_html, then get HTML from Twitter
         else:
             #if RT (if original_tweet_id exists)
             if db_tweet[3]:
                 try:
-                    tweet_html = get_tweet(db_tweet[3]) #get html of original tweet
-                    tweet.append(tweet_html)   #tweet_text: list db_tweet[3]
-                except:
-                    tweet.append("Can't retrieve Tweet")
-            #if not RT (no original_tweet_id), use post ID
-            else:
-                try:
-                    tweet_html = get_tweet(db_tweet[0]) #get html of base tweet
-                    tweet.append(tweet_html)
+                    tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
+                    tweet.append(tweet_html)            # add tweet_text
                 except:
                     tweet.append("Can't retrieve Tweet")
 
-        #Get botscore for original poster using tweet[1]: either
-        #original_author (if RT) or post author (if not RT)
+            #if not RT (no original_tweet_id), use post ID
+            else:
+                try:
+                    tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
+                    tweet.append(tweet_html)                # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+
+        # LIST POSITION [4]: Botscore
+            # Get botscore for original poster using the tweet[1] of this list:
+            # either original_author (if RT) or post author (if not RT)
         botscore = db.session.query(User.user_cap_perc).\
         filter(User.user_scrname==tweet[1]).first()
 
         if botscore:
-            tweet.append(botscore[0])           #list db_tweet[4]
+            tweet.append(botscore[0])           # append botscore
         else:
             tweet.append("Not yet in database")
-        if db_tweet[3]:
-            tweet.append("ORIGINAL_ID:{}".format(db_tweet[3]))
-        else:
-            tweet.append("ORIGINAL TWEET")
+
+        # if db_tweet[3]:
+        #     tweet.append("ORIGINAL_ID:{}".format(db_tweet[3]))
+        # else:
+        #     tweet.append("ORIGINAL TWEET")
         # print(tweet)
         most_retweeted_tweet_list.append(tweet)
         count += 1

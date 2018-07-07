@@ -214,15 +214,24 @@ def overview(dynamic):
     url = request.path
     str_time_range = stringtime(time_delta)
 
-    #Get a desc-ordered list of all hashtags being used in all districts
-    all_hashes = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
-    join(Post.hashtags).\
-    filter(Post.created_at >= str_time_range).\
-    group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+    conn = db.engine.connect()
+
+
+    # Get a desc-ordered list of all hashtags being used in all districts
+    # Object returns (hashtag, count)
+    all_hashes_result = conn.execute('SELECT hashtag, count FROM hash_activity_{};'.\
+    format(time_delta))
+
+    #RETURN THIS TO TEMPLATE
+    all_hashes = []
+
+    for item in all_hashes_result:
+        all_hashes.append(item)
 
     print("got all_hashes")
 
     #Get a list of tophashtags without district names
+    # RETURN THIS TO TEMPLATE
     hashes_no_dists = []
     counter = 0
     for item in all_hashes:
@@ -232,65 +241,93 @@ def overview(dynamic):
         if counter == 20:
             break
 
-    #GET 10-day table data for hashtag chart from graph_functions module
+    # GET 10-day table data for hashtag chart from graph_functions module
+    # RETURN THIS TO TEMPLATE
     hashtable_all = gf.get_all_hashrows()
 
     print("got hashtable")
 
+    # RETURN THIS TO TEMPLATE
     all_tweets = db.session.query(func.count(Post.post_id)).\
     filter(Post.created_at >= str_time_range).first()
 
     print("got all tweets")
 
 
-    # #Get list of most active districts
-    # most_active = db.session.query(District.district_name,\
-    # func.count(District.district_name)).\
-    # join(Post.districts).\
-    # filter(Post.created_at >= str_time_range).\
-    # group_by(District.district_name).\
-    # order_by(func.count(District.district_name).desc()).all()
-    #
-    # print("got most_active")
+    #Get list of most active districts
 
-    # #Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
-    # top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname), \
-    # User.user_cap_perc, User.user_id).\
-    # join(Post.user).\
-    # filter(Post.created_at >= str_time_range).\
-    # group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
-    #
-    # print("got top_tweeters")
-    #
-    # retweeted_users = db.session.query(Post.original_author_scrname, \
-    # func.count(Post.original_author_scrname)).\
-    # filter(Post.original_author_scrname != "").filter(Post.created_at >= str_time_range).\
-    # group_by(Post.original_author_scrname).order_by(func.count(Post.original_author_scrname).\
-    # desc()).all()
-    #
-    # print("got retweeted users")
-    #
-    # most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
-    # Post.text, Post.original_text).\
-    # join(Post.user).\
-    # filter(Post.created_at >= str_time_range).\
-    # group_by(Post.post_id).order_by(Post.retweet_count.desc()).all()
-    #
-    # print("got most retweeted tweets")
-    #
-    # most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
-    #
-    # print("got tweet list")
+    active_dists_result = conn.execute('SELECT district_name, count FROM dist_activity_{};'.\
+    format(time_delta))
+
+    # RETURN THIS TO TEMPLATE
+    most_active = []
+
+    for item in active_dists_result:
+        most_active.append(item)
+
+
+    print("got most_active")
+
+    # Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
+    top_tweeters_result = conn.execute('SELECT user_scrname, count, user_cap_perc FROM top_tweeters_{};'.\
+    format(time_delta))
+
+    # RETURN THIS TO TEMPLATE
+    top_tweeters = []
+
+    for item in top_tweeters_result:
+        top_tweeters.append(item)
+
+
+    print("got top_tweeters")
+
+    retweeted_users_result = conn.execute('SELECT original_author_scrname, count FROM retweeted_users_{};'.\
+    format(time_delta))
+
+    # RETURN THIS TO TEMPLATE
+    retweeted_users = []
+
+    for item in retweeted_users_result:
+        retweeted_users.append(item)
+
+
+
+    print("got retweeted users")
+
+    retweeted_tweets_result = conn.execute('SELECT post_id, original_poster, retweet_count, botscore FROM retweeted_tweets_{};'.\
+    format(time_delta))
+
+    # RETURN THIS TO TEMPLATE
+    most_retweeted_tweet_list = []
+
+    # Each item (tuple) is post_id, poster, count, botscore. Still need HTML
+    for item in retweeted_tweets_result:
+
+        #create list with attributes
+        holding_list = []
+        for attribute in item:
+            holding_list.append(attribute)
+
+        # Get Tweet HTML, add to list
+        try:
+            tweet_text = get_tweet(item[0])
+            holding_list.append(tweet_text)
+        except:
+            holding_list.append("Can't retrieve tweet")
+
+        most_retweeted_tweet_list.append(holding_list)
+
+    print("got most retweeted tweets")
+
+    conn.close()
 
     return render_template('overview.html', t_form=ChangeTimeForm(), \
     all_form=AllCongSearchForm(), dynamic=dynamic, time_delta=time_delta, \
     url=url, all_hashes=all_hashes,  hashes_no_dists=hashes_no_dists, \
-    hashtable_all=hashtable_all, all_tweets=all_tweets\
-    # most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    # most_retweeted_tweet_list=most_retweeted_tweet_list\
-    # top_tweeters=top_tweeters, retweeted_users=retweeted_users,
-    # most_active=most_active\
+    hashtable_all=hashtable_all, all_tweets=all_tweets,\
+    most_retweeted_tweet_list=most_retweeted_tweet_list,\
+    top_tweeters=top_tweeters, retweeted_users=retweeted_users,
+    most_active=most_active\
     )
 
 
