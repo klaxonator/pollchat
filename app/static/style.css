@@ -1,23 +1,55 @@
 
+* {
+ box-sizing: border-box;
+}
+*:before,
+*:after {
+ box-sizing: border-box;
+}
+
+html,
+body {
+ height: 100%;
+ position: relative;
+}
+
+#full-container,
+#shell {
+    min-height: 100vh; /* will cover the 100% of viewport */;
+}
+
+/*
+
 html,
 .content-wrap {
     margin: 0;
     padding: 0px;
-    height: 100%;
-    padding-top: 70px;
-    /*padding-bottom: 50px; */
+
+    padding-bottom: 50px;
 
   }
+ */
 
+/* THIS IS ENTIRE VIEWSCRIEEN CONTAINER */
 #full-container {
-    min-height: 100%;
     position: relative;
+    overflow: hidden;
+    display: block;
+    position: relative;
+    padding-bottom: 50px; /* height of your footer */
 }
 
 .content-wrap {
-      padding: 10px;
-      padding-bottom: 50px;
+    margin: 0;
+    padding: 10px;
+    padding-bottom: 50px;
+    padding-top: 70px;
   }
+
+#main-wrapper {
+  display: block;
+  overflow: auto;
+}
 
 /* FROM NAVBAR
 body {
@@ -34,17 +66,20 @@ footer {
     padding: 15px;
     bottom:0;
     width:100%;
+    position: absolute;
 
 }
 
 
-
+/*
 .content-wrap:after {
     content: " ";
     display: block;
+    height: 50;
 }
+*/
 
-footer, .content-wrap:after {
+footer {
     height: 50px;
 }
 
@@ -117,10 +152,7 @@ li:active {
    z-index: 9999;
 }
 
-#main-wrapper {
-    display: block;
-    overflow: auto;
-}
+
 
 /* @media screen and (max-width: 992px) {
   #main  {

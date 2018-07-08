@@ -155,11 +155,11 @@ def hashtag(dynamic):
     str_time_range = stringtime(time_delta)
 
 
-    top_districts=db.session.query(District.district_name, \
-    func.count(District.district_name)).\
+    top_districts=db.session.query(District.district_id, District.district_name, \
+    func.count(District.district_id), District.state_fullname, District.district).\
     join(Post.districts).join(Post.hashtags).\
     filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
-    group_by(District.district_name).order_by(func.count(District.district_name).\
+    group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
 
     top_users=db.session.query(User.user_scrname, func.count(User.user_scrname), \
@@ -276,7 +276,10 @@ def overview(dynamic):
     top_tweeters = []
 
     for item in top_tweeters_result:
-        top_tweeters.append(item)
+        if item == -1.0:
+            top_tweeters.append("Not yet in database")
+        else:
+            top_tweeters.append(item)
 
 
     print("got top_tweeters")
@@ -299,7 +302,7 @@ def overview(dynamic):
 
     # RETURN THIS TO TEMPLATE
     most_retweeted_tweet_list = []
-
+    tweet_count = 0
     # Each item (tuple) is post_id, poster, count, botscore. Still need HTML
     for item in retweeted_tweets_result:
 
@@ -316,6 +319,9 @@ def overview(dynamic):
             holding_list.append("Can't retrieve tweet")
 
         most_retweeted_tweet_list.append(holding_list)
+        tweet_count += 1
+        if tweet_count == 5:
+            break
 
     print("got most retweeted tweets")
 
@@ -502,16 +508,8 @@ def botspy(dynamic):
 @app.route('/about')
 def about():
     url = request.path
-    tweet_pull_nums = ['463440424141459456', '994575803504513024', '994575803504513024']
-    tweet_pull = []
-    for num in tweet_pull_nums:
-        x = get_tweet(num)
-        tweet_pull.append(x)
 
-    tweetlist = ['994575803504513024', '994575803504513024']
-    return render_template('about.html', tweetlist=tweetlist,\
-    get_tweet=get_tweet, tweet_pull=tweet_pull, test_insert=test_insert,\
-    url=url)
+    return render_template('about.html', url=url)
 
 @app.route('/doesnt_exist/<dynamic>')
 def doesnt_exist(dynamic):
@@ -524,3 +522,9 @@ def test():
     rows = gf.get_hash_rows('ca49')
     return render_template('test.html', get_tweet=get_tweet, \
     test_hashgraph_data=test_hashgraph_data, test_usergraph_data=test_usergraph_data)
+
+@app.route('/how_to_use')
+def how_to_use():
+    url = request.path
+
+    return render_template('how_to_use.html', url=url)

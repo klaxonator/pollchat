@@ -235,6 +235,8 @@ def get_tweet_list(db_search_object):
     # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
     # Post.tweet_html, Post.text)
 
+    # db_object in order Post_id, original_author_scrname, retweet_count,\
+    # original_tweet_idk, user_scrname, tweet_html, text, original_text
 
     most_retweeted_tweets = db_search_object
     seen_tweets = []                #list of tweets used to avoid duplicates
@@ -265,20 +267,32 @@ def get_tweet_list(db_search_object):
         tweet = []
 
         # LIST POSITION [0]: Post.post_id
-        tweet.append(db_tweet[0])       #post_id: list [db_tweet0]
+        tweet.append(db_tweet[0])           # post_id: list [db_tweet0]
 
         # LIST POSITION [1]: Author screen name (orig author if RT)
         if db_tweet[1]:                     #if retweet
-            tweet.append(db_tweet[1])           #post originak author
+            tweet.append(db_tweet[1])           # post original author
 
-        else:                           # or if original tweet
-            tweet.append(db_tweet[4])       #User.user_scrname
+        else:                               # or if original tweet
+            tweet.append(db_tweet[4])       # User.user_scrname
 
         # LIST POSITION [2]: Retweet Count
         tweet.append(db_tweet[2])
 
 
-        # LIST POSITION [3]: Post HTML (to call Tweet)
+        # LIST POSITION [3]: Botscore
+            # Get botscore for original poster using the tweet[1] of this list:
+            # either original_author (if RT) or post author (if not RT)
+        botscore = db.session.query(User.user_cap_perc).\
+        filter(User.user_scrname==tweet[1]).first()
+
+        if botscore:
+            tweet.append(botscore[0])           # append botscore
+        else:
+            tweet.append("Not yet in database")
+
+
+        # LIST POSITION [4]: Post HTML (to call Tweet)
             #if loop: if tweet_html already exists
         if db_tweet[5]:
             tweet.append(db_tweet[5])         #tweet_html
@@ -302,22 +316,6 @@ def get_tweet_list(db_search_object):
                     tweet.append("Can't retrieve Tweet")
 
 
-        # LIST POSITION [4]: Botscore
-            # Get botscore for original poster using the tweet[1] of this list:
-            # either original_author (if RT) or post author (if not RT)
-        botscore = db.session.query(User.user_cap_perc).\
-        filter(User.user_scrname==tweet[1]).first()
-
-        if botscore:
-            tweet.append(botscore[0])           # append botscore
-        else:
-            tweet.append("Not yet in database")
-
-        # if db_tweet[3]:
-        #     tweet.append("ORIGINAL_ID:{}".format(db_tweet[3]))
-        # else:
-        #     tweet.append("ORIGINAL TWEET")
-        # print(tweet)
         most_retweeted_tweet_list.append(tweet)
         count += 1
         if count == 5:

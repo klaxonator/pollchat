@@ -51,7 +51,7 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
                 <ul class="nav navbar-nav navbar-right">
                     <li class="active"><a href="{{ url_for('index') }}">Home</a></li>
                     <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a hef="">How to use this site</a></li>
+                    <li><a href="{{ url_for('how_to_use') }}">How to use this site</a></li>
                 </ul>
             </div>
         </div>
@@ -61,7 +61,6 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
 {% endblock %}
 
 {% block content %}
-
 
 
     <div class="clearfix content-wrap">
@@ -74,6 +73,7 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
                 <ul class="nav nav-pills nav-stacked">
                     {% block left_sidenav_content %}{% endblock %}
                 </ul>
+                <h4><a href="{{ url_for('index') }}">Search again</a></h4>
             </div>
         </nav>
 
@@ -106,7 +106,6 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
                 <div class="col-sm-2 sidenav"></div>
 
             </div>
-
         </div>
     </div>
 
