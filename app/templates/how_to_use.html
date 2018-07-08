@@ -1,0 +1,195 @@
+{% extends "base_clean.html" %}
+
+{% block app_content %}
+
+<div id="#top" class="titlebox">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="py-5 text-center">
+                <h1 class="display-4">HOW TO USE THIS SITE</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <hr class="my-4">
+            <div class="py-5 text-left">
+
+            </div>
+
+
+            <hr class="my-4">
+        </div>
+        <div class="col-sm-2"></div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+
+        <h4><strong>WHAT IT DOES</strong></h4>
+
+        <p>
+        The Pollchat application searches for Twitter mentions of U.S. House
+        districts in which competitive races are expected during the fall
+        2018 elections.
+        </p>
+        <p>
+        As described in more detail below, the search function does not have
+        access to all Twitter posts. Thus, while strongly indicative of what’s
+        happening in the various districts, it is not a perfect representation.
+        </p>
+        <p>
+        <strong>Think of this as a window, not a microscope.</strong>
+        <br><br>
+        <h4><strong>BASIC FUNCTIONS</strong></h4>
+        <p>
+        <strong>How to use the basic search functions:</strong>
+        </p>
+        <ul>
+            <li>By district: Select district, time period. Press “Submit your
+                choice”.</li>
+            <li>By hashtag: Enter a hashtag, with or without #, choose a time
+                period.
+            Press “Submit your choice.”</li>
+            <li>Overall view: A summary of what’s happening in all 102 competitive
+            districts. Choose time period, press “Submit your choice.”</li>
+            <li>What are “bot-like users” doing? Choose time period, press “Submit
+            your choice.”</li>
+        </ul>
+        <p>
+        On each search-result page, you can also click on a user’s screen name
+        to go to a page summarizing their activity (within the selected time
+        frame). For privacy reasons, we do not provide the top-level ability to
+        search on or for individual users. Please visit Twitter itself for this
+        information.
+        </p>
+        <br>
+        <p>
+        <strong>What’s a “bot-like user”?</strong>
+        </p>
+        <p>
+        A “bot-like user” is our term for users on Twitter that exhibit certain
+        patterns of behavior that often (but not always) correspond to automated accounts.
+        </p>
+        <p>
+        To make this assignment, we use the
+        "<a href="https://botometer.iuni.iu.edu/#!/faq#what-is-cap">Complete
+        Automation Probability</a>" scores produced by
+        the Botometer,  a joint project of the Indiana University Network
+        Science Institute (IUNI) and the Center for Complex Networks and
+        Systems Research (CnetS). For the purposes of this website, we
+        deem any user with a Botometer CAP score of higher than 60 percent
+        to be a “bot-like user.”
+        </p>
+        <p>
+        <strong>PLEASE NOTE</strong>: The “bot-like user” term is ours, and not
+        the Botometer’s. Neither we nor the original researchers mean to imply
+        that any particular user is not completely human. The reference is solely
+        to patterns of Twitter activity.
+        </p>
+        <p>
+        For more information on the Botometer’s methodology, please visit
+        <a href="https://botometer.iuni.iu.edu/#!/">their project</a>.
+        </p>
+        <br>
+        <p>
+        <strong>Districts covered:</strong>
+        </p>
+        <p>
+        The selection of districts (102 in total) is primarily drawn from the
+        <a href="https://www.cookpolitical.com/ratings/house-race-ratings">Cook
+        Political Report’s</a> list of races deemed competitive as of
+        May 20, 2018. We do not include their detailed political analysis (which
+        districts are “likely Democratic” vs. “lean Republican”, etc.).
+        Please visit the site for this information.
+        </p>
+        <p>
+        As time passes, the list of districts generally deemed competitive will
+        shorten. We will not remove districts from our search or from our
+        database. However, we may add districts if additional areas become
+        unexpectedly competitive.
+        </p>
+
+        <br>
+
+        <p>
+        <strong>Time periods:</strong>
+        </p>
+        <p>
+        Each search can be organized by “Last 24 hours”, “Last 48 hours”,
+        “Last week”, or “Last 4 weeks.” In each case, that period ends at the
+        midnight preceding the search, standard UTC time.
+        </p>
+        <p>
+        For example, a “Last 24 hours” search made in Washington D.C. at 8:30 am
+        would in fact be receiving Tweets from 8:00 pm from two days before
+        through 8:00 pm the previous day. (For a UTC conversion tool, visit
+        <a href="https://www.timeanddate.com/worldclock/converter.html?iso=20180708T140000&p1=1440">
+        here</a>.
+        </p>
+
+        <br><br>
+
+        <h4><strong>TECHNICAL DETAILS</strong></h4>
+        <p>
+        All relevant code is stored on github at: https://github.com/klaxonator/pollchat,
+        aside from sensitive credential-style variables.
+        </p>
+        <br>
+
+        <p>
+        <strong>Core technologies:</strong>
+        </p>
+        <p>
+        The underlying Pollchat application is written in Python, and uses Flask,
+        Gunicorn and Nginx to serve pages. The underlying database is Mysql.
+        </p>
+        <br>
+        <p>
+        <strong>Twitter queries:</strong>
+        </p>
+        <p>
+        The Twitter data is collected using a daily search of Twitter’s Standard-level
+        Search API. NOTE: According to Twitter, this is a sampling of all Tweets.
+        No information is provided on the parameters of this sample, thus, we
+        cannot say how representative it is (hence the window-not-microscope analogy).
+        </p>
+        <p>
+        For each district, the search query takes the following form (the example
+        uses AZ09, or Arizona’s 9th congressional district):
+        </p>
+        <p><blockquote>
+
+        ‘az09' OR 'az-09' OR '#az09' OR '#az-09' OR '#az9'
+
+        </blockquote></p>
+        <p>
+        This generally acquires tweets that either mention the district’s
+        shorthand or use it as a hashtag.
+        </p>
+        <p>
+        In a few cases, a search term has been used overwhelmingly on Twitter
+        for a different purpose. These have been removed from the search query.
+        Specifically, these were: #mi6 (the British spy agency), #ks2 and #ks3
+        (educational programs), and #mi8 (a cell phone).
+        </p>
+        <p>
+        The search query returns exact text matches, but also includes tweets
+        from users whose screen names contains these strings (ie, @fl15_official).
+        Thus, the application also carries out a local text-matching process,
+        comparing the query terms to the tweet’s text field, before adding the
+        tweet to the database.
+        </p>
+
+
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+{% endblock %}
