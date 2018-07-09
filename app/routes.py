@@ -41,23 +41,24 @@ def district(dynamic):
 
     str_time_range = stringtime(time_delta)
 
+    # Most frequently used hashtags column
     dist_hashes = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.districts).join(Post.hashtags).\
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
-    print('got dist_hashes')
+    # print('got dist_hashes')
 
-    #top tweeters: changed to reflect sql_mode=only_full_group_by
+    # Most active tweeters column
     top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname),\
     User.user_cap_perc, User.user_id).\
     join(Post.user).join(Post.districts).\
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
     group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
 
-    print('got top_tweeters')
+    # print('got top_tweeters')
 
-    # NOTE: NEED *ORIGINAL_AUTHOR's BOTSCORE, NOT CURRENT POSTER'S (NOTE: DONE/BELOW)
+    # Most frequently retweeted users column )
     most_retweeted = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.districts).\
@@ -75,6 +76,7 @@ def district(dynamic):
         tweeter.append(item[0])
         tweeter.append(item[1])
 
+        # Get botscore for original authors
         botscore = db.session.query(User.user_cap_perc).\
         filter(User.user_scrname==item[0]).first()
 
@@ -84,9 +86,9 @@ def district(dynamic):
             tweeter.append("Not yet in database")
         most_retweeted_list.append(tweeter)
 
-    print('got most_retweeted')
+    # print('got most_retweeted')
 
-    #Rewrite of most-retweeted tweets
+    # Most retweeted tweets column
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     Post.text, Post.original_text).\
@@ -99,7 +101,7 @@ def district(dynamic):
 
     most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
 
-    print('got most_retweeted_list')
+    # print('got most_retweeted_list')
 
     #Get basic district object for district info
     dist_obj = db.session.query(District.state_fullname, District.district, \
@@ -107,11 +109,12 @@ def district(dynamic):
     District.trump_2016, District.dem_candidate, District.rep_candidate).\
     filter(District.district_name==dynamic).first()
 
-    print('got dist_obj')
+    # print('got dist_obj')
 
+    #Using 3-day index for top-row hashtags to spotlight
     hash_table_rows = gf.get_hash_rows(dynamic)
 
-    print('got chart_rows')
+    # print('got chart_rows')
 
     return render_template('district.html', dynamic=dynamic, time_delta=time_delta, \
     url=url, dist_hashes=dist_hashes, top_tweeters=top_tweeters, \
@@ -154,7 +157,7 @@ def hashtag(dynamic):
 
     str_time_range = stringtime(time_delta)
 
-
+    # Where is this hashtag used column
     top_districts=db.session.query(District.district_id, District.district_name, \
     func.count(District.district_id), District.state_fullname, District.district).\
     join(Post.districts).join(Post.hashtags).\
@@ -162,6 +165,7 @@ def hashtag(dynamic):
     group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
 
+    # "Who uses this hashtag" column
     top_users=db.session.query(User.user_scrname, func.count(User.user_scrname), \
     User.user_cap_perc).\
     join(Post.user).join(Post.hashtags).\
@@ -169,6 +173,7 @@ def hashtag(dynamic):
     group_by(User.user_id, User.user_cap_perc).\
     order_by(func.count(User.user_scrname).desc()).all()
 
+    # Data for positive/negative chart
     valences = db.session.query(Post.polarity_val, func.count(Post.polarity_val)).\
     join(Post.hashtags).\
     filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
@@ -178,6 +183,7 @@ def hashtag(dynamic):
     for item in valences:
         valences_datatable.append([item[0], item[1]])
 
+    # Most retweeted tweets column
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     Post.text, Post.original_text).\
@@ -268,7 +274,7 @@ def overview(dynamic):
 
     print("got most_active")
 
-    # Get a desc-ordered list of top-volume Tweeters (sql_mode=fixed)
+    # Get a desc-ordered list of top-volume Tweeters
     top_tweeters_result = conn.execute('SELECT user_scrname, count, user_cap_perc FROM top_tweeters_{};'.\
     format(time_delta))
 
@@ -276,10 +282,14 @@ def overview(dynamic):
     top_tweeters = []
 
     for item in top_tweeters_result:
-        if item == -1.0:
-            top_tweeters.append("Not yet in database")
+        new_row = []
+        new_row.append(item[0])
+        new_row.append(item[1])
+        if item[2] == -1.0:
+            new_row.append("Not yet in database")
         else:
-            top_tweeters.append(item)
+            new_row.append(item[2])
+        top_tweeters.append(new_row)
 
 
     print("got top_tweeters")

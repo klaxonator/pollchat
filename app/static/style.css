@@ -102,6 +102,15 @@ div.left-table::before {
     overflow:hidden;
 }
 
+a.text-nocolor, a.text-nocolor:link, {
+    color: #353737;
+}
+
+a.text-nocolor:link. a.text-nocolor:link {
+    color: #353737;
+    text-decoration: underline;
+}
+
 a:link {
     color: #1B6186;
     text-decoration: none;
@@ -119,12 +128,16 @@ a:hover {
 
 a:active {
       text-decoration: underline;
-  }
+}
 
 
 li:active {
-      color: #1B6186;
-  }
+    color: #1B6186;
+}
+
+.text-nocolor, text-nocolor:link {
+    color: #353737;
+}
 
   /* Adjust for 70px header on in-page targets */
 :target:before {

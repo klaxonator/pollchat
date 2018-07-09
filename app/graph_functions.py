@@ -10,25 +10,26 @@ from sqlalchemy import Column, Integer, String, Float, func
 
 
 #Set beginnin of searches at midnight, so have full-day comparisons
-str_today = date.today().strftime("%Y-%m-%d %H:%M:%S")
+today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
 
+str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
 
 
 def get_beg_date(time_delta):
-    beg_date = date.today() - timedelta(days=time_delta)
+    beg_date = today - timedelta(days=time_delta)
     str_beg_date = beg_date.strftime("%Y-%m-%d %H:%M:%S")
     shrt_beg_date = beg_date.strftime('%b %d')
     results = [str_beg_date, shrt_beg_date]
     return results
 
 #Get top line for hash or user chart
-def top_line_all(var_type, index=1):
+def top_line_all(var_type, index=3):
 
     top_line = []
     top_line.append('Date')
 
     #Get beginning of time range (to expand if insufficient posts)
-    beg_range = date.today() - timedelta(days=index)
+    beg_range = today - timedelta(days=index)
     str_beg_range = beg_range.strftime("%Y-%m-%d %H:%M:%S")
 
     print("next try is: starting from {}".format(str_beg_range))
@@ -72,14 +73,14 @@ def top_line_all(var_type, index=1):
 
 
 
-
-def top_line_generic(this_district, var_type, index=1):
+# Get top line for charts. Index=3 means starting with 3-day running average
+def top_line_generic(this_district, var_type, index=3):
 
     top_line = []
     top_line.append('Date')
 
-    #Get beginning of time range (to expand if insufficient posts)
-    beg_range = date.today() - timedelta(days=index)
+    #Get (previous midnight) beginning of time range (to expand if insufficient posts)
+    beg_range = today - timedelta(days=index)
     str_beg_range = beg_range.strftime("%Y-%m-%d %H:%M:%S")
 
     print("next try is: starting from {}".format(str_beg_range))
@@ -104,7 +105,7 @@ def top_line_generic(this_district, var_type, index=1):
 
     counter = 0
     for item in top_list[0:7]:
-        if item[0] == this_district:
+        if item[0] in distlist:
             pass
         else:
             top_line.append(item[0])
@@ -142,11 +143,13 @@ def get_all_hashrows():
 
     #Top level loop through dates
     for x in range(1, 11):
+        # Using X as time_delta, get beg date of -1, -2, etc ... days
+        # Function returns (midnight, display date)
         beg_date = get_beg_date(x)
 
 
         #add short date version as first item of row
-        new_row.append(shrt_end_date)
+        new_row.append(beg_date[1])
 
 
         #For each date, iterate through seperate hashtag query for date range
@@ -199,7 +202,7 @@ def get_hash_rows(this_district):
 
 
         #add short date version as first item of row
-        new_row.append(shrt_end_date)
+        new_row.append(beg_date[1])
 
 
         #For each date, iterate through seperate hashtag query for date range
@@ -212,7 +215,7 @@ def get_hash_rows(this_district):
             filter(Post.created_at > beg_date[0]).filter(Post.created_at <= end_date).first()
 
             new_row.append(date_hash_num[0])
-            # print('Finished with hashtag: {}'.format(this_hashtag))
+            print('Finished with hashtag: {}'.format(this_hashtag))
 
         #Add new row to rows, reset new_row, move end-time back a day
         rows.append(new_row)

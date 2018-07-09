@@ -1,13 +1,16 @@
 from app import app, db
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 import requests
 from app.models import User, Post, District, Hashtag, Url
 
+
+# Time for functions always uses reference date/time of previous midnight UTC
 def stringtime(time_delta):
     if time_delta == None:
         time_delta = "7"
-    time_range = datetime.today() - timedelta(days=int(time_delta))
+    today = datetime.combine(date.today(), datetime.min.time())
+    time_range = today - timedelta(days=int(time_delta))
     str_time_range = time_range.strftime('%Y-%m-%d')
     return str_time_range
 
@@ -150,7 +153,8 @@ def get_tweet_list_ids(db_search_object):
         #Get text items for comparison
 
         tweet_texts = db.session.query(Post.post_id, Post.text, Post.original_text,\
-        User.user_scrname, Post.tweet_html, Post.original_tweet_id).\
+        User.user_scrname, Post.tweet_html, Post.original_tweet_id, \
+        Post.original_author_scrname).\
         join(Post.user).\
         filter(Post.post_id==db_tweet[0]).first()
 
@@ -165,10 +169,18 @@ def get_tweet_list_ids(db_search_object):
 
             continue
 
-        # Add ID to list of tweet to return, increment counter
 
-        tweet_id_list.append([db_tweet[0], tweet_texts[3], \
-        db_tweet[2], tweet_texts[4], tweet_texts[5]])
+
+        # List: Post_id, orig author name, retweet count, tweet_html, orig ID
+        if tweet_texts[6]:
+            tweet_id_list.append([db_tweet[0], tweet_texts[6], \
+            db_tweet[2], tweet_texts[4], tweet_texts[5]])
+
+        # List: Post_id, base post author, retweet count, tweet_html, orig ID
+        else:
+            tweet_id_list.append([db_tweet[0], tweet_texts[3], \
+            db_tweet[2], tweet_texts[4], tweet_texts[5]])
+
         count += 1
         # print("The Seen_Tweets list has {} items".format(len(seen_tweets)))
         # print("The Skipped_Tweets list has {} items".format(len(skipped_tweets)))
@@ -219,7 +231,7 @@ def populate_tweet_list(tweet_list):
         botscore = db.session.query(User.user_cap_perc).\
         filter(User.user_scrname==tweet[1]).first()
 
-        if botscore[0]:
+        if botscore:
             tweet.append(botscore[0])                       # append botscore
         else:
             tweet.append("Not yet in database")

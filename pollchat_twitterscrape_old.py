@@ -286,22 +286,22 @@ def twitter_search(query):
             for tag in skip_list:
                 if tag in tag_list or original_author_scrname == tag:
                     continue
-            else:
 
-                write_database(post_id, user_id, text, created_at, reply_to_user_id,
-                        reply_to_scrname, reply_to_status_id, retweet_count,
-                        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
-                        original_text, original_tweet_created_at, original_tweet_likes,
-                        original_author_id, original_author_scrname, polarity,
-                        polarity_val, tag_list, url_list, user_scrname, user_name,
-                        user_location, user_created, user_followers, user_friends,
-                        user_statuses, query)
 
-                count += 1
+            write_database(post_id, user_id, text, created_at, reply_to_user_id,
+                    reply_to_scrname, reply_to_status_id, retweet_count,
+                    favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                    original_text, original_tweet_created_at, original_tweet_likes,
+                    original_author_id, original_author_scrname, polarity,
+                    polarity_val, tag_list, url_list, user_scrname, user_name,
+                    user_location, user_created, user_followers, user_friends,
+                    user_statuses, query)
 
-                if count % 150 == 0:
-                    session.commit()
-                    print("{} items added to database so far".format(count))
+            count += 1
+
+            if count % 150 == 0:
+                session.commit()
+                print("{} items added to database so far".format(count))
 
     except tweepy.error.TweepError as err:
         print("Error raised: {0}".format(err))
