@@ -5,6 +5,7 @@ import tweepy
 import time
 from app.helpers import skip_list, get_tweet, distdict_short
 from app import app, db
+import fill_overview_tables_timed as fill
 
 #import preprocessor as p
 from textblob import TextBlob
@@ -337,5 +338,13 @@ def run_twitterscrape():
     db.session.close()
     print(datetime.datetime.now())
     time = datetime.datetime.now()
+
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('added items to database, finished at {}\n\n'.format(time))
+
+    #Run function filling overview-cache tables
+    fill.run_all()
+
+
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('filled all cache tables, finished at {}\n\n'.format(time))

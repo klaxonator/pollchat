@@ -223,6 +223,28 @@ def fill_retweeted_tweets(time_delta, table, table_new, table_old):
 
     conn.close()
 
+def run_all():
+    fill_dist_activity(1, 'dist_activity_1', 'dist_activity_1_new', 'dist_activity_1_old')
+    fill_dist_activity(2, 'dist_activity_2', 'dist_activity_2_new', 'dist_activity_2_old')
+    fill_dist_activity(7, 'dist_activity_7', 'dist_activity_7_new', 'dist_activity_7_old')
+    fill_dist_activity(28, 'dist_activity_28', 'dist_activity_28_new', 'dist_activity_28_old')
+    fill_hash_activity(1, 'hash_activity_1', 'hash_activity_1_new', 'hash_activity_1_old')
+    fill_hash_activity(2, 'hash_activity_2', 'hash_activity_2_new', 'hash_activity_2_old')
+    fill_hash_activity(7, 'hash_activity_7', 'hash_activity_7_new', 'hash_activity_7_old')
+    fill_hash_activity(28, 'hash_activity_28', 'hash_activity_28_new', 'hash_activity_28_old')
+    fill_retweeted_users(1, 'retweeted_users_1', 'retweeted_users_1_new', 'retweeted_users_1_old')
+    fill_retweeted_users(2, 'retweeted_users_2', 'retweeted_users_2_new', 'retweeted_users_2_old')
+    fill_retweeted_users(7, 'retweeted_users_7', 'retweeted_users_7_new', 'retweeted_users_7_old')
+    fill_retweeted_users(28, 'retweeted_users_28', 'retweeted_users_28_new', 'retweeted_users_28_old')
+    fill_top_tweeters(1, 'top_tweeters_1', 'top_tweeters_1_new', 'top_tweeters_1_old')
+    fill_top_tweeters(2, 'top_tweeters_2', 'top_tweeters_2_new', 'top_tweeters_2_old')
+    fill_top_tweeters(7, 'top_tweeters_7', 'top_tweeters_7_new', 'top_tweeters_7_old')
+    fill_top_tweeters(28, 'top_tweeters_28', 'top_tweeters_28_new', 'top_tweeters_28_old')
+    fill_retweeted_tweets(1, 'retweeted_tweets_1', 'retweeted_tweets_1_new', 'retweeted_tweets_1_old')
+    fill_retweeted_tweets(2, 'retweeted_tweets_2', 'retweeted_tweets_2_new', 'retweeted_tweets_2_old')
+    fill_retweeted_tweets(7, 'retweeted_tweets_7', 'retweeted_tweets_7_new', 'retweeted_tweets_7_old')
+    fill_retweeted_tweets(28, 'retweeted_tweets_28', 'retweeted_tweets_28_new', 'retweeted_tweets_28_old')
+
 
 if __name__ == '__main__':
     fill_dist_activity(1, 'dist_activity_1', 'dist_activity_1_new', 'dist_activity_1_old')

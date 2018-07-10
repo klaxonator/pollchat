@@ -406,8 +406,8 @@ def botweather_chart():
         beg_date = get_beg_date(x)
 
 
-        #add short date version as first item of row
-        new_row.append(shrt_end_date)
+        #add date as first item of row - use start date(midnight) fpr full day
+        new_row.append(beg_date[1])
 
         #Search for # of botposts between begdate and enddate
         date_botpost_count = db.session.query(func.count(Post.post_id)).\
@@ -452,7 +452,7 @@ def scrname_chart(screen_name):
     #Loop through week-long periods, starting from today
     for x in range(7, 71, 7):
         beg_date = get_beg_date(x)
-
+        last_chart_date = get_beg_date(1)
 
         #add short date version as first item of row
         new_row.append(shrt_end_date)

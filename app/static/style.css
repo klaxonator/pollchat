@@ -41,9 +41,9 @@ html,
 
 .content-wrap {
     margin: 0;
-    padding: 10px;
     padding-bottom: 50px;
     padding-top: 70px;
+    /*  padding: 10px; */
   }
 
 #main-wrapper {
@@ -186,12 +186,13 @@ li:active {
   overflow: auto;
   font-size: 12px;
   font-weight: 200;
-  background-color: #FFFFFF;
+
   position: fixed;
   top: 50px;
   width: 180px;
   height: auto;
   color: #353737;
+  z-index: 9990 !important
 }
 
 
@@ -201,7 +202,7 @@ li:active {
 }
 
 .nav-side-menu .brand {
-  background-color: #FFFFFF;
+  
   line-height: 50px;
   display: block;
   text-align: center;
@@ -216,8 +217,9 @@ li:active {
 }
 
 @media (min-width: 767px) {
-  .nav-side-menu .menu-list .menu-content {
+  .nav-side-menu .menu-list .menu-content .brand {
     display: block;
+    background-color: #FFFFFF;
   }
 #shell {
   	width:calc(100% - 180px);
@@ -230,8 +232,10 @@ li:active {
         /* position: relative; */
         width: 100%;
         margin-bottom: 10px;
-        background-color: #FFFFFF;
+        background-color: #F9F9F9;
+
     }
+
     .nav-side-menu .toggle-btn {
         display: block;
         cursor: pointer;
@@ -249,7 +253,7 @@ li:active {
         font-size: 22px;
         padding-left: 20px;
         line-height: 50px !important;
-        background-color: #FFFFFF;
+        background-color: #F9F9F9;
     }
 
     .content-wrap {
