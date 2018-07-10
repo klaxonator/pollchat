@@ -103,11 +103,11 @@ div.left-table::before {
 }
 
 a.text-nocolor, a.text-nocolor:link, {
-    color: #353737;
+    color: #353737 !important;
 }
 
 a.text-nocolor:link. a.text-nocolor:link {
-    color: #353737;
+    color: #353737 !important;
     text-decoration: underline;
 }
 
@@ -202,7 +202,7 @@ li:active {
 }
 
 .nav-side-menu .brand {
-  
+
   line-height: 50px;
   display: block;
   text-align: center;

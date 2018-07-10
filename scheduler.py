@@ -17,7 +17,7 @@ def main():
     sched = BlockingScheduler()
 
     job = sched.add_job(pt.run_twitterscrape, 'cron', hour=7, minute=10)
-    job = sched.add_job(pt.run_twitterscrape, 'cron', hour=19, minute=10)
+    job_two = sched.add_job(pt.run_twitterscrape, 'cron', hour=20, minute=30)
 
 
 
