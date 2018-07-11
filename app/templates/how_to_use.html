@@ -119,14 +119,12 @@
         <p>
         Each search can be organized by “Last 24 hours”, “Last 48 hours”,
         “Last week”, or “Last 4 weeks.” In each case, that period ends at the
-        midnight preceding the search, standard UTC time.
+        midnight preceding the search, standard UTC time (as a shorthand: London
+        time, but without daylight savings).
         </p>
         <p>
-        For example, a “Last 24 hours” search made in Washington D.C. at 8:30 am
-        would in fact be receiving Tweets from 8:00 pm from two days before
-        through 8:00 pm the previous day. (For a UTC conversion tool, visit
-        <a href="https://www.timeanddate.com/worldclock/converter.html?iso=20180708T140000&p1=1440">
-        here</a>.
+        For a converter between UTC and your own time zone, visit
+        <a href="http://www.timebie.com/std/utc.php">here</a>.
         </p>
 
         <br><br>
@@ -150,7 +148,7 @@
         <strong>Twitter queries:</strong>
         </p>
         <p>
-        The Twitter data is collected using a daily search of Twitter’s Standard-level
+        The Twitter data is collected using a twice-daily search of Twitter’s Standard-level
         Search API. NOTE: According to Twitter, this is a sampling of all Tweets.
         No information is provided on the parameters of this sample, thus, we
         cannot say how representative it is (hence the window-not-microscope analogy).
