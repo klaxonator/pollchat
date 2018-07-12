@@ -14,7 +14,7 @@ body {
 }
 
 #full-container,
-#shell {
+#shell, #main-wrapper {
     min-height: 100vh; /* will cover the 100% of viewport */;
 }
 
@@ -102,14 +102,7 @@ div.left-table::before {
     overflow:hidden;
 }
 
-a.text-nocolor, a.text-nocolor:link, {
-    color: #353737 !important;
-}
 
-a.text-nocolor:link. a.text-nocolor:link {
-    color: #353737 !important;
-    text-decoration: underline;
-}
 
 a:link {
     color: #1B6186;
@@ -130,6 +123,14 @@ a:active {
       text-decoration: underline;
 }
 
+a.text-nocolor, a.text-nocolor:link, {
+    color: #353737 !important;
+}
+
+a.text-nocolor:link. a.text-nocolor:link {
+    color: #353737 !important;
+    text-decoration: underline;
+}
 
 li:active {
     color: #1B6186;

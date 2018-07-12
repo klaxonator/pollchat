@@ -79,7 +79,11 @@
 <div class="row">
     <div class="col-sm-2"></div>
     <div class="col-sm-8 text-center">
+        {% if time_delta=='1' %}
+        <h2 class="text-muted">Data: Last {{ time_delta }} day</h2>
+        {% else %}
         <h2 class="text-muted">Data: Last {{ time_delta }} days</h2>
+        {% endif %}
         <hr class="my-4">
     </div>
     <div class="col-sm-2"></div>
