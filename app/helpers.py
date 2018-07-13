@@ -509,8 +509,10 @@ skip_list = [
     "hshq",
     "HSHQ",
     "thewarrior",
-    "TheWarrior"
-    "fl15_official"
+    "TheWarrior",
+    "fl15_official",
+    "cumbria",
+    "Cumbria"
     ]
 
 distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9'],
