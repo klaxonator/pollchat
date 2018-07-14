@@ -103,7 +103,7 @@
                     <tbody>
                         {% for item in top_districts[0:20] %}
                         <tr>
-                            <td><a href={{ url_for('district', dynamic=item[0],
+                            <td><a href={{ url_for('district', dynamic=item[1],
                                 time_delta=time_delta) }}>{{ item[1] }}</a></td>
                             <td>{{ item[2] }}</td>
                         </tr>
