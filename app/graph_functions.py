@@ -114,10 +114,13 @@ def top_line_generic(this_district, var_type, index=3):
                 break
 
     print(top_line)
-
+    recurs = 0
     if len(top_line) == 6:
         return top_line
     else:
+        recurs += 1
+        if recurs == 6:
+            return top_line
         top_line = top_line_generic(this_district, var_type, index+1)
 
     return top_line
