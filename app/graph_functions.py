@@ -85,6 +85,7 @@ def top_line_generic(this_district, var_type, index=3):
 
     print("next try is: starting from {}".format(str_beg_range))
 
+    # Get search object for most frequent posters in this district
     if var_type == "users":
 
         top_list = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
@@ -92,6 +93,7 @@ def top_line_generic(this_district, var_type, index=3):
         filter(District.district_name==this_district).filter(Post.created_at >= str_beg_range).\
         group_by(User.user_scrname).order_by(func.count(User.user_scrname).desc()).all()
 
+    # Get search object for most frequent hashtags used in this district
     elif var_type == "hashtags":
 
         top_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
@@ -104,23 +106,21 @@ def top_line_generic(this_district, var_type, index=3):
         return "Needs a variable type!"
 
     counter = 0
-    for item in top_list[0:7]:
-        if item[0] in distlist:
+    for item in top_list:
+        if item[0] in distlist:                 #skip all district names
             pass
         else:
-            top_line.append(item[0])
+            top_line.append(item[0])            #add hashtag to list
             counter += 1
-            if counter == 5:
+            if counter == 5:                    #break at "date" plus 5 items
                 break
 
     print(top_line)
-    recurs = 0
+
     if len(top_line) == 6:
         return top_line
     else:
-        recurs += 1
-        if recurs == 6:
-            return top_line
+
         top_line = top_line_generic(this_district, var_type, index+1)
 
     return top_line
