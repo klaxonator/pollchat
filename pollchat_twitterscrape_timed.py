@@ -18,7 +18,7 @@ import app.tweepy_cred as cred
 ##Set up database functions
 from azmodels import User, Post, Hashtag, District, Url, posthash_assoc,\
  posturl_assoc, postdist_assoc
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 
 #Instantiate SQLalchemy database connection
@@ -210,7 +210,7 @@ def twitter_search(query):
                     for dict in tweet.retweeted_status.entities['urls']:
                         url_list.append(dict['expanded_url'])
             except AttributeError as ae:
-                print("Error raised: {0}".format(ae))
+                # print("Error raised: {0}".format(ae))
                 is_retweet = False
                 original_tweet_id = None
                 original_tweet_retweets = None
@@ -287,18 +287,33 @@ def twitter_search(query):
             # print(polarity_val)
 
 
+            # Try writing to Mysql database
+            try:
+                write_database(post_id, user_id, text, created_at, reply_to_user_id,
+                        reply_to_scrname, reply_to_status_id, retweet_count,
+                        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                        original_text, original_tweet_created_at, original_tweet_likes,
+                        original_author_id, original_author_scrname, polarity,
+                        polarity_val, tag_list, url_list, user_scrname, user_name,
+                        user_location, user_created, user_followers, user_friends,
+                        user_statuses, query)
+
+                count += 1
+
+            except exc.SQLAlchemyError as e:
+                print("There's a dadgummed database write error for post ID {0}: {1}".\
+                format(post_id, e))
+
+                with open('logs/twitterscrape_passed.txt', 'a') as pw:
+                    pw.write('{}'.format(post_id))
+
+                time.sleep(1 * 60)
+                db.session.rollback()
+
+                pass
 
 
-            write_database(post_id, user_id, text, created_at, reply_to_user_id,
-                    reply_to_scrname, reply_to_status_id, retweet_count,
-                    favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
-                    original_text, original_tweet_created_at, original_tweet_likes,
-                    original_author_id, original_author_scrname, polarity,
-                    polarity_val, tag_list, url_list, user_scrname, user_name,
-                    user_location, user_created, user_followers, user_friends,
-                    user_statuses, query)
 
-            count += 1
 
             if count % 200 == 0:
                 db.session.commit()
@@ -331,9 +346,19 @@ def run_twitterscrape():
                 q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                 '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
             print("Starting district: {}".format(q))
-            twitter_search(q)
-            print("Finished with district: {}".format(q))
-            db.session.commit()
+
+            try:
+                twitter_search(q)
+                print("Finished with district: {}".format(q))
+                db.session.commit()
+
+            except exc.SQLAlchemyError as e:
+                print("There's a dadgummed db error: {}".format(e))
+
+
+                time.sleep(1 * 60)
+                session.rollback()
+                pass
 
     db.session.close()
     print(datetime.datetime.now())
