@@ -305,7 +305,7 @@ def twitter_search(query):
                 format(post_id, e))
 
                 with open('logs/twitterscrape_passed.txt', 'a') as pw:
-                    pw.write('{}'.format(post_id))
+                    pw.write('{}\n'.format(post_id))
 
                 time.sleep(1 * 60)
                 db.session.rollback()

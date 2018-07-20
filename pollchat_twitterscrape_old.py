@@ -15,7 +15,7 @@ import app.tweepy_cred as cred
 
 ##Set up database functions
 from azmodels import User, Post, Hashtag, District, Url, Base, posthash_assoc, posturl_assoc, postdist_assoc
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker
 
 #Instantiate SQLalchemy database connection
@@ -288,16 +288,35 @@ def twitter_search(query):
                     continue
 
 
-            write_database(post_id, user_id, text, created_at, reply_to_user_id,
-                    reply_to_scrname, reply_to_status_id, retweet_count,
-                    favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
-                    original_text, original_tweet_created_at, original_tweet_likes,
-                    original_author_id, original_author_scrname, polarity,
-                    polarity_val, tag_list, url_list, user_scrname, user_name,
-                    user_location, user_created, user_followers, user_friends,
-                    user_statuses, query)
+            # Try writing to Mysql database
+            try:
+                write_database(post_id, user_id, text, created_at, reply_to_user_id,
+                        reply_to_scrname, reply_to_status_id, retweet_count,
+                        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                        original_text, original_tweet_created_at, original_tweet_likes,
+                        original_author_id, original_author_scrname, polarity,
+                        polarity_val, tag_list, url_list, user_scrname, user_name,
+                        user_location, user_created, user_followers, user_friends,
+                        user_statuses, query)
 
-            count += 1
+                count += 1
+
+            except exc.SQLAlchemyError as e:
+                print("Error raised in database write for post ID {0}: {1}".\
+                format(post_id, e))
+
+                with open('logs/twitterscrape_passed.txt', 'a') as pw:
+                    pw.write('{}'.format(post_id))
+
+                session.rollback()
+
+                pass
+
+            except KeyboardInterrupt:
+                session.rollback()
+                raise
+
+
 
             if count % 150 == 0:
                 session.commit()
@@ -335,8 +354,20 @@ if __name__ == "__main__":
                 q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                 '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
             print(q)
-            twitter_search(q)
-            session.commit()
+
+            try:
+                twitter_search(q)
+                session.commit()
+
+            except exc.SQLAlchemyError as e:
+                print("There's a dadgummed db error: {}".format(e))
+
+
+                time.sleep(.5 * 60)
+                session.rollback()
+                pass
+
+
 
     session.close()
     print(datetime.datetime.now())

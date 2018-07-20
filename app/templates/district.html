@@ -134,7 +134,11 @@
                         <tr>
                             <td><a href={{ url_for('screen_name', dynamic=item[0], time_delta=time_delta) }}>{{ item[0] }}</a></td>
                             <td>{{ item[1] }}</td>
-                            <td>{{ item[2] }}</td>
+                            {% if item[2] == 0.00 or item[2] == None %}
+                                <td>Not yet in database</td>
+                            {% else %}
+                                <td>{{ item[2] }}</td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>

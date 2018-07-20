@@ -335,6 +335,117 @@ def get_tweet_list(db_search_object):
 
     return most_retweeted_tweet_list
 
+def get_tweet_list_dated(db_search_object, time_delta):
+
+    # produce list of (Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
+    # Post.tweet_html, Post.text)
+
+    # db_object in order Post_id, original_author_scrname, retweet_count,\
+    # original_tweet_id, user_scrname, tweet_html, text, original_text
+
+    most_retweeted_tweets = db_search_object
+    seen_tweets = []                #list of tweets used to avoid duplicates
+    most_retweeted_tweet_list = []      #list of retweets for site
+    count = 0                           #count to get total of 5
+    time_check = stringtime(time_delta)
+
+    for db_tweet in most_retweeted_tweets:
+
+
+
+        #if the tweet id/original tweet_id has already been seen, skip
+
+        if db_tweet[3] in seen_tweets or db_tweet[0] in seen_tweets:
+            continue
+        seen_tweets.append(db_tweet[0])
+        if db_tweet[3]:
+            seen_tweets.append(db_tweet[3])
+
+        #Check if district name is in text
+        check = check_district_relevance(db_tweet)
+
+        if check == False:
+            # print("Skipping tweet_id {}".format(db_tweet[0]))
+            # print("Screenname was: {}".format(db_tweet[4]))
+            continue
+
+        # Get original tweet's created at date
+        orig_tweet = db.session.query(Post.post_id, Post.created_at).\
+        filter(Post.post_id==db_tweet[3]).first()
+
+        # If orig tweet in database...
+        if orig_tweet:
+
+            # if original tweet date < time_delta, skip
+
+            if orig_tweet[1] < time_check:
+                continue
+
+        # Otherwise skip
+        else:
+            continue
+
+        #create actual tweet list
+        tweet = []
+
+        # LIST POSITION [0]: Post.post_id
+        tweet.append(db_tweet[0])           # post_id: list [db_tweet0]
+
+        # LIST POSITION [1]: Author screen name (orig author if RT)
+        if db_tweet[1]:                     #if retweet
+            tweet.append(db_tweet[1])           # post original author
+
+        else:                               # or if original tweet
+            tweet.append(db_tweet[4])       # User.user_scrname
+
+        # LIST POSITION [2]: Retweet Count
+        tweet.append(db_tweet[2])
+
+
+        # LIST POSITION [3]: Botscore
+            # Get botscore for original poster using the tweet[1] of this list:
+            # either original_author (if RT) or post author (if not RT)
+        botscore = db.session.query(User.user_cap_perc).\
+        filter(User.user_scrname==tweet[1]).first()
+
+        if botscore:
+            tweet.append(botscore[0])           # append botscore
+        else:
+            tweet.append("Not yet in database")
+
+
+        # LIST POSITION [4]: Post HTML (to call Tweet)
+            #if loop: if tweet_html already exists
+        if db_tweet[5]:
+            tweet.append(db_tweet[5])         #tweet_html
+
+            #if no tweet_html, then get HTML from Twitter
+        else:
+            #if RT (if original_tweet_id exists)
+            if db_tweet[3]:
+                try:
+                    tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
+                    tweet.append(tweet_html)            # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+            #if not RT (no original_tweet_id), use post ID
+            else:
+                try:
+                    tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
+                    tweet.append(tweet_html)                # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+
+        most_retweeted_tweet_list.append(tweet)
+        count += 1
+        if count == 5:
+            break
+
+    return most_retweeted_tweet_list
+
 dists = [
 ('az01', 'Arizona 01'),
 ('az02', 'Arizona 02'),

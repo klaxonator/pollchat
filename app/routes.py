@@ -89,6 +89,9 @@ def district(dynamic):
     # print('got most_retweeted')
 
     # Most retweeted tweets column
+
+    # Gets list of tweets in time period, ordered by most-retweeted (NOTE: many
+    # or most of these retweets may be previous to this period)
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     Post.text, Post.original_text).\
@@ -100,6 +103,9 @@ def district(dynamic):
     # create list of [post_id, name,retweet numbers, botscore]
 
     most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+
+    #most_retweeted_tweet_list_dated = get_tweet_list_dated(db_search_object, time_delta)
+
 
     # print('got most_retweeted_list')
 
