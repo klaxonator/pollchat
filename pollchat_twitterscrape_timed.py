@@ -94,9 +94,16 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
 
 #DISTRICT TABLE
             #capture District_id from 1st query term:
-        state = query[2:4]
-        district = query[4:6]
-        district_name = query[2:6]
+        state = query[2:4].lower()
+            #Handle Senate districts differently than congressional
+        if query[4:7] == 'Sen':
+            district = 'sen'
+            district_name = query[2:7]
+            dist_type = 2
+        else:
+            district = query[4:6]
+            district_name = query[2:6]
+            dist_type = 1
 
         #Check if district is in DB, add if not
         district_search = db.session.query(District).\
@@ -232,24 +239,28 @@ def twitter_search(query):
                 if tag in tag_list or original_author_scrname == tag:
                     continue
 
+            #Use local filter if not Senate
+            #NOTE: if this creates garbages in Senate, figure out better filter!!
+
+            if query[4:7] != 'Sen':
+                district_name = query[2:6]
 
 
+                # Check Tweet text for district name to filter out irrelvancies;
+                # skip rest of for loop if district name (or aliases) not found
 
-            # Check Tweet text for district name to filter out irrelvancies;
-            # skip rest of for loop if district name (or aliases) not found
-            district_name = query[2:6]
-            check = False
+                check = False
 
-            for district_alias in distdict_short[district_name]:
-                if original_text:
-                    if district_alias in original_text.lower():
-                        check = True
-                else:
-                    if district_alias in text.lower():
-                        check = True
-            if check == False:
-                # print("Tweet rejected, no district reference")
-                continue
+                for district_alias in distdict_short[district_name]:
+                    if original_text:
+                        if district_alias in original_text.lower():
+                            check = True
+                    else:
+                        if district_alias in text.lower():
+                            check = True
+                if check == False:
+                    # print("Tweet rejected, no district reference")
+                    continue
 
 
             #TextBlob analysis of tweet sentiment
@@ -263,28 +274,6 @@ def twitter_search(query):
                 polarity_val = 'negative'
             else:
                 polarity_val = 'neutral'
-
-
-
-            #NOTE: Taeks to long, take out until online. cut from:"
-            # in pollchat_twitter:
-            #     write_database,
-            #     new_post
-            #     write_database
-            #
-            # in az_models
-            #     def_init
-
-            # try:
-            #     tweet_html = get_tweet(post_id)
-            # except:
-            #     pass
-
-            # print(tweet.user.screen_name, "\n", tweet.id_str, "\n", tweet.full_text, "\n")
-            # print(original_tweet_id)
-            # print(original_tweet_retweets)
-            # print(tweet_html)
-            # print(polarity_val)
 
 
             # Try writing to Mysql database
@@ -324,15 +313,7 @@ def twitter_search(query):
         time.sleep(5 * 60)
 
 
-
-
-
-
-def run_twitterscrape():
-
-    with open('logs/twitterscrape_log.txt', 'a') as fw:
-        fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
-
+def search_cong():
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
     with open('app/comp_races_parsed.csv', 'r') as f:
@@ -361,6 +342,75 @@ def run_twitterscrape():
                 pass
 
     db.session.close()
+
+def search_sen():
+    #Open csv file of competitive districts, iterate through it, searching for each row/district
+    with open('app/comp_races_parsed_sen.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            #Create search query with quotation marks, to limit to exact matches
+            query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]
+            print(query)
+            print(query[4:7])
+
+
+            try:
+                twitter_search(query)
+                session.commit()
+
+            except exc.SQLAlchemyError as e:
+                print("There's a dadgummed db error: {}".format(e))
+
+
+                time.sleep(.5 * 60)
+                session.rollback()
+                pass
+
+
+
+    session.close()
+
+if __name__ == "__main__":
+# def run_twitterscrape():
+
+    with open('logs/twitterscrape_log.txt', 'a') as fw:
+        fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
+
+    #Do Senate search
+    search_sen()
+
+    #Do Congress search
+    search_cong()
+
+    # #Open csv file of competitive districts, iterate through it, searching for each row/district
+    # with open('app/comp_races_parsed.csv', 'r') as f:
+    #     reader = csv.reader(f)
+    #     for row in reader:
+    #         #Create search query with quotation marks, to limit to exact matches
+    #         if row[4] != "":
+    #             q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+    #             '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
+    #         else:
+    #             q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+    #             '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
+    #         print("Starting district: {}".format(q))
+    #
+    #         try:
+    #             twitter_search(q)
+    #             print("Finished with district: {}".format(q))
+    #             db.session.commit()
+    #
+    #         except exc.SQLAlchemyError as e:
+    #             print("There's a dadgummed db error: {}".format(e))
+    #
+    #
+    #             time.sleep(1 * 60)
+    #             session.rollback()
+    #             pass
+    #
+    # db.session.close()
     print(datetime.datetime.now())
     time = datetime.datetime.now()
 

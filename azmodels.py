@@ -187,6 +187,7 @@ class District(Base):
     trump_2016 = Column(Float)
     clinton_2016 = Column(Float)
     incumbent_party = Column(String)
+    dist_type = Column(Integer)
 
     district_posts = relationship(
         "Post",
@@ -201,11 +202,12 @@ class District(Base):
     # dem_candidate = Column(String)
     # rep_candidate = Column(String)
 
-    def __init__(self, state, district, district_name):
+    def __init__(self, state, district, district_name, dist_type):
         #self.post_id = post_id
         self.state = state
         self.district = district
         self.district_name = district_name
+        self.dist_type = dist_type
 
     def __repr__(self):
         return "District object with district {0}".format(self.district_name)
