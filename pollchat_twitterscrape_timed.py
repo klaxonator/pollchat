@@ -372,50 +372,26 @@ def search_sen():
 
     session.close()
 
-if __name__ == "__main__":
-# def run_twitterscrape():
+
+def run_twitterscrape():
 
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
 
     #Do Senate search
     search_sen()
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('added senate items to database, finished at {}\n\n'.format(time))
 
     #Do Congress search
     search_cong()
 
-    # #Open csv file of competitive districts, iterate through it, searching for each row/district
-    # with open('app/comp_races_parsed.csv', 'r') as f:
-    #     reader = csv.reader(f)
-    #     for row in reader:
-    #         #Create search query with quotation marks, to limit to exact matches
-    #         if row[4] != "":
-    #             q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-    #             '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
-    #         else:
-    #             q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-    #             '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
-    #         print("Starting district: {}".format(q))
-    #
-    #         try:
-    #             twitter_search(q)
-    #             print("Finished with district: {}".format(q))
-    #             db.session.commit()
-    #
-    #         except exc.SQLAlchemyError as e:
-    #             print("There's a dadgummed db error: {}".format(e))
-    #
-    #
-    #             time.sleep(1 * 60)
-    #             session.rollback()
-    #             pass
-    #
-    # db.session.close()
+
     print(datetime.datetime.now())
     time = datetime.datetime.now()
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('added items to database, finished at {}\n\n'.format(time))
+        f.write('added cong items to database, finished at {}\n\n'.format(time))
 
     #Run function filling overview-cache tables
     fill.run_all()
