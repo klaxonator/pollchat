@@ -109,7 +109,7 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
         district_search = db.session.query(District).\
         filter(District.district_name == district_name).first()
         if district_search == None:
-            new_district = District(state, district, district_name)
+            new_district = District(state, district, district_name, dist_type)
             db.session.add(new_district)
         else:
             new_district = district_search
