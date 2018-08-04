@@ -338,7 +338,7 @@ def search_cong():
 
 
                 time.sleep(1 * 60)
-                session.rollback()
+                db.session.rollback()
                 pass
 
     db.session.close()
@@ -358,19 +358,19 @@ def search_sen():
 
             try:
                 twitter_search(query)
-                session.commit()
+                db.session.commit()
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
 
 
                 time.sleep(.5 * 60)
-                session.rollback()
+                db.session.rollback()
                 pass
 
 
 
-    session.close()
+    db.session.close()
 
 
 def run_twitterscrape():
