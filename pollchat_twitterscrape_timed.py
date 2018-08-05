@@ -381,7 +381,7 @@ def run_twitterscrape():
     #Do Senate search
     search_sen()
     with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('added senate items to database, finished at {}\n\n'.format(time))
+        f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
     #Do Congress search
     search_cong()
@@ -391,11 +391,11 @@ def run_twitterscrape():
     time = datetime.datetime.now()
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('added cong items to database, finished at {}\n\n'.format(time))
+        f.write('added cong items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
     #Run function filling overview-cache tables
     fill.run_all()
 
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('filled all cache tables, finished at {}\n\n'.format(time))
+        f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
