@@ -23,7 +23,7 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
 
 
     if dist_group == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     if dist_group == "allsen":
         dist_fig = 2
 
@@ -83,7 +83,7 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
 def fill_hash_activity(dist_group, time_delta, table, table_new, table_old):
 
     if dist_group == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     if dist_group == "allsen":
         dist_fig = 2
 
@@ -138,7 +138,7 @@ def fill_hash_activity(dist_group, time_delta, table, table_new, table_old):
 def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
 
     if dist_group == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     if dist_group == "allsen":
         dist_fig = 2
 
@@ -198,7 +198,7 @@ def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
 def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
 
     if dist_group == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     if dist_group == "allsen":
         dist_fig = 2
 
@@ -246,7 +246,7 @@ def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
 def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
 
     if dist_group == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     if dist_group == "allsen":
         dist_fig = 2
 
