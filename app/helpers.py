@@ -104,6 +104,8 @@ def check_district_relevance_st(tweet_texts):
 
     for named_district in district_list:
         # print(distdict[named_district])
+        if named_district[2:5] == "Sen":
+            continue
 
         # check if any of district aliases are included in tweet text;
         # if finds a match, return True
@@ -128,7 +130,7 @@ def check_district_relevance_st(tweet_texts):
 def get_tweet_list_ids(db_search_object):
 
     # produce list of top retweeted ids for fill. Db object is
-    # Post_post_id, Post.original_tweet_id, Post.retweet_count
+    # Post_post_id, Post.original_tweet_id, Post.retweet_count, District.dist_type
 
     most_retweeted_tweets = db_search_object
     seen_tweets = []                    #list of tweets used to avoid duplicates
@@ -139,9 +141,11 @@ def get_tweet_list_ids(db_search_object):
     for db_tweet in most_retweeted_tweets:
 
         #if the tweet id/original tweet_id has already been seen, skip
+        print(db_tweet[0], db_tweet[3])
 
         if db_tweet[0] in seen_tweets or db_tweet[1] in seen_tweets:
             continue
+
 
         # Add IDs to seen_tweets list
 
@@ -158,18 +162,22 @@ def get_tweet_list_ids(db_search_object):
         join(Post.user).\
         filter(Post.post_id==db_tweet[0]).first()
 
-        check = check_district_relevance_st(tweet_texts)
+
+        if db_tweet[3] != 2:
+            print('post {} is not a senate post, checking relevance'.format(db_tweet[0]))
+            check = check_district_relevance_st(tweet_texts)
 
 
-        if check == False:
-            # print("skipping tweet_id {0}, \ntext: {1}\n full_text: {2}\nscreen name: {3}\n\n".\
-            # format(tweet_texts[0], tweet_texts[1], tweet_texts[2], tweet_texts[3]))
+            if check == False:
+                # print("skipping tweet_id {0}, \ntext: {1}\n full_text: {2}\nscreen name: {3}\n\n".\
+                # format(tweet_texts[0], tweet_texts[1], tweet_texts[2], tweet_texts[3]))
 
-            skipped_tweets.append(tweet_texts[0])
+                skipped_tweets.append(tweet_texts[0])
 
-            continue
+                continue
 
 
+        print('going on with post {}'.format(db_tweet[0]))
 
         # List: Post_id, orig author name, retweet count, tweet_html, orig ID
         if tweet_texts[6]:
@@ -274,6 +282,102 @@ def get_tweet_list(db_search_object, distname):
                 # print("Skipping tweet_id {}".format(db_tweet[0]))
                 # print("Screenname was: {}".format(db_tweet[4]))
                 continue
+
+
+
+        #create actual tweet list
+        tweet = []
+
+        # LIST POSITION [0]: Post.post_id
+        tweet.append(db_tweet[0])           # post_id: list [db_tweet0]
+
+        # LIST POSITION [1]: Author screen name (orig author if RT)
+        if db_tweet[1]:                     #if retweet
+            tweet.append(db_tweet[1])           # post original author
+
+        else:                               # or if original tweet
+            tweet.append(db_tweet[4])       # User.user_scrname
+
+        # LIST POSITION [2]: Retweet Count
+        tweet.append(db_tweet[2])
+
+
+        # LIST POSITION [3]: Botscore
+            # Get botscore for original poster using the tweet[1] of this list:
+            # either original_author (if RT) or post author (if not RT)
+        botscore = db.session.query(User.user_cap_perc).\
+        filter(User.user_scrname==tweet[1]).first()
+
+        if botscore:
+            tweet.append(botscore[0])           # append botscore
+        else:
+            tweet.append("Not yet in database")
+
+
+        # LIST POSITION [4]: Post HTML (to call Tweet)
+            #if loop: if tweet_html already exists
+        if db_tweet[5]:
+            tweet.append(db_tweet[5])         #tweet_html
+
+            #if no tweet_html, then get HTML from Twitter
+        else:
+            #if RT (if original_tweet_id exists)
+            if db_tweet[3]:
+                try:
+                    tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
+                    tweet.append(tweet_html)            # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+            #if not RT (no original_tweet_id), use post ID
+            else:
+                try:
+                    tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
+                    tweet.append(tweet_html)                # add tweet_text
+                except:
+                    tweet.append("Can't retrieve Tweet")
+
+
+        most_retweeted_tweet_list.append(tweet)
+        count += 1
+        if count == 5:
+            break
+
+    return most_retweeted_tweet_list
+
+def get_tweet_list_nodist(db_search_object):
+
+    # produce list of (Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
+    # Post.tweet_html, Post.text)
+
+    # db_object in order Post_id, original_author_scrname, retweet_count,\
+    # original_tweet_idk, user_scrname, tweet_html, text, original_text
+
+    most_retweeted_tweets = db_search_object
+    seen_tweets = []                #list of tweets used to avoid duplicates
+    most_retweeted_tweet_list = []      #list of retweets for site
+    count = 0                           #count to get total of 5
+
+    for db_tweet in most_retweeted_tweets:
+
+        #if the tweet id/original tweet_id has already been seen, skip
+
+        if db_tweet[3] in seen_tweets or db_tweet[0] in seen_tweets:
+            continue
+        seen_tweets.append(db_tweet[0])
+        if db_tweet[3]:
+            seen_tweets.append(db_tweet[3])
+
+        #Check if district name is in text; skip if Senate district
+
+        #NOTE: FIND ANOTHER WAY TO CHECK RELEVANCE
+        # check = check_district_relevance(db_tweet)
+        #
+        # if check == False:
+        #     # print("Skipping tweet_id {}".format(db_tweet[0]))
+        #     # print("Screenname was: {}".format(db_tweet[4]))
+        #     continue
 
 
 
@@ -586,9 +690,11 @@ distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
  'mn8', 'mo2', 'mt0', 'nc2', 'nc8', 'nc9', 'ne2', 'nh1', 'nh2', 'nj2', 'nj3',
  'nj5', 'nj7', 'nm2', 'nv3', 'nv4', 'ny1', 'oh1', 'pa1', 'pa5', 'pa6', 'pa7',
  'pa8', 'sc1', 'sc5', 'tx7', 'ut4', 'va2', 'va5', 'va7', 'wa3', 'wa5', 'wa8',
- 'wi1', 'wi3', 'wi6', 'wi7', 'wv3', 'INSen', 'NDSen', 'WVSen', 'NVSen', 'TXSen',
- 'NESen', 'MSSen', 'MTSen','NJSen', 'PASen', 'TNSen', 'MISen', 'MOSen', 'MNSen',
- 'WISen', 'AZSen', 'FLSen']
+ 'wi1', 'wi3', 'wi6', 'wi7', 'wv3', 'OHSen', 'INSen', 'NDSen', 'WVSen', 'NVSen',
+ 'TXSen', 'NESen', 'MSSen', 'MTSen','NJSen', 'PASen', 'TNSen', 'MISen', 'MOSen',
+ 'MNSen', 'WISen', 'AZSen', 'FLSen', 'ohsen', 'insen', 'ndsen', 'wvsen', 'nvsen',
+ 'txsen', 'nesen', 'mssen', 'mtsen','njsen', 'pasen', 'tnsen', 'misen', 'mosen',
+ 'mnsen', 'wisen', 'azsen', 'flsen']
 
 
 

@@ -52,10 +52,35 @@
     </form>
 </div>
 
-    {# <h3>What's happening in a Senate district?</h3> #}
+<h3>What's being tweeted about a specific competitive Senate race?</h3>
 
 <div>
-    <h3>How are specific hashtags being used in election-related Tweets?</h3>
+    <form class="form" name="sen_form" action="{{ url_for('select_district') }}" method="post" role="form">
+
+
+        <div class="form-group">
+            {{ sen_form.hidden_tag() }}
+            {{ wtf.form_errors(sen_form, hiddens="only") }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(sen_form.select_district) }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(sen_form.district_time_delta) }}
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            {{ wtf.form_field(sen_form.submit_district) }}
+        </div>
+
+    </form>
+</div>
+
+<div>
+    <h3>How is a specific hashtag being used in election-related Tweets?</h3>
 
 
     <form class="form" name='h_form' action="{{ url_for('hashtag_search') }}" method="post">

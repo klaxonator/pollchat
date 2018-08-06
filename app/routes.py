@@ -1,13 +1,14 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import HashtagSearchForm, PhraseSearchForm, DistrictForm, \
-AllCongSearchForm, ChangeTimeForm, BotSearchForm
+AllCongSearchForm, ChangeTimeForm, BotSearchForm, SenForm
 from app.models import User, Post, District, Hashtag, Url
 from sqlalchemy import func, Date, cast
 from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
-test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list
+test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
+get_tweet_list_nodist
 import app.graph_functions as gf
 
 
@@ -18,11 +19,12 @@ def index():
 
     return render_template('index.html', title ='Home', d_form=DistrictForm(), \
     h_form=HashtagSearchForm(), p_form=PhraseSearchForm(), all_form=AllCongSearchForm(),\
-    botform=BotSearchForm(), url=url)
+    botform=BotSearchForm(), sen_form=SenForm(), url=url)
 
 @app.route('/select_district', methods = ['GET', 'POST'])
 def select_district():
     d_form = DistrictForm()
+    sen_form = SenForm()
 #    if request.method == 'POST':
     if d_form.is_submitted():
         dynamic = d_form.select_district.data
@@ -30,9 +32,17 @@ def select_district():
         flash('Your request({0}) has been submitted, with delta(days)={1}'.format(dynamic, \
         time_delta))
         return redirect(url_for('district', dynamic=dynamic, time_delta=time_delta))
+
+    if sen_form.is_submitted():
+        dynamic = sen_form.select_district.data
+        time_delta = sen_form.district_time_delta.data
+        flash('Your request({0}) has been submitted, with delta(days)={1}'.format(dynamic, \
+        time_delta))
+        return redirect(url_for('district', dynamic=dynamic, time_delta=time_delta))
+
     return render_template('index.html', title='Home', d_form=d_form, \
     p_form=PhraseSearchForm(), h_form=HashtagSearchForm(), all_form=AllCongSearchForm(),\
-    botform=BotSearchForm())
+    botform=BotSearchForm(), sen_form=SenForm())
 
 @app.route('/district/<dynamic>', methods=['GET', 'POST'])
 def district(dynamic):
@@ -102,7 +112,7 @@ def district(dynamic):
     # Use helper function to Get botscore for top five most-retweeted tweets,
     # create list of [post_id, name,retweet numbers, botscore]
 
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets, dynamic)
 
     #most_retweeted_tweet_list_dated = get_tweet_list_dated(db_search_object, time_delta)
 
@@ -154,7 +164,7 @@ def hashtag_search():
 
     return render_template('index.html', title ='Home', h_form=h_form, \
     p_form=PhraseSearchForm(), d_form=DistrictForm(), all_form=AllCongSearchForm(),\
-    botform=BotSearchForm())
+    botform=BotSearchForm(), sen_form=SenForm())
 
 @app.route('/hashtag/<dynamic>', methods=['GET', 'POST'])
 def hashtag(dynamic):
@@ -199,7 +209,7 @@ def hashtag(dynamic):
 
     #Get botscore for top five most-retweeted tweets, create list of [post_id, name,
     # retweet numbers, botscore] to send to template
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+    most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
     return render_template('hashtag.html', t_form=ChangeTimeForm(), url=url, \
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
@@ -218,7 +228,7 @@ def all_search():
         return redirect(url_for('overview', dynamic=dynamic, time_delta=time_delta))
     return render_template('index.html', title ='Home', all_form=all_form, \
     h_form=HashtagSearchForm(), p_form=PhraseSearchForm(), d_form=DistrictForm(),\
-    botform=BotSearchForm())
+    botform=BotSearchForm(), sen_form=SenForm())
 
 @app.route('/overview/<dynamic>', methods = ['GET', 'POST'])
 def overview(dynamic):
@@ -408,7 +418,7 @@ def screen_name(dynamic):
     filter(Post.original_author_scrname==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
 
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+    most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
 
     #Get data for double-7 chart
@@ -458,7 +468,7 @@ def phrase_search():
 
     return render_template('index.html', title ='Home', p_form=p_form, \
     all_form=AllCongSearchForm(), d_form=DistrictForm(), \
-    h_form=HashtagSearchForm())
+    h_form=HashtagSearchForm(), sen_form=SenForm())
 
 @app.route('/bot_search', methods = ['GET', 'POST'])
 def bot_search():
@@ -470,7 +480,7 @@ def bot_search():
         return redirect(url_for('botspy', dynamic=dynamic, time_delta=time_delta))
     return render_template('index.html', title ='Home', all_form=AllCongSearchForm(), \
     h_form=HashtagSearchForm(), p_form=PhraseSearchForm(), d_form=DistrictForm(),\
-    botform=botform)
+    botform=botform, sen_form=SenForm())
 
 
 @app.route('/botspy/<dynamic>', methods = ['GET', 'POST'])
@@ -498,7 +508,7 @@ def botspy(dynamic):
     filter(Post.is_retweet == 0).\
     order_by(Post.retweet_count.desc()).all()
 
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets)
+    most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
 
     popular_bot = db.session.query(User.user_scrname, User.user_followers,\

@@ -239,7 +239,7 @@ def twitter_search(query):
                 if tag in tag_list or original_author_scrname == tag:
                     continue
 
-            #Use local filter if not Senate
+            #Use local relevance filter *if not Senate*
             #NOTE: if this creates garbages in Senate, figure out better filter!!
 
             if query[4:7] != 'Sen':
@@ -351,7 +351,7 @@ def search_sen():
             #Create search query with quotation marks, to limit to exact matches
             query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                 '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
-                '"'+row[4]+'"' + ' OR ' + '"'+row[5]
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
             print(query)
             print(query[4:7])
 
@@ -373,7 +373,8 @@ def search_sen():
     db.session.close()
 
 
-def run_twitterscrape():
+if __name__ == "__main__":
+# def run_twitterscrape():
 
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))

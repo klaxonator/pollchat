@@ -18,7 +18,14 @@
         <div class="col-sm-12">
             <div class="py-5 text-center">
                 <h1 id="top" class="display-4">Overview:<h1>
-                <h3>All 102 competitive congressional districts</h3>
+                <h3>All 2018 competitive
+                    {% if dynamic=='allcong' %}
+                        House
+                    {% elif dynamic=='allsen' %}
+                        Senate
+                    {% endif %}
+
+                    districts</h3>
             </div>
 
         </div>

@@ -1,11 +1,20 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, HiddenField
 from wtforms.validators import DataRequired
-from app.helpers import dists
+from app.helpers import dists, sen_dists
 
 class DistrictForm(FlaskForm):
-    #NOTE: to be updated with QuierySelectField
     select_district = SelectField(u'District', choices=dists)
+    district_time_delta = SelectField(u'Time period', choices=[
+            ('1', 'Last 24 hours'),
+            ('2', 'Last 48 hours'),
+            ('7', 'Last week'),
+            ('28', 'Last 4 weeks'),
+    ])
+    submit_district = SubmitField('Submit your choice')
+
+class SenForm(FlaskForm):
+    select_district = SelectField(u'State', choices=sen_dists)
     district_time_delta = SelectField(u'Time period', choices=[
             ('1', 'Last 24 hours'),
             ('2', 'Last 48 hours'),
@@ -32,7 +41,9 @@ class PhraseSearchForm(FlaskForm):
 
 class AllCongSearchForm(FlaskForm):
     scope_search = SelectField(u'Scope', choices=[
-            ('allcong', 'All competitive 2018 congressional races')
+            ('allcong', 'All competitive 2018 House races'),
+            ('allsen', 'All competitive 2018 Senate races'),
+            ('allraces', 'All competitive 2018 congressional races'),
     ])
     #phrase_search = StringField('phrase search', validators=[DataRequired()])
     allcong_time_delta = SelectField(u'Time period', choices=[
