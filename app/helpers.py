@@ -241,7 +241,7 @@ def populate_tweet_list(tweet_list):
     return populated_list
 
 
-def get_tweet_list(db_search_object):
+def get_tweet_list(db_search_object, distname):
 
     # produce list of (Post.post_id, Post.original_author_scrname, \
     # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
@@ -265,13 +265,15 @@ def get_tweet_list(db_search_object):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
-        #Check if district name is in text
-        check = check_district_relevance(db_tweet)
+        #Check if district name is in text; skip if Senate district
 
-        if check == False:
-            # print("Skipping tweet_id {}".format(db_tweet[0]))
-            # print("Screenname was: {}".format(db_tweet[4]))
-            continue
+        if distname[2:5] != 'Sen':
+            check = check_district_relevance(db_tweet)
+
+            if check == False:
+                # print("Skipping tweet_id {}".format(db_tweet[0]))
+                # print("Screenname was: {}".format(db_tweet[4]))
+                continue
 
 
 
@@ -551,6 +553,22 @@ dists = [
 ('wv03', 'West Virginia 03')
 ]
 
+sen_dists = [
+('OHSen', 'Ohio'),
+('INSen', 'Indiana'),
+('NDSen', 'North Dakota'),
+('WVSen', 'West Virginia'),
+('NVSen', 'Nevada'),
+('TXSen', 'Texas'),
+('NESen', 'Nebraska'),
+('MSSen', 'Missouri'),
+('MTSen', 'Montana'),
+('NJSen', 'New Jersey'),
+('MTSen', 'Montana'),
+('PASen', 'Pennsylvania'),
+('TNSen', 'Tennessee'),
+]
+
 distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
  'ca21', 'ca25', 'ca39', 'ca45', 'ca48', 'ca49', 'ca50', 'co06', 'ct05',
  'fl07', 'fl15', 'fl16', 'fl18', 'fl25', 'fl26', 'fl27', 'ga06', 'ga07',
@@ -568,7 +586,13 @@ distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
  'mn8', 'mo2', 'mt0', 'nc2', 'nc8', 'nc9', 'ne2', 'nh1', 'nh2', 'nj2', 'nj3',
  'nj5', 'nj7', 'nm2', 'nv3', 'nv4', 'ny1', 'oh1', 'pa1', 'pa5', 'pa6', 'pa7',
  'pa8', 'sc1', 'sc5', 'tx7', 'ut4', 'va2', 'va5', 'va7', 'wa3', 'wa5', 'wa8',
- 'wi1', 'wi3', 'wi6', 'wi7', 'wv3']
+ 'wi1', 'wi3', 'wi6', 'wi7', 'wv3', 'INSen', 'NDSen', 'WVSen', 'NVSen', 'TXSen',
+ 'NESen', 'MSSen', 'MTSen','NJSen', 'PASen', 'TNSen', 'MISen', 'MOSen', 'MNSen',
+ 'WISen', 'AZSen', 'FLSen']
+
+
+
+
 
 a = '''<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">RIGHT. LIKE IT’S JUST BAKING A CAKE AMIRITE? <a href="https://t.co/O9kC1pnDr1">https://t.co/O9kC1pnDr1</a></p>&mdash; Shannon Watts (@shannonrwatts) <a href="https://twitter.com/shannonrwatts/status/1006269046009065473?ref_src=twsrc%5Etfw">June 11, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>'''
@@ -710,7 +734,7 @@ distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9'],
              'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06'],
              'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7'],
              'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2'],
-             'mtAL': ['mtAL', 'mt-AL', '#mtAL', '#mt-AL'],
+             'mtAL': ['mtal', 'mt-al', '#mtal', '#mt-al'],
              'mt00': ['mt00', 'mt-00', '#mt00', '#mt-00'],
              'nc02': ['nc02', 'nc-02', '#nc02', '#nc-02', '#nc2'],
              'nc08': ['nc08', 'nc-08', '#nc08', '#nc-08', '#nc8'],
