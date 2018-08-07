@@ -56,21 +56,21 @@ def check_district_relevance(db_tweet):
     for named_district in district_list:
         # print(distdict[named_district])
 
-        for district_alias in distdict_short[named_district]:
+        for district_keyword in distdict_short[named_district]:
 
     # check if any of district aliases are included in tweet text;
             # if finds a match, return True
 
             #NOTE: too many variations of search found by twitter in scr_name
-            # if district_alias in db_tweet[1].lower() or \
-            #   district_alias in db_tweet[4].lower():
+            # if district_keyword in db_tweet[1].lower() or \
+            #   district_keyword in db_tweet[4].lower():
             #     return False
 
             if db_tweet[7]:
-                if district_alias in db_tweet[7].lower():
+                if district_keyword in db_tweet[7].lower():
                     return True
             else:
-                if district_alias in db_tweet[6].lower():
+                if district_keyword in db_tweet[6].lower():
                     return True
     #
     #if no match found, return False
@@ -90,6 +90,7 @@ def check_district_relevance_st(tweet_texts):
     join(Post.districts).\
     filter(Post.post_id == tweet_texts[0]).all()
 
+
     # Create list of districts associated with post - generally only one,
     # but someitmes multiple mentions
 
@@ -98,24 +99,26 @@ def check_district_relevance_st(tweet_texts):
     for distref in referenced_districts:
         district_list.append(distref[0])
 
-    # print(district_list)
+    print(district_list)
 
-    # iterate through district_list, get dist_aliases from dictionary,
+    # iterate through district_list, get dist_aliases from dictionary (distdict_short)
 
     for named_district in district_list:
-        # print(distdict[named_district])
-        if named_district[2:5] == "Sen":
-            continue
+
+        # if named_district[2:5] == "Sen":
+        #     continue
 
         # check if any of district aliases are included in tweet text;
         # if finds a match, return True
-        for district_alias in distdict_short[named_district]:
+        for district_keyword in distdict_short[named_district]:
 
             if tweet_texts[2]:
-                if district_alias in tweet_texts[2].lower():
+                if district_keyword in tweet_texts[2].lower():
+                    print(district_keyword)
                     return True
             else:
-                if district_alias in tweet_texts[1].lower():
+                if district_keyword in tweet_texts[1].lower():
+                    print(district_keyword)
                     return True
 
     # if no match found, return False
@@ -756,109 +759,121 @@ skip_list = [
     "Cumbria"
     ]
 
-distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9'],
-             'ca07': ['ca07', 'ca-07', '#ca07', '#ca-07', '#ca7'],
-             'ct05': ['ct05', 'ct-05', '#ct05', '#ct-05', '#ct5'],
-             'fl07': ['fl07', 'fl-07', '#fl07', '#fl-07', '#fl7'],
-             'mn07': ['mn07', 'mn-07', '#mn07', '#mn-07', '#mn7'],
-             'nh02': ['nh02', 'nh-02', '#nh02', '#nh-02', '#nh2'],
-             'nj05': ['nj05', 'nj-05', '#nj05', '#nj-05', '#nj5'],
-             'nv04': ['nv04', 'nv-04', '#nv04', '#nv-04', '#nv4'],
-             'pa05': ['pa05', 'pa-05', '#pa05', '#pa-05', '#pa5'],
-             'pa06': ['pa06', 'pa-06', '#pa06', '#pa-06', '#pa6'],
-             'pa08': ['pa08', 'pa-08', '#pa08', '#pa-08', '#pa8'],
-             'wi03': ['wi03', 'wi-03', '#wi03', '#wi-03', '#wi3'],
-             'az01': ['az01', 'az-01', '#az01', '#az-01', '#az1'],
-             'az02': ['az02', 'az-02', '#az02', '#az-02', '#az2'],
-             'ca39': ['ca39', 'ca-39', '#ca39', '#ca-39'],
-             'ca49': ['ca49', 'ca-49', '#ca49', '#ca-49'],
-             'fl27': ['fl27', 'fl-27', '#fl27', '#fl-27'],
-             'nh01': ['nh01', 'nh-01', '#nh01', '#nh-01', '#nh1'],
-             'nj02': ['nj02', 'nj-02', '#nj02', '#nj-02', '#nj2'],
-             'nv03': ['nv03', 'nv-03', '#nv03', '#nv-03', '#nv3'],
-             'pa07': ['pa07', 'pa-07', '#pa07', '#pa-07', '#pa7'],
-             'mn01': ['mn01', 'mn-01', '#mn01', '#mn-01', '#mn1'],
-             'mn08': ['mn08', 'mn-08', '#mn08', '#mn-08', '#mn8'],
-             'ca10': ['ca10', 'ca-10', '#ca10', '#ca-10'],
-             'ca25': ['ca25', 'ca-25', '#ca25', '#ca-25'],
-             'ca48': ['ca48', 'ca-48', '#ca48', '#ca-48'],
-             'co06': ['co06', 'co-06', '#co06', '#co-06', '#co6'],
-             'fl26': ['fl26', 'fl-26', '#fl26', '#fl-26'],
-             'ia01': ['ia01', 'ia-01', '#ia01', '#ia-01', '#ia1'],
-             'il06': ['il06', 'il-06', '#il06', '#il-06', '#il6'],
-             'il12': ['il12', 'il-12', '#il12', '#il-12'],
-             'mi11': ['mi11', 'mi-11', '#mi11', '#mi-11'],
-             'mn02': ['mn02', 'mn-02', '#mn02', '#mn-02', '#mn2'],
-             'mn03': ['mn03', 'mn-03', '#mn03', '#mn-03', '#mn3'],
-             'ne02': ['ne02', 'ne-02', '#ne02', '#ne-02', '#ne2'],
-             'nj07': ['nj07', 'nj-07', '#nj07', '#nj-07', '#nj7'],
-             'nj11': ['nj11', 'nj-11', '#nj11', '#nj-11'],
-             'ny19': ['ny19', 'ny-19', '#ny19', '#ny-19'],
-             'ny22': ['ny22', 'ny-22', '#ny22', '#ny-22'],
-             'oh12': ['oh12', 'oh-12', '#oh12', '#oh-12'],
-             'pa01': ['pa01', 'pa-01', '#pa01', '#pa-01', '#pa1'],
-             'pa17': ['pa17', 'pa-17', '#pa17', '#pa-17'],
-             'tx07': ['tx07', 'tx-07', '#tx07', '#tx-07', '#tx7'],
-             'va10': ['va10', 'va-10', '#va10', '#va-10'],
-             'wa08': ['wa08', 'wa-08', '#wa08', '#wa-08', '#wa8'],
-             'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2'],
-             'ca21': ['ca21', 'ca-21', '#ca21', '#ca-21'],
-             'ca45': ['ca45', 'ca-45', '#ca45', '#ca-45'],
-             'fl18': ['fl18', 'fl-18', '#fl18', '#fl-18'],
-             'ga06': ['ga06', 'ga-06', '#ga06', '#ga-06', '#ga6'],
-             'ia03': ['ia03', 'ia-03', '#ia03', '#ia-03', '#ia3'],
-             'il14': ['il14', 'il-14', '#il14', '#il-14'],
-             'ks02': ['ks02', 'ks-02', '#ks02', '#ks-02'],
-             'ks03': ['ks03', 'ks-03', '#ks03', '#ks-03'],
-             'ky06': ['ky06', 'ky-06', '#ky06', '#ky-06', '#ky6'],
-             'me02': ['me02', 'me-02', '#me02', '#me-02', '#me2'],
-             'mi08': ['mi08', 'mi-08', '#mi08', '#mi-08'],
-             'nc09': ['nc09', 'nc-09', '#nc09', '#nc-09', '#nc9'],
-             'nc13': ['nc13', 'nc-13', '#nc13', '#nc-13'],
-             'nj03': ['nj03', 'nj-03', '#nj03', '#nj-03', '#nj3'],
-             'nm02': ['nm02', 'nm-02', '#nm02', '#nm-02', '#nm2'],
-             'ny11': ['ny11', 'ny-11', '#ny11', '#ny-11'],
-             'oh01': ['oh01', 'oh-01', '#oh01', '#oh-01', '#oh1'],
-             'tx23': ['tx23', 'tx-23', '#tx23', '#tx-23'],
-             'tx32': ['tx32', 'tx-32', '#tx32', '#tx-32'],
-             'ut04': ['ut04', 'ut-04', '#ut04', '#ut-04', '#ut4'],
-             'va02': ['va02', 'va-02', '#va02', '#va-02', '#va2'],
-             'va05': ['va05', 'va-05', '#va05', '#va-05', '#va5'],
-             'va07': ['va07', 'va-07', '#va07', '#va-07', '#va7'],
-             'wa05': ['wa05', 'wa-05', '#wa05', '#wa-05', '#wa5'],
-             'wi01': ['wi01', 'wi-01', '#wi01', '#wi-01', '#wi1'],
-             'az06': ['az06', 'az-06', '#az06', '#az-06', '#az6'],
-             'ca04': ['ca04', 'ca-04', '#ca04', '#ca-04', '#ca4'],
-             'ca50': ['ca50', 'ca-50', '#ca50', '#ca-50'],
-             'fl15': ['fl15', 'fl-15', '#fl15', '#fl-15'],
-             'fl16': ['fl16', 'fl-16', '#fl16', '#fl-16'],
-             'fl25': ['fl25', 'fl-25', '#fl25', '#fl-25'],
-             'ga07': ['ga07', 'ga-07', '#ga07', '#ga-07', '#ga7'],
-             'il13': ['il13', 'il-13', '#il13', '#il-13'],
-             'in02': ['in02', 'in-02', '#in02', '#in-02', '#in2'],
-             'mi01': ['mi01', 'mi-01', '#mi01', '#mi-01', '#mi1'],
-             'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06'],
-             'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7'],
-             'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2'],
-             'mtAL': ['mtal', 'mt-al', '#mtal', '#mt-al'],
-             'mt00': ['mt00', 'mt-00', '#mt00', '#mt-00'],
-             'nc02': ['nc02', 'nc-02', '#nc02', '#nc-02', '#nc2'],
-             'nc08': ['nc08', 'nc-08', '#nc08', '#nc-08', '#nc8'],
-             'ny01': ['ny01', 'ny-01', '#ny01', '#ny-01', '#ny1'],
-             'ny24': ['ny24', 'ny-24', '#ny24', '#ny-24'],
-             'oh10': ['oh10', 'oh-10', '#oh10', '#oh-10'],
-             'oh14': ['oh14', 'oh-14', '#oh14', '#oh-14'],
-             'oh15': ['oh15', 'oh-15', '#oh15', '#oh-15'],
-             'pa10': ['pa10', 'pa-10', '#pa10', '#pa-10'],
-             'pa14': ['pa14', 'pa-14', '#pa14', '#pa-14'],
-             'pa16': ['pa16', 'pa-16', '#pa16', '#pa-16'],
-             'sc01': ['sc01', 'sc-01', '#sc01', '#sc-01', '#sc1'],
-             'sc05': ['sc05', 'sc-05', '#sc05', '#sc-05', '#sc5'],
-             'tx21': ['tx21', 'tx-21', '#tx21', '#tx-21'],
-             'wa03': ['wa03', 'wa-03', '#wa03', '#wa-03', '#wa3'],
-             'wi06': ['wi06', 'wi-06', '#wi06', '#wi-06', '#wi6'],
-             'wi07': ['wi07', 'wi-07', '#wi07', '#wi-07', '#wi7'],
-             'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3']
+distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09'],
+             'ca07': ['ca07', 'ca-07', '#ca07', '#ca-07', '#ca7', 'ca 07'],
+             'ct05': ['ct05', 'ct-05', '#ct05', '#ct-05', '#ct5', 'ct 05'],
+             'fl07': ['fl07', 'fl-07', '#fl07', '#fl-07', '#fl7', 'fl 07'],
+             'mn07': ['mn07', 'mn-07', '#mn07', '#mn-07', '#mn7', 'mn 07'],
+             'nh02': ['nh02', 'nh-02', '#nh02', '#nh-02', '#nh2', 'nh 02'],
+             'nj05': ['nj05', 'nj-05', '#nj05', '#nj-05', '#nj5', 'nj 05'],
+             'nv04': ['nv04', 'nv-04', '#nv04', '#nv-04', '#nv4', 'nv 04'],
+             'pa05': ['pa05', 'pa-05', '#pa05', '#pa-05', '#pa5', 'pa 05'],
+             'pa06': ['pa06', 'pa-06', '#pa06', '#pa-06', '#pa6', 'pa 06'],
+             'pa08': ['pa08', 'pa-08', '#pa08', '#pa-08', '#pa8', 'pa 08'],
+             'wi03': ['wi03', 'wi-03', '#wi03', '#wi-03', '#wi3', 'wi 03'],
+             'az01': ['az01', 'az-01', '#az01', '#az-01', '#az1', 'az 01'],
+             'az02': ['az02', 'az-02', '#az02', '#az-02', '#az2', 'az 02'],
+             'ca39': ['ca39', 'ca-39', '#ca39', '#ca-39', 'ca 39'],
+             'ca49': ['ca49', 'ca-49', '#ca49', '#ca-49', 'ca 49'],
+             'fl27': ['fl27', 'fl-27', '#fl27', '#fl-27', 'fl 27'],
+             'nh01': ['nh01', 'nh-01', '#nh01', '#nh-01', '#nh1', 'nh 01'],
+             'nj02': ['nj02', 'nj-02', '#nj02', '#nj-02', '#nj2', 'nj 02'],
+             'nv03': ['nv03', 'nv-03', '#nv03', '#nv-03', '#nv3', 'nv 03'],
+             'pa07': ['pa07', 'pa-07', '#pa07', '#pa-07', '#pa7', 'pa 07'],
+             'mn01': ['mn01', 'mn-01', '#mn01', '#mn-01', '#mn1', 'mn 01'],
+             'mn08': ['mn08', 'mn-08', '#mn08', '#mn-08', '#mn8', 'mn 08'],
+             'ca10': ['ca10', 'ca-10', '#ca10', '#ca-10', 'ca 10'],
+             'ca25': ['ca25', 'ca-25', '#ca25', '#ca-25', 'ca 25'],
+             'ca48': ['ca48', 'ca-48', '#ca48', '#ca-48', 'ca 48'],
+             'co06': ['co06', 'co-06', '#co06', '#co-06', '#co6', 'co 06'],
+             'fl26': ['fl26', 'fl-26', '#fl26', '#fl-26', 'fl 26'],
+             'ia01': ['ia01', 'ia-01', '#ia01', '#ia-01', '#ia1', 'ia 01'],
+             'il06': ['il06', 'il-06', '#il06', '#il-06', '#il6', 'il 06'],
+             'il12': ['il12', 'il-12', '#il12', '#il-12', 'il 12'],
+             'mi11': ['mi11', 'mi-11', '#mi11', '#mi-11', 'mi 11'],
+             'mn02': ['mn02', 'mn-02', '#mn02', '#mn-02', '#mn2', 'mn 02'],
+             'mn03': ['mn03', 'mn-03', '#mn03', '#mn-03', '#mn3', 'mn 03'],
+             'ne02': ['ne02', 'ne-02', '#ne02', '#ne-02', '#ne2', 'ne 02'],
+             'nj07': ['nj07', 'nj-07', '#nj07', '#nj-07', '#nj7', 'nj 07'],
+             'nj11': ['nj11', 'nj-11', '#nj11', '#nj-11', 'nj 11'],
+             'ny19': ['ny19', 'ny-19', '#ny19', '#ny-19', 'ny 19'],
+             'ny22': ['ny22', 'ny-22', '#ny22', '#ny-22', 'ny 22'],
+             'oh12': ['oh12', 'oh-12', '#oh12', '#oh-12', 'oh 12'],
+             'pa01': ['pa01', 'pa-01', '#pa01', '#pa-01', '#pa1', 'pa 01'],
+             'pa17': ['pa17', 'pa-17', '#pa17', '#pa-17', 'pa 17'],
+             'tx07': ['tx07', 'tx-07', '#tx07', '#tx-07', '#tx7', 'tx 07'],
+             'va10': ['va10', 'va-10', '#va10', '#va-10', 'va 10'],
+             'wa08': ['wa08', 'wa-08', '#wa08', '#wa-08', '#wa8', 'wa 08'],
+             'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar 02'],
+             'ca21': ['ca21', 'ca-21', '#ca21', '#ca-21', 'ca 21'],
+             'ca45': ['ca45', 'ca-45', '#ca45', '#ca-45', 'ca 45'],
+             'fl18': ['fl18', 'fl-18', '#fl18', '#fl-18', 'fl 18'],
+             'ga06': ['ga06', 'ga-06', '#ga06', '#ga-06', '#ga6', 'ga 06'],
+             'ia03': ['ia03', 'ia-03', '#ia03', '#ia-03', '#ia3', 'ia 03'],
+             'il14': ['il14', 'il-14', '#il14', '#il-14', 'il 14'],
+             'ks02': ['ks02', 'ks-02', '#ks02', '#ks-02', 'ks 02'],
+             'ks03': ['ks03', 'ks-03', '#ks03', '#ks-03', 'ks 03'],
+             'ky06': ['ky06', 'ky-06', '#ky06', '#ky-06', '#ky6', 'ky 06'],
+             'me02': ['me02', 'me-02', '#me02', '#me-02', '#me2', 'me 02'],
+             'mi08': ['mi08', 'mi-08', '#mi08', '#mi-08', 'mi 08'],
+             'nc09': ['nc09', 'nc-09', '#nc09', '#nc-09', '#nc9', 'mc 09'],
+             'nc13': ['nc13', 'nc-13', '#nc13', '#nc-13', 'nc 13'],
+             'nj03': ['nj03', 'nj-03', '#nj03', '#nj-03', '#nj3', 'nj 03'],
+             'nm02': ['nm02', 'nm-02', '#nm02', '#nm-02', '#nm2', 'nm 02'],
+             'ny11': ['ny11', 'ny-11', '#ny11', '#ny-11', 'ny 11'],
+             'oh01': ['oh01', 'oh-01', '#oh01', '#oh-01', '#oh1', 'oh 01'],
+             'tx23': ['tx23', 'tx-23', '#tx23', '#tx-23', 'tx 23'],
+             'tx32': ['tx32', 'tx-32', '#tx32', '#tx-32', 'tx 32'],
+             'ut04': ['ut04', 'ut-04', '#ut04', '#ut-04', '#ut4', 'ut 04'],
+             'va02': ['va02', 'va-02', '#va02', '#va-02', '#va2', 'va 02'],
+             'va05': ['va05', 'va-05', '#va05', '#va-05', '#va5', 'va 05'],
+             'va07': ['va07', 'va-07', '#va07', '#va-07', '#va7', 'va 07'],
+             'wa05': ['wa05', 'wa-05', '#wa05', '#wa-05', '#wa5', 'wa 05'],
+             'wi01': ['wi01', 'wi-01', '#wi01', '#wi-01', '#wi1', 'wi 01'],
+             'az06': ['az06', 'az-06', '#az06', '#az-06', '#az6', 'az 06'],
+             'ca04': ['ca04', 'ca-04', '#ca04', '#ca-04', '#ca4', 'ca 04'],
+             'ca50': ['ca50', 'ca-50', '#ca50', '#ca-50', 'ca 50'],
+             'fl15': ['fl15', 'fl-15', '#fl15', '#fl-15', 'fl 15'],
+             'fl16': ['fl16', 'fl-16', '#fl16', '#fl-16', 'fl 16'],
+             'fl25': ['fl25', 'fl-25', '#fl25', '#fl-25', 'fl 25'],
+             'ga07': ['ga07', 'ga-07', '#ga07', '#ga-07', '#ga7', 'ga 07'],
+             'il13': ['il13', 'il-13', '#il13', '#il-13', 'il 13'],
+             'in02': ['in02', 'in-02', '#in02', '#in-02', '#in2', 'in 02'],
+             'mi01': ['mi01', 'mi-01', '#mi01', '#mi-01', '#mi1', 'mi 01'],
+             'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06', 'mi 06'],
+             'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7', 'mi 07'],
+             'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2', 'mo 02'],
+             'mtAL': ['mtal', 'mt-al', '#mtal', '#mt-al', 'mt al'],
+             'mt00': ['mt00', 'mt-00', '#mt00', '#mt-00', 'mt 00'],
+             'nc02': ['nc02', 'nc-02', '#nc02', '#nc-02', '#nc2', 'nc 02'],
+             'nc08': ['nc08', 'nc-08', '#nc08', '#nc-08', '#nc8', 'nc 08'],
+             'ny01': ['ny01', 'ny-01', '#ny01', '#ny-01', '#ny1', 'ny 01'],
+             'ny24': ['ny24', 'ny-24', '#ny24', '#ny-24', 'ny 24'],
+             'oh10': ['oh10', 'oh-10', '#oh10', '#oh-10', 'oh 10'],
+             'oh14': ['oh14', 'oh-14', '#oh14', '#oh-14', 'oh 14'],
+             'oh15': ['oh15', 'oh-15', '#oh15', '#oh-15', 'oh 15'],
+             'pa10': ['pa10', 'pa-10', '#pa10', '#pa-10', 'pa 10'],
+             'pa14': ['pa14', 'pa-14', '#pa14', '#pa-14', 'pa 14'],
+             'pa16': ['pa16', 'pa-16', '#pa16', '#pa-16', 'pa 16'],
+             'sc01': ['sc01', 'sc-01', '#sc01', '#sc-01', '#sc1', 'sc 01'],
+             'sc05': ['sc05', 'sc-05', '#sc05', '#sc-05', '#sc5', 'sc 05'],
+             'tx21': ['tx21', 'tx-21', '#tx21', '#tx-21', 'tx 21'],
+             'wa03': ['wa03', 'wa-03', '#wa03', '#wa-03', '#wa3', 'wa 03'],
+             'wi06': ['wi06', 'wi-06', '#wi06', '#wi-06', '#wi6', 'wi 06'],
+             'wi07': ['wi07', 'wi-07', '#wi07', '#wi-07', '#wi7', 'wi 07'],
+             'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3', 'wv 03'],
+             'OHSen': ['ohsen', '#ohsen', 'oh', 'brown', 'ohio', 'renacci'],
+             'INSen': ['insen', '#insen', 'in', 'donnelly', 'indiana', 'braun'],
+             'NDSen': ['ndsen', '#ndsen', 'nd', 'heitkamp', 'north dakota', 'cramer'],
+             'WVSen': ['wvsen', '#wvsen', 'wv', 'manchin', 'west virginia', 'morrisey'],
+             'NVSen': ['nvsen', '#nvsen', 'nv', 'rosen', 'nevada', 'heller'],
+             'TXSen': ['txsen', '#txsen', 'tx', 'o’rourke', 'texas', 'cruz'],
+             'NESen': ['nesen', '#nesen', 'ne', 'raybould', 'nebraska', 'fischer'],
+             'MSSen': ['mssen', '#mssen', 'ms', 'baria', 'mississippi', 'wicker'],
+             'MTSen': ['mtsen', '#mtsen', 'mt', 'tester', 'montana', 'rosendale'],
+             'NJSen': ['njsen', '#njsen', 'nj', 'menendez', 'new jersey', 'hugin'],
+             'PASen': ['pasen', '#pasen', 'pa', 'casey', 'montana', 'barletta'],
+             'TNSen': ['tnsen', '#tnsen', 'tn', 'bredesen', 'tennessee', 'blackburn']
              }
 
 distdict = {'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar2'],

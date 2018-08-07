@@ -241,8 +241,8 @@ def overview(dynamic):
 
     # Get a desc-ordered list of all hashtags being used in all districts
     # Object returns (hashtag, count)
-    all_hashes_result = conn.execute('SELECT hashtag, count FROM hash_activity_{};'.\
-    format(time_delta))
+    all_hashes_result = conn.execute('SELECT hashtag, count FROM hash_activity_{0}_{1};'.\
+    format(dynamic, time_delta))
 
     #RETURN THIS TO TEMPLATE
     all_hashes = []
@@ -278,8 +278,8 @@ def overview(dynamic):
 
     #Get list of most active districts
 
-    active_dists_result = conn.execute('SELECT district_name, count FROM dist_activity_{};'.\
-    format(time_delta))
+    active_dists_result = conn.execute('SELECT district_name, count FROM dist_activity_{0}_{1};'.\
+    format(dynamic, time_delta))
 
     # RETURN THIS TO TEMPLATE
     most_active = []
@@ -291,8 +291,8 @@ def overview(dynamic):
     print("got most_active")
 
     # Get a desc-ordered list of top-volume Tweeters
-    top_tweeters_result = conn.execute('SELECT user_scrname, count, user_cap_perc FROM top_tweeters_{};'.\
-    format(time_delta))
+    top_tweeters_result = conn.execute('SELECT user_scrname, count, user_cap_perc FROM top_tweeters_{0}_{1};'.\
+    format(dynamic, time_delta))
 
     # RETURN THIS TO TEMPLATE
     top_tweeters = []
@@ -310,8 +310,8 @@ def overview(dynamic):
 
     print("got top_tweeters")
 
-    retweeted_users_result = conn.execute('SELECT original_author_scrname, count FROM retweeted_users_{};'.\
-    format(time_delta))
+    retweeted_users_result = conn.execute('SELECT original_author_scrname, count FROM retweeted_users_{0}_{1};'.\
+    format(dynamic, time_delta))
 
     # RETURN THIS TO TEMPLATE
     retweeted_users = []
@@ -323,8 +323,8 @@ def overview(dynamic):
 
     print("got retweeted users")
 
-    retweeted_tweets_result = conn.execute('SELECT post_id, original_poster, retweet_count, botscore FROM retweeted_tweets_{};'.\
-    format(time_delta))
+    retweeted_tweets_result = conn.execute('SELECT post_id, original_poster, retweet_count, botscore FROM retweeted_tweets_{0}_{1};'.\
+    format(dynamic, time_delta))
 
     # RETURN THIS TO TEMPLATE
     most_retweeted_tweet_list = []
