@@ -105,9 +105,6 @@ def check_district_relevance_st(tweet_texts):
 
     for named_district in district_list:
 
-        # if named_district[2:5] == "Sen":
-        #     continue
-
         # check if any of district aliases are included in tweet text;
         # if finds a match, return True
         for district_keyword in distdict_short[named_district]:

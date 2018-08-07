@@ -379,7 +379,7 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
 
-    #Do Senate search
+    #Do Senate searchcd
     search_sen()
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
