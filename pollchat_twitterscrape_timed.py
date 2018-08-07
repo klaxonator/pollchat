@@ -373,8 +373,8 @@ def search_sen():
     db.session.close()
 
 
-if __name__ == "__main__":
-# def run_twitterscrape():
+
+def run_twitterscrape():
 
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
@@ -400,3 +400,6 @@ if __name__ == "__main__":
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
+
+if __name__ == "__main__":
+    run_twitterscrape()
