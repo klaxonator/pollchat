@@ -99,7 +99,7 @@ def check_district_relevance_st(tweet_texts):
     for distref in referenced_districts:
         district_list.append(distref[0])
 
-    print(district_list)
+    #print(district_list)
 
     # iterate through district_list, get dist_aliases from dictionary (distdict_short)
 
@@ -111,11 +111,11 @@ def check_district_relevance_st(tweet_texts):
 
             if tweet_texts[2]:
                 if district_keyword in tweet_texts[2].lower():
-                    print(district_keyword)
+                    #print(district_keyword)
                     return True
             else:
                 if district_keyword in tweet_texts[1].lower():
-                    print(district_keyword)
+                    #print(district_keyword)
                     return True
 
     # if no match found, return False

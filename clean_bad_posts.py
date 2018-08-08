@@ -64,7 +64,7 @@ def clean_bad_posts():
                 to_delete = session.query(Post).\
                 filter(Post.post_id==db_tweet[0]).first()
 
-                #session.delete(to_delete)
+                session.delete(to_delete)
 
                 if db_tweet[2]:
                     print("Deleting tweet_id {}".format(db_tweet[0]))
@@ -82,6 +82,7 @@ def clean_bad_posts():
                 count += 1
                 if count % 100 == 0:
                     db.session.commit()
+                    print("deleted {} posts".format(count))
         except:
             session.rollback()
             continue
