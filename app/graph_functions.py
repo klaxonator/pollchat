@@ -31,7 +31,7 @@ def top_line_all(distgroup, var_type, index=3):
     print(index)
 
     if distgroup == "allcong":
-        dist_fig = 0
+        dist_fig = 1
     elif distgroup == "allsen":
         dist_fig = 2
     elif distgroup == "allraces":
