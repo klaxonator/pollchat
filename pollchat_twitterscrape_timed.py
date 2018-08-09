@@ -292,6 +292,7 @@ def twitter_search(query):
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed database write error for post ID {0}: {1}".\
                 format(post_id, e))
+                print("It's currently {}".format(datetime.datetime.now())
 
                 with open('logs/twitterscrape_passed.txt', 'a') as pw:
                     pw.write('{}\n'.format(post_id))

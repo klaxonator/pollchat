@@ -1,4 +1,5 @@
 
+
 from app import app, db
 from datetime import datetime, date, timedelta
 from app.helpers import dists as district_list
@@ -9,7 +10,7 @@ from sqlalchemy import Column, Integer, String, Float, func
 
 
 
-#Set beginnin of searches at midnight, so have full-day comparisons
+#Set beginning of searches at midnight, so have full-day comparisons
 today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
 
 str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
@@ -22,8 +23,21 @@ def get_beg_date(time_delta):
     results = [str_beg_date, shrt_beg_date]
     return results
 
-#Get top line for hash or user chart
-def top_line_all(var_type, index=3):
+# Get top line for get_all_hashrows (overview page)
+
+def top_line_all(distgroup, var_type, index=3):
+    print(distgroup)
+    print(var_type)
+    print(index)
+
+    if distgroup == "allcong":
+        dist_fig = 0
+    elif distgroup == "allsen":
+        dist_fig = 2
+    elif distgroup == "allraces":
+        dist_fig = 3
+
+    print(dist_fig)
 
     top_line = []
     top_line.append('Date')
@@ -34,24 +48,49 @@ def top_line_all(var_type, index=3):
 
     print("next try is: starting from {}".format(str_beg_range))
 
-    if var_type == "users":
+    if distgroup == "allcong" or distgroup == "allsen":
 
-        top_list = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
-        join(Post.user).\
-        filter(Post.created_at >= str_beg_range).\
-        group_by(User.user_scrname).order_by(func.count(User.user_scrname).desc()).all()
+        if var_type == "users":
 
-    elif var_type == "hashtags":
+            top_list = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
+            join(Post.user).join(Post.districts).\
+            filter(Post.created_at >= str_beg_range).filter(District.dist_type==dist_fig).\
+            group_by(User.user_scrname).order_by(func.count(User.user_scrname).desc()).all()
 
-        top_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
-        join(Post.hashtags).\
-        filter(Post.created_at >= str_beg_range).\
-        group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+        elif var_type == "hashtags":
+            print("trying hashsearch")
 
-    else:
+            top_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
+            join(Post.hashtags).join(Post.districts).\
+            filter(Post.created_at >= str_beg_range).filter(District.dist_type==dist_fig).\
+            group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
-        return "Needs a variable type!"
+            print(len(top_list))
+        else:
 
+            raise ValueError('Needs a variable type!')
+
+    else:                           #For allraces (all congressional races)
+
+        if var_type == "users":
+
+            top_list = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
+            join(Post.user).\
+            filter(Post.created_at >= str_beg_range).\
+            group_by(User.user_scrname).order_by(func.count(User.user_scrname).desc()).all()
+
+        elif var_type == "hashtags":
+
+            top_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
+            join(Post.hashtags).\
+            filter(Post.created_at >= str_beg_range).\
+            group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+
+        else:
+
+            raise ValueError('Needs a variable type!')
+
+        print(len(top_list))
     counter = 0
     for item in top_list:
         if item[0] in distlist:
@@ -67,13 +106,14 @@ def top_line_all(var_type, index=3):
     if len(top_line) == 6:
         return top_line
     else:
-        top_line = top_line_all(var_type, index+1)
+        top_line = top_line_all(distgroup, var_type, index+1)
 
     return top_line
 
 
 
 # Get top line for charts. Index=3 means starting with 3-day running average
+# Used for get_hash_rows (single-district page)
 def top_line_generic(this_district, var_type, index=3):
 
     top_line = []
@@ -126,13 +166,15 @@ def top_line_generic(this_district, var_type, index=3):
     return top_line
 
 
+#This is used only for Overview chart
 
-def get_all_hashrows():
+def get_hashrows_overview(distgroup):
     #Container for all rows
+
     rows = []
 
     #Get top line (first row)
-    this_top_line = top_line_all(var_type='hashtags')
+    this_top_line = top_line_all(distgroup=distgroup, var_type='hashtags')
 
     #start with current time as endtime
     end_date = str_today
@@ -146,6 +188,7 @@ def get_all_hashrows():
 
     #Top level loop through dates
     for x in range(1, 11):
+
         # Using X as time_delta, get beg date of -1, -2, etc ... days
         # Function returns (midnight, display date)
         beg_date = get_beg_date(x)
@@ -177,6 +220,8 @@ def get_all_hashrows():
 
 
     rows.append(this_top_line)
+
+    #Reverse so that earliest row is first, latest last
     rows.reverse()
 
     return rows

@@ -238,6 +238,16 @@ def overview(dynamic):
 
     conn = db.engine.connect()
 
+    # GET 10-day table data for hashtag chart from graph_functions module
+    # RETURN THIS TO TEMPLATE
+    hashtable_all = gf.get_hashrows_overview(dynamic)
+
+    print("got hashtable")
+    time_now = datetime.now()
+    with open('datafiles/overview_{}_graph.txt'.format(dynamic), 'w') as f:
+        f.write(time_now.strftime('%Y-%m-%d') + '\n\n')
+        f.write(str(hashtable_all))
+
 
     # Get a desc-ordered list of all hashtags being used in all districts
     # Object returns (hashtag, count)
@@ -263,11 +273,7 @@ def overview(dynamic):
         if counter == 20:
             break
 
-    # GET 10-day table data for hashtag chart from graph_functions module
-    # RETURN THIS TO TEMPLATE
-    hashtable_all = gf.get_all_hashrows()
 
-    print("got hashtable")
 
     # RETURN THIS TO TEMPLATE
     all_tweets = db.session.query(func.count(Post.post_id)).\
