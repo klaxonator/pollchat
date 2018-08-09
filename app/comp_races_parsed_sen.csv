@@ -10,3 +10,5 @@
 'NJSen','#NJSen',('NJ' AND 'Menendez'),('New Jersey' AND 'Menendez'),('NJ' AND 'Hugin'),('New Jersey' AND 'Hugin')
 'PASen','#PASen',('PA' AND 'Casey'),('Montana' AND 'Casey'),('PA' AND 'Barletta'),('Montana' AND 'Barletta')
 'TNSen','#TNSen',('TN' AND 'Bredesen'),('Tennessee' AND 'Bredesen'),('TN' AND 'Blackburn'),('Tennessee' AND 'Blackburn')
+'MISen','#MISen',('MI' AND 'Stabenow'),('Michigan' AND 'Stabenow'),('MI' AND 'James'),('Michigan' AND 'James')
+'MOSen','#MOSen',('MO' AND 'McCaskill'),('Missouri' AND 'McCaskill'),('MO' AND 'Hawley'),('Missouri' AND 'Hawley')
