@@ -8,9 +8,11 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
 test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
-get_tweet_list_nodist
+get_tweet_list_nodist, Logger
 import app.graph_functions as gf
+import sys
 
+sys.stdout = Logger()
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -57,7 +59,7 @@ def district(dynamic):
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
-    # print('got dist_hashes')
+    print('got dist_hashes')
 
     # Most active tweeters column
     top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname),\
@@ -66,7 +68,7 @@ def district(dynamic):
     filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
     group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
 
-    # print('got top_tweeters')
+    print('got top_tweeters')
 
     # Most frequently retweeted users column )
     most_retweeted = db.session.query(Post.original_author_scrname, \
@@ -96,7 +98,7 @@ def district(dynamic):
             tweeter.append("Not yet in database")
         most_retweeted_list.append(tweeter)
 
-    # print('got most_retweeted')
+    print('got most_retweeted')
 
     # Most retweeted tweets column
 
@@ -117,7 +119,7 @@ def district(dynamic):
     #most_retweeted_tweet_list_dated = get_tweet_list_dated(db_search_object, time_delta)
 
 
-    # print('got most_retweeted_list')
+    print('got most_retweeted_list')
 
     #Get basic district object for district info
     dist_obj = db.session.query(District.state_fullname, District.district, \
@@ -125,12 +127,12 @@ def district(dynamic):
     District.trump_2016, District.dem_candidate, District.rep_candidate).\
     filter(District.district_name==dynamic).first()
 
-    # print('got dist_obj')
+    print('got dist_obj')
 
     #Using 3-day index for top-row hashtags to spotlight
     hash_table_rows = gf.get_hash_rows(dynamic)
 
-    # print('got chart_rows')
+    print('got chart_rows')
 
     return render_template('district.html', dynamic=dynamic, time_delta=time_delta, \
     url=url, dist_hashes=dist_hashes, top_tweeters=top_tweeters, \
@@ -181,6 +183,8 @@ def hashtag(dynamic):
     group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
 
+    print("got top districts")
+
     # "Who uses this hashtag" column
     top_users=db.session.query(User.user_scrname, func.count(User.user_scrname), \
     User.user_cap_perc).\
@@ -188,6 +192,8 @@ def hashtag(dynamic):
     filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
     group_by(User.user_id, User.user_cap_perc).\
     order_by(func.count(User.user_scrname).desc()).all()
+
+    print("got top users")
 
     # Data for positive/negative chart
     valences = db.session.query(Post.polarity_val, func.count(Post.polarity_val)).\
@@ -199,6 +205,8 @@ def hashtag(dynamic):
     for item in valences:
         valences_datatable.append([item[0], item[1]])
 
+    print("got valences")
+
     # Most retweeted tweets column
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
@@ -207,9 +215,13 @@ def hashtag(dynamic):
     filter(Hashtag.hashtag==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
 
+    print("got most retweeted tweets")
+
     #Get botscore for top five most-retweeted tweets, create list of [post_id, name,
     # retweet numbers, botscore] to send to template
     most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
+
+    print("got top districts")
 
     return render_template('hashtag.html', t_form=ChangeTimeForm(), url=url, \
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
@@ -240,13 +252,11 @@ def overview(dynamic):
 
     # GET 10-day table data for hashtag chart from graph_functions module
     # RETURN THIS TO TEMPLATE
-    hashtable_all = gf.get_hashrows_overview(dynamic)
 
-    print("got hashtable")
-    time_now = datetime.now()
-    with open('datafiles/overview_{}_graph.txt'.format(dynamic), 'w') as f:
-        f.write(time_now.strftime('%Y-%m-%d') + '\n\n')
-        f.write(str(hashtable_all))
+
+
+
+
 
 
     # Get a desc-ordered list of all hashtags being used in all districts
@@ -356,6 +366,10 @@ def overview(dynamic):
             break
 
     print("got most retweeted tweets")
+
+    hashtable_all = gf.get_hashrows_overview(dynamic)
+
+    print("got hashtable")
 
     conn.close()
 
