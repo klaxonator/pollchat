@@ -155,8 +155,9 @@ def twitter_search(query):
     tweetsPerQry = 100
     max_id = -1
 
-    tweetCount = 0
-    indexCount = 0
+
+    tweetCount = 0      # Number of tweets obtained from Twitter
+    indexCount = 0      # Number of tweets added to DB
 
     # Create manual paging system for tweets. Each new call is 100-tweet page
     # Here will generally always use no sinceID (meaning return all possible tweets)
@@ -348,12 +349,12 @@ def twitter_search(query):
 
                 if indexCount % 200 == 0:
                     db.session.commit()
-                    print("{} items added to database so far".format(count))
+                    print("{} items added to database so far".format(indexCount))
 
 
             #Reset total tweets fetched
             tweetCount += len(new_tweets)
-            print("Downloaded {} tweets".format(count))
+            print("Downloaded {} tweets".format(tweetCount))
 
             #Reset max_id from last tweet returned for new manually paged page of tweets
             max_id = new_tweets[-1].id
