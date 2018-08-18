@@ -50,6 +50,17 @@ class User(db.Model):
         return "Object: Twitter User with id {0!r} and screen name {1!r}".\
         format(self.user_id, self.user_scrname)
 
+    def __init__(self, user_id, user_scrname, user_name, user_location,
+            user_created, user_followers, user_friends, user_statuses):
+        self.user_id = user_id
+        self.user_scrname = user_scrname
+        self.user_name = user_name
+        self.user_location = user_location
+        self.user_created = user_created
+        self.user_followers = user_followers
+        self.user_friends = user_friends
+        self.user_statuses = user_statuses
+
 
 
 class Post(db.Model):
@@ -102,9 +113,10 @@ class Post(db.Model):
 #        'original_author_scrname')
 
 
-    def __init__(self, post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
-     reply_to_scrname, reply_to_status_id, retweet_count,
-     favorite_count, is_retweet, original_text, original_author_id,
+    def __init__(self, post_id, user_id, text, created_at, created_at_dt,
+     reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
+     favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+     original_text, original_tweet_created_at, original_tweet_likes, original_author_id,
      original_author_scrname, polarity, polarity_val):
         self.post_id = post_id
         self.user_id = user_id
@@ -115,12 +127,17 @@ class Post(db.Model):
         self.reply_to_scrname = reply_to_scrname
         self.reply_to_status_id = reply_to_status_id
         self.retweet_count = retweet_count
-
         self.favorite_count = favorite_count
+
         self.is_retweet = is_retweet
+        self.original_tweet_id = original_tweet_id
+        self.original_tweet_retweets = original_tweet_retweets
         self.original_text = original_text
+        self.original_tweet_created_at = original_tweet_created_at
+        self.original_tweet_likes = original_tweet_likes
         self.original_author_id = original_author_id
         self.original_author_scrname = original_author_scrname
+
         self.polarity = polarity
         self.polarity_val = polarity_val
 

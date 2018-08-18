@@ -106,7 +106,7 @@ class Post(Base):
 
     post_created_at_index = Index('post_created_at_idx', 'created_at')
 
-    def __init__(self, post_id, user_id, text, created_at, reply_to_user_id,
+    def __init__(self, post_id, user_id, text, created_at, create_at_dt, reply_to_user_id,
      reply_to_scrname, reply_to_status_id, retweet_count,
      favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
      original_text, original_tweet_created_at, original_tweet_likes,
@@ -116,6 +116,7 @@ class Post(Base):
         self.user_id = user_id
         self.text = text
         self.created_at = created_at
+        self.created_at_dt = created_at_dt
         self.reply_to_user_id = reply_to_user_id
         self.reply_to_scrname = reply_to_scrname
         self.reply_to_status_id = reply_to_status_id

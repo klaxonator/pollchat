@@ -16,10 +16,9 @@ import app.tweepy_cred as cred
 
 
 ##Set up database functions
-from azmodels import User, Post, Hashtag, District, Url, posthash_assoc,\
+from app.models import User, Post, Hashtag, District, Url, posthash_assoc,\
  posturl_assoc, postdist_assoc
-from sqlalchemy import create_engine, exc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import exc
 
 #Instantiate SQLalchemy database connection
 
@@ -60,11 +59,12 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
         #POST table
 
 
-        new_post = Post(post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
-            reply_to_scrname, reply_to_status_id, retweet_count,
+        new_post = Post(post_id, user_id, text, created_at, created_at_dt,
+            reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
             favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
             original_text, original_tweet_created_at, original_tweet_likes,
             original_author_id, original_author_scrname, polarity, polarity_val)
+
         db.session.add(new_post)
 
         #If original tweet is in database, update its retweeted count. If not, do nothing
