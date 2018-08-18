@@ -25,7 +25,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 #Write Twitter variables to DB
-def write_database(post_id, user_id, text, created_at, reply_to_user_id,
+def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
         reply_to_scrname, reply_to_status_id, retweet_count,
         favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
         original_text, original_tweet_created_at, original_tweet_likes,
@@ -60,7 +60,7 @@ def write_database(post_id, user_id, text, created_at, reply_to_user_id,
         #POST table
 
 
-        new_post = Post(post_id, user_id, text, created_at, reply_to_user_id,
+        new_post = Post(post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
             reply_to_scrname, reply_to_status_id, retweet_count,
             favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
             original_text, original_tweet_created_at, original_tweet_likes,
@@ -221,6 +221,7 @@ def twitter_search(query):
                 post_id = tweet.id_str
                 text = tweet.full_text
                 created_at = tweet.created_at                #NOTE: UTC time
+                created_at_dt = tweet.created_at
 
                 #Post table variables: Nullable
                 reply_to_user_id = tweet.in_reply_to_user_id_str
@@ -319,7 +320,8 @@ def twitter_search(query):
 
                 # Try writing to Mysql database
                 try:
-                    write_database(post_id, user_id, text, created_at, reply_to_user_id,
+                    write_database(post_id, user_id, text, created_at,
+                            created_at_dt, reply_to_user_id,
                             reply_to_scrname, reply_to_status_id, retweet_count,
                             favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
                             original_text, original_tweet_created_at, original_tweet_likes,
