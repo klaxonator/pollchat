@@ -58,6 +58,7 @@ class Post(db.Model):
     user_id = db.Column(db.String, db.ForeignKey('User.user_id'), nullable=False)
     text = db.Column(db.String, nullable=False)
     created_at = db.Column(db.String, nullable=False, index=True)
+    created_at_dt = db.Column(db.DateTime, index=True)
     reply_to_user_id = db.Column(db.String)
     reply_to_scrname = db.Column(db.String)
     reply_to_status_id = db.Column(db.String)
@@ -101,7 +102,7 @@ class Post(db.Model):
 #        'original_author_scrname')
 
 
-    def __init__(self, post_id, user_id, text, created_at, reply_to_user_id,
+    def __init__(self, post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
      reply_to_scrname, reply_to_status_id, retweet_count,
      favorite_count, is_retweet, original_text, original_author_id,
      original_author_scrname, polarity, polarity_val):
@@ -109,6 +110,7 @@ class Post(db.Model):
         self.user_id = user_id
         self.text = text
         self.created_at = created_at
+        self.created_at_dt = created_at_dt
         self.reply_to_user_id = reply_to_user_id
         self.reply_to_scrname = reply_to_scrname
         self.reply_to_status_id = reply_to_status_id
