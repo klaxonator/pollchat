@@ -322,16 +322,16 @@ def search_cong():
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
             if row[4] != "":
-                q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                 '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
             else:
-                q = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                 '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
-            print("Starting district: {}".format(q))
+            print("Starting district: {}".format(query))
 
             try:
-                twitter_search(q)
-                print("Finished with district: {}".format(q))
+                twitter_search(query)
+                print("Finished with district: {}".format(query))
                 db.session.commit()
 
             except exc.SQLAlchemyError as e:

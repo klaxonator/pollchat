@@ -209,13 +209,6 @@ class District(db.Model):
         back_populates = "districts"
     )
 
-#    district_district_name_index = db.Index('district_district_name_idx', 'district_name')
-
-    #TO ADD IN LATER VERSION: Also possible array of candidates, so don't limit to 2-party
-    # district_type = db.Column(db.Integer)
-    # dem_candidate = db.Column(db.String)
-    # rep_candidate = db.Column(db.String)
-
     def __init__(self, state, district, district_name, dist_type):
         #self.post_id = post_id
         self.state = state
@@ -225,6 +218,36 @@ class District(db.Model):
 
     def __repr__(self):
         return "District object with district {0}".format(self.district_name)
+
+# To hold data for charts on District, overview packages
+
+class District_graphs(db.Model):
+    __tablename__="District_graphs"
+    date_id = db.Column(db.Integer, primary_key=True)
+    reference_date = db.Column(db.DateTime, nullable=False)
+    district_name = db.Column(db.String, nullable=False, index=True)
+    chart_rows = db.Column(db.LargeBinary, nullable=False)
+
+    def __repr__(self):
+        return "Graph data object: Contains all district chart data for 1 day"
+
+    def __init__(self, reference_date, district_name, chart_rows):
+        self.reference_date = reference_date
+        self.district_name = district_name
+        self.chart_rows = chart_rows
+
+
+
+
+
+#    district_district_name_index = db.Index('district_district_name_idx', 'district_name')
+
+    #TO ADD IN LATER VERSION: Also possible array of candidates, so don't limit to 2-party
+    # district_type = db.Column(db.Integer)
+    # dem_candidate = db.Column(db.String)
+    # rep_candidate = db.Column(db.String)
+
+
 
 
 

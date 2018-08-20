@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import HashtagSearchForm, PhraseSearchForm, DistrictForm, \
 AllCongSearchForm, ChangeTimeForm, BotSearchForm, SenForm
-from app.models import User, Post, District, Hashtag, Url
+from app.models import User, Post, District, Hashtag, Url, District_graphs
 from sqlalchemy import func, Date, cast
 from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta
@@ -11,8 +11,11 @@ test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
 get_tweet_list_nodist, Logger
 import app.graph_functions as gf
 import sys
+from app.graph_functions import str_today
+import pickle
 
 sys.stdout = Logger()
+
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -130,7 +133,17 @@ def district(dynamic):
     print('got dist_obj')
 
     #Using 3-day index for top-row hashtags to spotlight
-    hash_table_rows = gf.get_hash_rows(dynamic)
+    #hash_table_rows = gf.get_hash_rows(dynamic)
+    hash_pickled = db.session.query(District_graphs.chart_rows).\
+    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.district_name==dynamic).first()
+
+    if hash_table_rows != None:
+        hash_table_rows = pickle.loads(hash_pickled[0])
+    else:
+        hash_table_rows = gf.get_hash_rows(dynamic)
+
+    print(hash_table_rows)
 
     print('got chart_rows')
 
@@ -367,7 +380,15 @@ def overview(dynamic):
 
     print("got most retweeted tweets")
 
-    hashtable_all = gf.get_hashrows_overview(dynamic)
+
+    hash_pickled = db.session.query(District_graphs.chart_rows).\
+    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.district_name==dynamic).first()
+
+    if hash_pickled != None:
+        hashtable_all = pickle.loads(hash_pickled[0])
+    else:
+        hashtable_all = gf.get_hashrows_overview(dynamic)
 
     print("got hashtable")
 

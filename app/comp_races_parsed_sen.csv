@@ -12,3 +12,5 @@
 'TNSen','#TNSen',('TN' AND 'Bredesen'),('Tennessee' AND 'Bredesen'),('TN' AND 'Blackburn'),('Tennessee' AND 'Blackburn')
 'MISen','#MISen',('MI' AND 'Stabenow'),('Michigan' AND 'Stabenow'),('MI' AND 'James'),('Michigan' AND 'James')
 'MOSen','#MOSen',('MO' AND 'McCaskill'),('Missouri' AND 'McCaskill'),('MO' AND 'Hawley'),('Missouri' AND 'Hawley')
+'MNSen','#MNSen',('MN' AND 'Smith'),('Minnesota' AND 'Smith'),('MN' AND 'Housley'),('Minnesota' AND 'Housley')
+'WISen','#MOSen',('MO' AND 'Baldwin'),('Wisconsin' AND 'Baldwin'),('MO' AND 'Vukmir'),('Wisconsin' AND 'Vukmir')

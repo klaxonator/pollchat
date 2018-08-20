@@ -4,9 +4,10 @@ from app import app, db
 from datetime import datetime, date, timedelta
 from app.helpers import dists as district_list
 from app.helpers import distlist
-from app.models import User, Post, District, Hashtag, Url
+from app.models import User, Post, District, Hashtag, Url, District_graphs
 from sqlalchemy import Column, Integer, String, Float, func
-
+import pickle
+import csv
 
 
 
@@ -24,6 +25,7 @@ def get_beg_date(time_delta):
     return results
 
 # Get top line for get_all_hashrows (overview page)
+
 
 def top_line_all(distgroup, var_type, index=3):
     print(distgroup)
@@ -108,6 +110,7 @@ def top_line_all(distgroup, var_type, index=3):
     else:
         top_line = top_line_all(distgroup, var_type, index+1)
 
+    # Top line = [Date, hash_1, hash_2, hash_3, hash_4, hash_5]
     return top_line
 
 
@@ -224,6 +227,20 @@ def get_hashrows_overview(distgroup):
     #Reverse so that earliest row is first, latest last
     rows.reverse()
 
+
+    rows_pickled = pickle.dumps(rows)
+
+    hash_add = District_graphs(str_today, distgroup, rows_pickled)
+
+
+    db.session.add(hash_add)
+    print('added to session')
+
+    db.session.commit()
+    print('committed')
+
+
+
     return rows
 
 
@@ -277,8 +294,38 @@ def get_hash_rows(this_district):
     rows.append(this_top_line)
     rows.reverse()
 
+
+    rows_pickled = pickle.dumps(rows)
+
+    hash_add = District_graphs(str_today, this_district, rows_pickled)
+
+    db.session.add(hash_add)
+    db.session.commit()
+
+
+
     return rows
-#
+
+
+def fill_graphs():
+    overview_districts = ['allcong', 'allsen', 'allraces']
+
+    for item in overview_districts:
+        get_hashrows_overview(item)
+
+
+    with open('app/comp_races_parsed.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            print(row[0][1:5])
+            get_hash_rows(row[0][1:5])
+
+
+
+    with open('app/comp_races_parsed_sen.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            get_hash_rows(row[0][1:6])
 
 
 
