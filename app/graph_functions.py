@@ -232,13 +232,14 @@ def get_hashrows_overview(distgroup):
 
     hash_add = District_graphs(str_today, distgroup, rows_pickled)
 
+    try:
+        db.session.add(hash_add)
+        print('added to session')
 
-    db.session.add(hash_add)
-    print('added to session')
-
-    db.session.commit()
-    print('committed')
-
+        db.session.commit()
+        print('committed')
+    except:
+        db.session.rollback()
 
 
     return rows
@@ -299,8 +300,11 @@ def get_hash_rows(this_district):
 
     hash_add = District_graphs(str_today, this_district, rows_pickled)
 
-    db.session.add(hash_add)
-    db.session.commit()
+    try:
+        db.session.add(hash_add)
+        db.session.commit()
+    except:
+        db.session.rollback()
 
 
 
@@ -309,6 +313,7 @@ def get_hash_rows(this_district):
 
 def fill_graphs():
     overview_districts = ['allcong', 'allsen', 'allraces']
+
 
     for item in overview_districts:
         get_hashrows_overview(item)
