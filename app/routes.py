@@ -51,6 +51,8 @@ def select_district():
 
 @app.route('/district/<dynamic>', methods=['GET', 'POST'])
 def district(dynamic):
+    print('starting district {}'.format(dynamic))
+
     time_delta = request.args.get('time_delta')
     url = request.path
 
@@ -183,6 +185,9 @@ def hashtag_search():
 
 @app.route('/hashtag/<dynamic>', methods=['GET', 'POST'])
 def hashtag(dynamic):
+
+    print('starting hashtag {}'.format(dynamic))
+
     time_delta = request.args.get('time_delta')
     url = request.path
 
@@ -257,6 +262,8 @@ def all_search():
 
 @app.route('/overview/<dynamic>', methods = ['GET', 'POST'])
 def overview(dynamic):
+
+    print('starting district group {}'.format(dynamic))
     time_delta = request.args.get('time_delta')
     url = request.path
     str_time_range = stringtime(time_delta)
@@ -406,6 +413,9 @@ def overview(dynamic):
 
 @app.route('/screen_name/<dynamic>', methods = ['GET', 'POST'])
 def screen_name(dynamic):
+
+    print('starting screen name {}'.format(dynamic))
+
     time_delta = request.args.get('time_delta')
     url = request.path
     str_time_range = stringtime(time_delta)
