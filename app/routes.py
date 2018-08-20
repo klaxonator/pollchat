@@ -138,7 +138,7 @@ def district(dynamic):
     filter(District_graphs.reference_date==str_today).\
     filter(District_graphs.district_name==dynamic).first()
 
-    if hash_table_rows != None:
+    if hash_pickled != None:
         hash_table_rows = pickle.loads(hash_pickled[0])
     else:
         hash_table_rows = gf.get_hash_rows(dynamic)
@@ -192,7 +192,7 @@ def hashtag(dynamic):
     top_districts=db.session.query(District.district_id, District.district_name, \
     func.count(District.district_id), District.state_fullname, District.district).\
     join(Post.districts).join(Post.hashtags).\
-    filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(Hashtag.hashtag == dynamic).filter(Post.created_at_dt >= str_time_range).\
     group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
 
@@ -200,18 +200,18 @@ def hashtag(dynamic):
 
     # "Who uses this hashtag" column
     top_users=db.session.query(User.user_scrname, func.count(User.user_scrname), \
-    User.user_cap_perc).\
+    User.user_cap_perc, User.user_id).\
     join(Post.user).join(Post.hashtags).\
-    filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
-    group_by(User.user_id, User.user_cap_perc).\
-    order_by(func.count(User.user_scrname).desc()).all()
+    filter(Hashtag.hashtag == dynamic).filter(Post.created_at_dt >= str_time_range).\
+    group_by(User.user_id).\
+    order_by(func.count(User.user_id).desc()).all()
 
     print("got top users")
 
     # Data for positive/negative chart
     valences = db.session.query(Post.polarity_val, func.count(Post.polarity_val)).\
     join(Post.hashtags).\
-    filter(Hashtag.hashtag == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(Hashtag.hashtag == dynamic).filter(Post.created_at_dt >= str_time_range).\
     group_by(Post.polarity_val).all()
 
     valences_datatable = [['Attitude', 'Number of Tweets']]
@@ -225,7 +225,7 @@ def hashtag(dynamic):
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     Post.text, Post.original_text).\
     join(Post.hashtags).join(Post.user).\
-    filter(Hashtag.hashtag==dynamic).filter(Post.created_at >= str_time_range).\
+    filter(Hashtag.hashtag==dynamic).filter(Post.created_at_dt >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
 
     print("got most retweeted tweets")
@@ -234,7 +234,7 @@ def hashtag(dynamic):
     # retweet numbers, botscore] to send to template
     most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
-    print("got top districts")
+    print("got most retweeted tweets")
 
     return render_template('hashtag.html', t_form=ChangeTimeForm(), url=url, \
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \

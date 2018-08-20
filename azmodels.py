@@ -67,6 +67,7 @@ class Post(Base):
     user_id = Column(String, ForeignKey('User.user_id'), nullable=False)
     text = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
+    created_at_dt = Column(String)
     reply_to_user_id = Column(String)
     reply_to_scrname = Column(String)
     reply_to_status_id = Column(String)
@@ -106,7 +107,7 @@ class Post(Base):
 
     post_created_at_index = Index('post_created_at_idx', 'created_at')
 
-    def __init__(self, post_id, user_id, text, created_at, create_at_dt, reply_to_user_id,
+    def __init__(self, post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
      reply_to_scrname, reply_to_status_id, retweet_count,
      favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
      original_text, original_tweet_created_at, original_tweet_likes,
@@ -143,7 +144,7 @@ class Post(Base):
 class Hashtag(Base):
     __tablename__='Hashtag'
     hash_id = Column(Integer, primary_key=True)
-    hashtag = Column(String)
+    hashtag = Column(String, index=True)
     #post_id = Column(String, ForeignKey('Post.post_id'))
     hashtag_posts = relationship(
             "Post",
@@ -183,11 +184,14 @@ class District(Base):
     #post_id = Column(String, ForeignKey('Post.post_id'))
     state = Column(String)
     district = Column(String)
-    district_name = Column(String)
+    district_name = Column(String, index=True)
     incumbent = Column(String)
     trump_2016 = Column(Float)
     clinton_2016 = Column(Float)
     incumbent_party = Column(String)
+    state_fullname = Column(String)
+    dem_candidate = Column(String)
+    rep_candidate = Column(String)
     dist_type = Column(Integer)
 
     district_posts = relationship(
