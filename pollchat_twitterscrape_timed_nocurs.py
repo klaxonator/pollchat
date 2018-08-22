@@ -17,7 +17,7 @@ import app.tweepy_cred as cred
 
 ##Set up database functions
 from app.models import User, Post, Hashtag, District, Url, posthash_assoc,\
- posturl_assoc, postdist_assoc
+ posturl_assoc, postdist_assoc, Post_extended
 from sqlalchemy import exc
 
 #Instantiate SQLalchemy database connection
@@ -33,14 +33,25 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
         user_location, user_created, user_followers, user_friends,
         user_statuses, query):
 
+    print("starting db entry for postid = {}".format(post_id))
 
+    if query[4:7] == 'Sen':
+        district = 'sen'
+        district_name = query[2:7]
+        dist_type = 2
+    else:
+        district = query[4:6]
+        district_name = query[2:6]
+        dist_type = 1
 
-#POST TABLE: If tweet ID not already in database, add to Post table
+    #POST TABLE:
+    #If tweet ID not already in database, add to Post table
 
     if db.session.query(Post).filter(Post.post_id == post_id).count() == 0:
 
-
+        print('adding post')
         #USER table
+
         #If User already in User table, update dynamic elements, associate with this post
         this_user = db.session.query(User).filter(User.user_id == user_id).first()
         if this_user != None:
@@ -58,7 +69,6 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
 
         #POST table
 
-
         new_post = Post(post_id, user_id, text, created_at, created_at_dt,
             reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
             favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
@@ -75,7 +85,8 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
                 orig_tweet.retweet_count = original_tweet_retweets
                 db.session.add(orig_tweet)
 
-#HASHTAG TABLE
+        #HASHTAG TABLE
+
         # If tweet is being added, iterate through tag/url list, and create a
         # Hashtag/Url table row for each tag
         for item in tag_list:
@@ -91,23 +102,36 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
             new_post.hashtags.append(new_hashtag)
             #db.session.add(posthash_assoc.hashtag)
 
+            #add one row to Post_extended per hashtag
 
-#DISTRICT TABLE
+            new_row = Post_extended(post_id, user_id, text, created_at, created_at_dt,
+                reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
+                favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                original_text, original_tweet_created_at, original_tweet_likes,
+                original_author_id, original_author_scrname, polarity, polarity_val,
+                item, district_name, dist_type)
+
+            db.session.add(new_row)
+            print("added newrow for hash {}".format(item))
+
+
+        #DISTRICT TABLE
             #capture District_id from 1st query term:
         state = query[2:4].lower()
             #Handle Senate districts differently than congressional
-        if query[4:7] == 'Sen':
-            district = 'sen'
-            district_name = query[2:7]
-            dist_type = 2
-        else:
-            district = query[4:6]
-            district_name = query[2:6]
-            dist_type = 1
+        # if query[4:7] == 'Sen':
+        #     district = 'sen'
+        #     district_name = query[2:7]
+        #     dist_type = 2
+        # else:
+        #     district = query[4:6]
+        #     district_name = query[2:6]
+        #     dist_type = 1
 
         #Check if district is in DB, add if not
         district_search = db.session.query(District).\
         filter(District.district_name == district_name).first()
+
         if district_search == None:
             new_district = District(state, district, district_name, dist_type)
             db.session.add(new_district)
@@ -119,7 +143,7 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
 
 
 
-#URL TABLE
+        #URL TABLE
 
         #if URLS exist, add to db
         if len(url_list) > 0:
@@ -141,8 +165,25 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
         #associate user with post
         this_user.user_posts.append(new_post)
 
+    #If tweet ID in db (from another dist query), add new association to Post table
+    else:
+        print('ID there, trying plan B')
+        district_check = db.session.query(District.district_name).\
+        join(Post.districts).\
+        filter(Post.post_id==post_id).all()
 
-
+        check = 0
+        for result in district_check:               #iterate through associated dists
+            if result[0] == district_name:
+                check = 1
+                print("already there")                          #if find match, check =  1, do nothing
+        if check == 0:
+            print("adding newdist")                               # if no match, add to postdist_assoc
+            sql_command = '''INSERT INTO postdist_assoc (post_id, district_name)
+                            VALUES (post_id, district_name);'''
+            conn = db.engine.connect()
+            conn.execute(sql_command)
+            conn.close()
 
 def twitter_search(query):
 
