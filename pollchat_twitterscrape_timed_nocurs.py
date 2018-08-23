@@ -33,7 +33,7 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
         user_location, user_created, user_followers, user_friends,
         user_statuses, query):
 
-    print("starting db entry for postid = {}".format(post_id))
+    #print("starting db entry for postid = {}".format(post_id))
 
     if query[4:7] == 'Sen':
         district = 'sen'
@@ -49,7 +49,7 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
 
     if db.session.query(Post).filter(Post.post_id == post_id).count() == 0:
 
-        print('adding post')
+        #print('adding post')
         #USER table
 
         #If User already in User table, update dynamic elements, associate with this post
@@ -112,7 +112,7 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
                 item, district_name, dist_type)
 
             db.session.add(new_row)
-            print("added newrow for hash {}".format(item))
+            #print("added newrow for hash {}".format(item))
 
 
         #DISTRICT TABLE
@@ -167,7 +167,7 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
 
     #If tweet ID in db (from another dist query), add new association to Post table
     else:
-        print('ID there, trying plan B')
+        #print('ID there, trying plan B')
         district_check = db.session.query(District.district_name).\
         join(Post.districts).\
         filter(Post.post_id==post_id).all()
@@ -176,9 +176,9 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
         for result in district_check:               #iterate through associated dists
             if result[0] == district_name:
                 check = 1
-                print("already there")                          #if find match, check =  1, do nothing
+                #print("already there")                          #if find match, check =  1, do nothing
         if check == 0:
-            print("adding newdist")                               # if no match, add to postdist_assoc
+            #print("adding newdist")                               # if no match, add to postdist_assoc
             sql_command = '''INSERT INTO postdist_assoc (post_id, district_name)
                             VALUES (post_id, district_name);'''
             conn = db.engine.connect()
@@ -211,14 +211,14 @@ def twitter_search(query):
                                                 lang='en',
                                                 include_entities=True,
                                                 tweet_mode="extended")
-                    print("New_tweets length is: {}".format(len(new_tweets)))
+                    #print("New_tweets length is: {}".format(len(new_tweets)))
                 else:
                     new_tweets = cred.api.search(q=query, count=tweetsPerQry,
                                             since_id=sinceId,
                                             lang='en',
                                             include_entities=True,
                                             tweet_mode="extended")
-                    print("New_tweets length is: {}".format(len(new_tweets)))
+                    #print("New_tweets length is: {}".format(len(new_tweets)))
 
             else:
                 if (not sinceId):
@@ -227,7 +227,7 @@ def twitter_search(query):
                                             lang='en',
                                             include_entities=True,
                                             tweet_mode="extended")
-                    print("New_tweets length is: {}".format(len(new_tweets)))
+                    #print("New_tweets length is: {}".format(len(new_tweets)))
                 else:
                     new_tweets = cred.api.search(q=query, count=tweetsPerQry,
                                             max_id=str(max_id - 1),
@@ -235,10 +235,10 @@ def twitter_search(query):
                                             lang='en',
                                             include_entities=True,
                                             tweet_mode="extended")
-                    print("New_tweets length is: {}".format(len(new_tweets)))
+                    #print("New_tweets length is: {}".format(len(new_tweets)))
 
             if not new_tweets:
-                print("No more tweets found")
+                #print("No more tweets found")
                 break
 
             for tweet in new_tweets:
@@ -392,12 +392,12 @@ def twitter_search(query):
 
                 if indexCount % 200 == 0:
                     db.session.commit()
-                    print("{} items added to database so far".format(indexCount))
+                    print("{} tweets searched".format(indexCount))
 
 
             #Reset total tweets fetched
             tweetCount += len(new_tweets)
-            print("Downloaded {} tweets".format(tweetCount))
+            #print("Downloaded {} tweets".format(tweetCount))
 
             #Reset max_id from last tweet returned for new manually paged page of tweets
             max_id = new_tweets[-1].id

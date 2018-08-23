@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import HashtagSearchForm, PhraseSearchForm, DistrictForm, \
 AllCongSearchForm, ChangeTimeForm, BotSearchForm, SenForm
-from app.models import User, Post, District, Hashtag, Url, District_graphs
+from app.models import User, Post, District, Hashtag, Url, District_graphs, Post_extended
 from sqlalchemy import func, Date, cast
 from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta
@@ -14,7 +14,7 @@ import sys
 from app.graph_functions import str_today
 import pickle
 
-sys.stdout = Logger()
+sys.stdout = Logger("logs/pollchat_stdout.txt")
 
 
 @app.route('/')
@@ -193,13 +193,31 @@ def hashtag(dynamic):
 
     str_time_range = stringtime(time_delta)
 
-    # Where is this hashtag used column
+    #Where is this hashtag used column
     top_districts=db.session.query(District.district_id, District.district_name, \
     func.count(District.district_id), District.state_fullname, District.district).\
     join(Post.districts).join(Post.hashtags).\
     filter(Hashtag.hashtag == dynamic).filter(Post.created_at_dt >= str_time_range).\
     group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
+
+    # conn = db.engine.connect()
+    # top_dist_q = '''SELECT res.district_name, count(res.district_name) as ct
+    #                      FROM (
+    #                         SELECT post_id, district_name
+    #                         FROM  Post_extended pe
+    #                         WHERE pe.hashtag = '{0}'
+    #                             and pe.created_at_dt >= '{1}') res
+    #                      GROUP BY res.district_name
+    #                      ORDER BY ct DESC;'''.format(dynamic, str_time_range)
+    # print(top_dist_q)
+    #
+    # top_districts = conn.execute(top_dist_q).fetchall()
+
+    top_district = db.session.query(District.state_fullname, District.district).\
+                filter(District.district_name==top_districts[0][0]).first()
+
+    conn.close()
 
     print("got top districts")
 
@@ -245,7 +263,7 @@ def hashtag(dynamic):
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
     top_users=top_users, valences=valences, valences_datatable=valences_datatable,
     most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list)
+    most_retweeted_tweet_list=most_retweeted_tweet_list, top_district=top_district)
 
 @app.route('/all_search', methods = ['GET', 'POST'])
 def all_search():
@@ -282,7 +300,7 @@ def overview(dynamic):
     # Get a desc-ordered list of all hashtags being used in all districts
     # Object returns (hashtag, count)
     all_hashes_result = conn.execute('SELECT hashtag, count FROM hash_activity_{0}_{1};'.\
-    format(dynamic, time_delta))
+    format(dynamic, time_delta)).fetchall()
 
     #RETURN THIS TO TEMPLATE
     all_hashes = []
@@ -315,7 +333,7 @@ def overview(dynamic):
     #Get list of most active districts
 
     active_dists_result = conn.execute('SELECT district_name, count FROM dist_activity_{0}_{1};'.\
-    format(dynamic, time_delta))
+    format(dynamic, time_delta)).fetchall()
 
     # RETURN THIS TO TEMPLATE
     most_active = []
@@ -328,7 +346,7 @@ def overview(dynamic):
 
     # Get a desc-ordered list of top-volume Tweeters
     top_tweeters_result = conn.execute('SELECT user_scrname, count, user_cap_perc FROM top_tweeters_{0}_{1};'.\
-    format(dynamic, time_delta))
+    format(dynamic, time_delta)).fetchall()
 
     # RETURN THIS TO TEMPLATE
     top_tweeters = []
@@ -347,7 +365,7 @@ def overview(dynamic):
     print("got top_tweeters")
 
     retweeted_users_result = conn.execute('SELECT original_author_scrname, count FROM retweeted_users_{0}_{1};'.\
-    format(dynamic, time_delta))
+    format(dynamic, time_delta)).fetchall()
 
     # RETURN THIS TO TEMPLATE
     retweeted_users = []
@@ -360,7 +378,7 @@ def overview(dynamic):
     print("got retweeted users")
 
     retweeted_tweets_result = conn.execute('SELECT post_id, original_poster, retweet_count, botscore FROM retweeted_tweets_{0}_{1};'.\
-    format(dynamic, time_delta))
+    format(dynamic, time_delta)).fetchall()
 
     # RETURN THIS TO TEMPLATE
     most_retweeted_tweet_list = []
@@ -420,11 +438,13 @@ def screen_name(dynamic):
     url = request.path
     str_time_range = stringtime(time_delta)
 
+    # What hashtags are used most frequently by this screen name
     top_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
     filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
+    # Which districts are referenced most frequently by screen name
     top_districts = db.session.query(District.district_name, \
     func.count(District.district_name)).\
     join(Post.districts).join(Post.user).\
@@ -433,9 +453,11 @@ def screen_name(dynamic):
     desc()).all()
 
     user_obj = db.session.query(User).filter(User.user_scrname==dynamic).first()
-    #Turn user_created into datetime obj for use with Mmoment
+    #Turn user_created into datetime obj for use with Moment
     if user_obj:
         user_created_date = get_tweet_datetime(user_obj.user_created)
+
+    # Who has this user most frequently retweeted in this time period?
 
     retweeted_users_period = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
@@ -445,12 +467,16 @@ def screen_name(dynamic):
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
 
+    # Who has this user most frequently retweeted overall (in accessible db)?
+
     retweeted_users_total = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.user).\
     filter(User.user_scrname == dynamic).filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
+
+    # Who has retweeted this user the most?
 
     who_retweets = db.session.query(User.user_scrname, \
     func.count(User.user_scrname)).\
@@ -462,10 +488,11 @@ def screen_name(dynamic):
     #Get top retweet (retweet count reflects original post_ NOTE: needs work on authors
     #idea: filtering by orig_author, only getting retweets, always with dynamic
     #screenname. Thus no User needed. Remove?)
+
+    # All posts that are retweets, and have this user as original_author_scrname
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.retweet_count, Post.original_tweet_id, Post.tweet_html,
     Post.text, Post.original_text).\
-    join(Post.user).\
     filter(Post.original_author_scrname==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
 

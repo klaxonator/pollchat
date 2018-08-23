@@ -6,9 +6,9 @@ from app.models import User, Post, District, Hashtag, Url
 import sys
 
 class Logger(object):
-    def __init__(self):
+    def __init__(self, logfile):
         self.terminal = sys.stdout
-        self.log = open("logs/pollchat_stdout.txt", "a")
+        self.log = open(logfile, "a")
 
     def write(self, message):
         self.terminal.write(message)

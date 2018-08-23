@@ -10,7 +10,7 @@ class DistrictForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_district = SubmitField('Submit your choice')
 
@@ -21,7 +21,7 @@ class SenForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_district = SubmitField('Submit your choice')
 
@@ -33,7 +33,7 @@ class HashtagSearchForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_hash = SubmitField('Submit your choice')
 
@@ -54,7 +54,7 @@ class AllCongSearchForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_allcong_search = SubmitField('Submit your choice')
 
@@ -68,7 +68,7 @@ class BotSearchForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_botform_search = SubmitField('Submit your choice')
 
@@ -80,6 +80,6 @@ class ChangeTimeForm(FlaskForm):
             ('2', 'Last 48 hours'),
             ('7', 'Last week'),
             ('14', 'Last two weeks'),
-            ('28', 'Last 4 weeks'),
+            #('28', 'Last 4 weeks'),
     ])
     submit_change_time = SubmitField('Submit')
