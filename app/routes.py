@@ -213,11 +213,11 @@ def hashtag(dynamic):
     # print(top_dist_q)
     #
     # top_districts = conn.execute(top_dist_q).fetchall()
+    #
+    # top_district = db.session.query(District.state_fullname, District.district).\
+    #             filter(District.district_name==top_districts[0][0]).first()
 
-    top_district = db.session.query(District.state_fullname, District.district).\
-                filter(District.district_name==top_districts[0][0]).first()
-
-    conn.close()
+    # conn.close()
 
     print("got top districts")
 
@@ -263,7 +263,7 @@ def hashtag(dynamic):
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
     top_users=top_users, valences=valences, valences_datatable=valences_datatable,
     most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list, top_district=top_district)
+    most_retweeted_tweet_list=most_retweeted_tweet_list)
 
 @app.route('/all_search', methods = ['GET', 'POST'])
 def all_search():
