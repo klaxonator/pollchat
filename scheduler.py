@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from time import sleep
 from apscheduler.schedulers.blocking import BlockingScheduler
-import pollchat_twitterscrape_timed as pt
+import pollchat_twitterscrape_timed_nocurs as pt
 import app.graph_functions as gf
 
 

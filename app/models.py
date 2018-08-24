@@ -250,6 +250,7 @@ class Post_extended(db.Model):
     hashtag = db.Column(db.String)
     district_name = db.Column(db.String)
     dist_type = db.Column(db.Integer)
+    user_scrname = db.Column(db.String)
     __table_args__ = (db.Index('ix_dist_hash_pid', 'district_name',
                             'hashtag', 'post_id'), )
 
@@ -262,7 +263,7 @@ class Post_extended(db.Model):
      favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
      original_text, original_tweet_created_at, original_tweet_likes, original_author_id,
      original_author_scrname, polarity, polarity_val, hashtag, district_name,
-     dist_type):
+     dist_type, user_scrname):
         self.post_id = post_id
         self.user_id = user_id
         self.text = text
@@ -288,6 +289,7 @@ class Post_extended(db.Model):
         self.hashtag = hashtag
         self.district_name = district_name
         self.dist_type = dist_type
+        self.user_scrname = user_scrname
 
 
 
