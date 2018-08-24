@@ -103,13 +103,15 @@ def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_u
             #db.session.add(posthash_assoc.hashtag)
 
             #add one row to Post_extended per hashtag
+            # NOTE: this means number of rows per post_id = cartesian product
+            # of hashtags times districts (if picked up in search for every dist)
 
             new_row = Post_extended(post_id, user_id, text, created_at, created_at_dt,
                 reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
                 favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
                 original_text, original_tweet_created_at, original_tweet_likes,
                 original_author_id, original_author_scrname, polarity, polarity_val,
-                item, district_name, dist_type)
+                item, district_name, dist_type, user_scrname)
 
             db.session.add(new_row)
             #print("added newrow for hash {}".format(item))
