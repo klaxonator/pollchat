@@ -30,7 +30,8 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
     #CREATE CONNECTION FOR DIRECT DB ACCESS
     conn = db.engine.connect()
     conn.execute("DROP TABLE IF EXISTS {0}, {1};".format(table_new, table_old))
-    conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE dist_activity_1;'.format(table))
+    if time_delta == 14:
+        conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE dist_activity_{1}_1;'.format(table, dist_group))
     conn.execute('CREATE TABLE {0} LIKE {1};'.format(table_new, table))
     conn.execute("DELETE FROM {0};".format(table_new))
 
@@ -91,7 +92,8 @@ def fill_hash_activity(dist_group, time_delta, table, table_new, table_old):
 
     conn = db.engine.connect()
     conn.execute("DROP TABLE IF EXISTS {0}, {1}".format(table_new, table_old))
-    conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE hash_activity_1;'.format(table))
+    if time_delta == 14:
+        conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE hash_activity_{1}_1;'.format(table, dist_group))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
     conn.execute("DELETE FROM {0}".format(table_new))
 
@@ -144,7 +146,8 @@ def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
 
     conn = db.engine.connect()
     conn.execute("DROP TABLE IF EXISTS {0}, {1}".format(table_new, table_old))
-    conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE top_tweeters_1;'.format(table))
+    if time_delta == 14:
+        conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE top_tweeters_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
     conn.execute("DELETE FROM {0}".format(table_new))
 
@@ -204,7 +207,8 @@ def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
 
     conn = db.engine.connect()
     conn.execute("DROP TABLE IF EXISTS {0}, {1}".format(table_new, table_old))
-    conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_users_1;'.format(table))
+    if time_delta == 14:
+        conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_users_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
     conn.execute("DELETE FROM {0}".format(table_new))
 
@@ -252,7 +256,8 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
 
     conn = db.engine.connect()
     conn.execute("DROP TABLE IF EXISTS {0}, {1}".format(table_new, table_old))
-    conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_tweets_1;'.format(table))
+    if time_delta == 14:
+        conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_tweets_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
     conn.execute("DELETE FROM {0}".format(table_new))
 
@@ -279,13 +284,13 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
     # [Post.post_id, relevant screen name, retweet_count, tweet_html (if exists),
     # original_tweet_id]
     tweet_list = get_tweet_list_ids(most_retweeted_tweets)
-    print(tweet_list[0])
+    #print(tweet_list[0])
 
     # GET FULL LIST. RETURNS FOLLOWING ATTRIBUTE:
     # [Post id, screen name, retweet count, botscore]
     populated_list = populate_tweet_list(tweet_list)
 
-    pprint.pprint(populated_list[0])
+    # pprint.pprint(populated_list[0])
     counter = 1
     for item in populated_list:
 
@@ -306,71 +311,71 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
 
 
 def run_all():
-    fill_dist_activity('allcong', 1, 'dist_activity_allcong_1', 'dist_activity_allcong_1_new', 'dist_activity_allcong_1_old')
-    fill_dist_activity('allsen', 1, 'dist_activity_allsen_1', 'dist_activity_allsen_1_new', 'dist_activity_allsen_1_old')
-    fill_dist_activity('allraces', 1, 'dist_activity_allraces_1', 'dist_activity_allraces_1_new', 'dist_activity_allraces_1_old')
-    fill_dist_activity('allcong', 2, 'dist_activity_allcong_2', 'dist_activity_allcong_2_new', 'dist_activity_allcong_2_old')
-    fill_dist_activity('allsen', 2, 'dist_activity_allsen_2', 'dist_activity_allsen_2_new', 'dist_activity_allsen_2_old')
-    fill_dist_activity('allraces', 2, 'dist_activity_allraces_2', 'dist_activity_allraces_2_new', 'dist_activity_allraces_2_old')
-    fill_dist_activity('allcong', 7, 'dist_activity_allcong_7', 'dist_activity_allcong_7_new', 'dist_activity_allcong_7_old')
-    fill_dist_activity('allsen', 7, 'dist_activity_allsen_7', 'dist_activity_allsen_7_new', 'dist_activity_allsen_7_old')
-    fill_dist_activity('allraces', 7, 'dist_activity_allraces_7', 'dist_activity_allraces_7_new', 'dist_activity_allraces_7_old')
-    fill_dist_activity('allcong', 14, 'dist_activity_allcong_7', 'dist_activity_allcong_7_new', 'dist_activity_allcong_7_old')
-    fill_dist_activity('allsen', 14, 'dist_activity_allsen_7', 'dist_activity_allsen_7_new', 'dist_activity_allsen_7_old')
-    fill_dist_activity('allraces', 14, 'dist_activity_allraces_7', 'dist_activity_allraces_7_new', 'dist_activity_allraces_7_old')
-    fill_dist_activity('allcong', 28, 'dist_activity_allcong_28', 'dist_activity_allcong_28_new', 'dist_activity_allcong_28_old')
-    fill_dist_activity('allsen', 28, 'dist_activity_allsen_28', 'dist_activity_allsen_28_new', 'dist_activity_allsen_28_old')
-    fill_dist_activity('allraces', 28, 'dist_activity_allraces_28', 'dist_activity_allraces_28_new', 'dist_activity_allracesg_28_old')
+    # fill_dist_activity('allcong', 1, 'dist_activity_allcong_1', 'dist_activity_allcong_1_new', 'dist_activity_allcong_1_old')
+    # fill_dist_activity('allsen', 1, 'dist_activity_allsen_1', 'dist_activity_allsen_1_new', 'dist_activity_allsen_1_old')
+    # fill_dist_activity('allraces', 1, 'dist_activity_allraces_1', 'dist_activity_allraces_1_new', 'dist_activity_allraces_1_old')
+    # fill_dist_activity('allcong', 2, 'dist_activity_allcong_2', 'dist_activity_allcong_2_new', 'dist_activity_allcong_2_old')
+    # fill_dist_activity('allsen', 2, 'dist_activity_allsen_2', 'dist_activity_allsen_2_new', 'dist_activity_allsen_2_old')
+    # fill_dist_activity('allraces', 2, 'dist_activity_allraces_2', 'dist_activity_allraces_2_new', 'dist_activity_allraces_2_old')
+    # fill_dist_activity('allcong', 7, 'dist_activity_allcong_7', 'dist_activity_allcong_7_new', 'dist_activity_allcong_7_old')
+    # fill_dist_activity('allsen', 7, 'dist_activity_allsen_7', 'dist_activity_allsen_7_new', 'dist_activity_allsen_7_old')
+    # fill_dist_activity('allraces', 7, 'dist_activity_allraces_7', 'dist_activity_allraces_7_new', 'dist_activity_allraces_7_old')
+    # fill_dist_activity('allcong', 14, 'dist_activity_allcong_14', 'dist_activity_allcong_14_new', 'dist_activity_allcong_14_old')
+    # fill_dist_activity('allsen', 14, 'dist_activity_allsen_14', 'dist_activity_allsen_14_new', 'dist_activity_allsen_14_old')
+    # fill_dist_activity('allraces', 14, 'dist_activity_allraces_14', 'dist_activity_allraces_14_new', 'dist_activity_allraces_14_old')
+    # fill_dist_activity('allcong', 28, 'dist_activity_allcong_28', 'dist_activity_allcong_28_new', 'dist_activity_allcong_28_old')
+    # fill_dist_activity('allsen', 28, 'dist_activity_allsen_28', 'dist_activity_allsen_28_new', 'dist_activity_allsen_28_old')
+    # fill_dist_activity('allraces', 28, 'dist_activity_allraces_28', 'dist_activity_allraces_28_new', 'dist_activity_allraces_28_old')
 
-    fill_hash_activity('allcong', 1, 'hash_activity_allcong_1', 'hash_activity_allcong_1_new', 'hash_activity_allcong_1_old')
-    fill_hash_activity('allsen', 1, 'hash_activity_allsen_1', 'hash_activity_allsen_1_new', 'hash_activity_allsen_1_old')
-    fill_hash_activity('allraces', 1, 'hash_activity_allraces_1', 'hash_activity_allraces_1_new', 'hash_activity_allraces_1_old')
-    fill_hash_activity('allcong', 2, 'hash_activity_allcong_2', 'hash_activity_allcong_2_new', 'hash_activity_allcong_2_old')
-    fill_hash_activity('allsen', 2, 'hash_activity_allsen_2', 'hash_activity_allsen_2_new', 'hash_activity_allsen_2_old')
-    fill_hash_activity('allraces', 2, 'hash_activity_allraces_2', 'hash_activity_allraces_2_new', 'hash_activity_allraces_2_old')
-    fill_hash_activity('allcong', 7, 'hash_activity_allcong_7', 'hash_activity_allcong_7_new', 'hash_activity_allcong_7_old')
-    fill_hash_activity('allsen', 7, 'hash_activity_allsen_7', 'hash_activity_allsen_7_new', 'hash_activity_allsen_7_old')
-    fill_hash_activity('allraces', 7, 'hash_activity_allraces_7', 'hash_activity_allraces_7_new', 'hash_activity_allraces_7_old')
-    fill_hash_activity('allcong', 14, 'hash_activity_allcong_7', 'hash_activity_allcong_7_new', 'hash_activity_allcong_7_old')
-    fill_hash_activity('allsen', 14, 'hash_activity_allsen_7', 'hash_activity_allsen_7_new', 'hash_activity_allsen_7_old')
-    fill_hash_activity('allraces', 14, 'hash_activity_allraces_7', 'hash_activity_allraces_7_new', 'hash_activity_allraces_7_old')
-    fill_hash_activity('allcong', 28, 'hash_activity_allcong_28', 'hash_activity_allcong_28_new', 'hash_activity_allcong_28_old')
-    fill_hash_activity('allsen', 28, 'hash_activity_allsen_28', 'hash_activity_allsen_28_new', 'hash_activity_allsen_28_old')
-    fill_hash_activity('allraces', 28, 'hash_activity_allraces_28', 'hash_activity_allraces_28_new', 'hash_activity_allraces_28_old')
-
-    fill_top_tweeters('allcong', 1, 'top_tweeters_allcong_1', 'top_tweeters_allcong_1_new', 'top_tweeters_allcong_1_old')
-    fill_top_tweeters('allsen', 1, 'top_tweeters_allsen_1', 'top_tweeters_allsen_1_new', 'top_tweeters_allsen_1_old')
-    fill_top_tweeters('allraces', 1, 'top_tweeters_allraces_1', 'top_tweeters_allraces_1_new', 'top_tweeters_allraces_1_old')
-    fill_top_tweeters('allcong', 2, 'top_tweeters_allcong_2', 'top_tweeters_allcong_2_new', 'top_tweeters_allcong_2_old')
-    fill_top_tweeters('allsen', 2, 'top_tweeters_allsen_2', 'top_tweeters_allsen_2_new', 'top_tweeters_allsen_2_old')
-    fill_top_tweeters('allraces', 2, 'top_tweeters_allraces_2', 'top_tweeters_allraces_2_new', 'top_tweeters_allraces_2_old')
-    fill_top_tweeters('allcong', 7, 'top_tweeters_allcong_7', 'top_tweeters_allcong_7_new', 'top_tweeters_allcong_7_old')
-    fill_top_tweeters('allsen', 7, 'top_tweeters_allsen_7', 'top_tweeters_allsen_7_new', 'top_tweeters_allsen_7_old')
-    fill_top_tweeters('allraces', 7, 'top_tweeters_allraces_7', 'top_tweeters_allraces_7_new', 'top_tweeters_allraces_7_old')
-    fill_top_tweeters('allcong', 14, 'top_tweeters_allcong_28', 'top_tweeters_allcong_28_new', 'top_tweeters_allcong_28_old')
-    fill_top_tweeters('allsen', 14, 'top_tweeters_allsen_28', 'top_tweeters_allsen_28_new', 'top_tweeters_allsen_28_old')
-    fill_top_tweeters('allraces', 14, 'top_tweeters_allraces_28', 'top_tweeters_allraces_28_new', 'top_tweeters_allraces_28_old')
-    fill_top_tweeters('allcong', 28, 'top_tweeters_allcong_28', 'top_tweeters_allcong_28_new', 'top_tweeters_allcong_28_old')
-    fill_top_tweeters('allsen', 28, 'top_tweeters_allsen_28', 'top_tweeters_allsen_28_new', 'top_tweeters_allsen_28_old')
-    fill_top_tweeters('allraces', 28, 'top_tweeters_allraces_28', 'top_tweeters_allraces_28_new', 'top_tweeters_allraces_28_old')
-
-
-    fill_retweeted_users('allcong', 1, 'retweeted_users_allcong_1', 'retweeted_users_allcong_1_new', 'retweeted_users_allcong_1_old')
-    fill_retweeted_users('allsen', 1, 'retweeted_users_allsen_1', 'retweeted_users_allsen_1_new', 'retweeted_users_allsen_1_old')
-    fill_retweeted_users('allraces', 1, 'retweeted_users_allraces_1', 'retweeted_users_allraces_1_new', 'retweeted_users_allraces_1_old')
-    fill_retweeted_users('allcong', 2, 'retweeted_users_allcong_2', 'retweeted_users_allcong_2_new', 'retweeted_users_allcong_2_old')
-    fill_retweeted_users('allsen', 2, 'retweeted_users_allsen_2', 'retweeted_users_allsen_2_new', 'retweeted_users_allsen_2_old')
-    fill_retweeted_users('allraces', 2, 'retweeted_users_allraces_2', 'retweeted_users_allraces_2_new', 'retweeted_users_allraces_2_old')
-    fill_retweeted_users('allcong', 7, 'retweeted_users_allcong_7', 'retweeted_users_allcong_7_new', 'retweeted_users_allcong_7_old')
-    fill_retweeted_users('allsen', 7, 'retweeted_users_allsen_7', 'retweeted_users_allsen_7_new', 'retweeted_users_allsen_7_old')
-    fill_retweeted_users('allraces', 7, 'retweeted_users_allraces_7', 'retweeted_users_allraces_7_new', 'retweeted_users_allraces_7_old')
-    fill_retweeted_users('allcong', 14, 'retweeted_users_allcong_28', 'retweeted_users_allcong_28_new', 'retweeted_users_allcong_28_old')
-    fill_retweeted_users('allsen', 14, 'retweeted_users_allsen_28', 'retweeted_users_allsen_28_new', 'retweeted_users_allsen_28_old')
-    fill_retweeted_users('allraces', 14, 'retweeted_users_allraces_28', 'retweeted_users_allraces_28_new', 'retweeted_users_allraces_28_old')
-    fill_retweeted_users('allcong', 28, 'retweeted_users_allcong_28', 'retweeted_users_allcong_28_new', 'retweeted_users_allcong_28_old')
-    fill_retweeted_users('allsen', 28, 'retweeted_users_allsen_28', 'retweeted_users_allsen_28_new', 'retweeted_users_allsen_28_old')
-    fill_retweeted_users('allraces', 28, 'retweeted_users_allraces_28', 'retweeted_users_allraces_28_new', 'retweeted_users_allraces_28_old')
-
+    # fill_hash_activity('allcong', 1, 'hash_activity_allcong_1', 'hash_activity_allcong_1_new', 'hash_activity_allcong_1_old')
+    # fill_hash_activity('allsen', 1, 'hash_activity_allsen_1', 'hash_activity_allsen_1_new', 'hash_activity_allsen_1_old')
+    # fill_hash_activity('allraces', 1, 'hash_activity_allraces_1', 'hash_activity_allraces_1_new', 'hash_activity_allraces_1_old')
+    # fill_hash_activity('allcong', 2, 'hash_activity_allcong_2', 'hash_activity_allcong_2_new', 'hash_activity_allcong_2_old')
+    # fill_hash_activity('allsen', 2, 'hash_activity_allsen_2', 'hash_activity_allsen_2_new', 'hash_activity_allsen_2_old')
+    # fill_hash_activity('allraces', 2, 'hash_activity_allraces_2', 'hash_activity_allraces_2_new', 'hash_activity_allraces_2_old')
+    # fill_hash_activity('allcong', 7, 'hash_activity_allcong_7', 'hash_activity_allcong_7_new', 'hash_activity_allcong_7_old')
+    # fill_hash_activity('allsen', 7, 'hash_activity_allsen_7', 'hash_activity_allsen_7_new', 'hash_activity_allsen_7_old')
+    # fill_hash_activity('allraces', 7, 'hash_activity_allraces_7', 'hash_activity_allraces_7_new', 'hash_activity_allraces_7_old')
+    # fill_hash_activity('allcong', 14, 'hash_activity_allcong_14', 'hash_activity_allcong_14_new', 'hash_activity_allcong_14_old')
+    # fill_hash_activity('allsen', 14, 'hash_activity_allsen_14', 'hash_activity_allsen_14_new', 'hash_activity_allsen_14_old')
+    # fill_hash_activity('allraces', 14, 'hash_activity_allraces_14', 'hash_activity_allraces_14_new', 'hash_activity_allraces_14_old')
+    # fill_hash_activity('allcong', 28, 'hash_activity_allcong_28', 'hash_activity_allcong_28_new', 'hash_activity_allcong_28_old')
+    # fill_hash_activity('allsen', 28, 'hash_activity_allsen_28', 'hash_activity_allsen_28_new', 'hash_activity_allsen_28_old')
+    # fill_hash_activity('allraces', 28, 'hash_activity_allraces_28', 'hash_activity_allraces_28_new', 'hash_activity_allraces_28_old')
+    #
+    # fill_top_tweeters('allcong', 1, 'top_tweeters_allcong_1', 'top_tweeters_allcong_1_new', 'top_tweeters_allcong_1_old')
+    # fill_top_tweeters('allsen', 1, 'top_tweeters_allsen_1', 'top_tweeters_allsen_1_new', 'top_tweeters_allsen_1_old')
+    # fill_top_tweeters('allraces', 1, 'top_tweeters_allraces_1', 'top_tweeters_allraces_1_new', 'top_tweeters_allraces_1_old')
+    # fill_top_tweeters('allcong', 2, 'top_tweeters_allcong_2', 'top_tweeters_allcong_2_new', 'top_tweeters_allcong_2_old')
+    # fill_top_tweeters('allsen', 2, 'top_tweeters_allsen_2', 'top_tweeters_allsen_2_new', 'top_tweeters_allsen_2_old')
+    # fill_top_tweeters('allraces', 2, 'top_tweeters_allraces_2', 'top_tweeters_allraces_2_new', 'top_tweeters_allraces_2_old')
+    # fill_top_tweeters('allcong', 7, 'top_tweeters_allcong_7', 'top_tweeters_allcong_7_new', 'top_tweeters_allcong_7_old')
+    # fill_top_tweeters('allsen', 7, 'top_tweeters_allsen_7', 'top_tweeters_allsen_7_new', 'top_tweeters_allsen_7_old')
+    # fill_top_tweeters('allraces', 7, 'top_tweeters_allraces_7', 'top_tweeters_allraces_7_new', 'top_tweeters_allraces_7_old')
+    # fill_top_tweeters('allcong', 14, 'top_tweeters_allcong_14', 'top_tweeters_allcong_14_new', 'top_tweeters_allcong_14_old')
+    # fill_top_tweeters('allsen', 14, 'top_tweeters_allsen_14', 'top_tweeters_allsen_14_new', 'top_tweeters_allsen_14_old')
+    # fill_top_tweeters('allraces', 14, 'top_tweeters_allraces_14', 'top_tweeters_allraces_14_new', 'top_tweeters_allraces_14_old')
+    # fill_top_tweeters('allcong', 28, 'top_tweeters_allcong_28', 'top_tweeters_allcong_28_new', 'top_tweeters_allcong_28_old')
+    # fill_top_tweeters('allsen', 28, 'top_tweeters_allsen_28', 'top_tweeters_allsen_28_new', 'top_tweeters_allsen_28_old')
+    # fill_top_tweeters('allraces', 28, 'top_tweeters_allraces_28', 'top_tweeters_allraces_28_new', 'top_tweeters_allraces_28_old')
+    #
+    #
+    # fill_retweeted_users('allcong', 1, 'retweeted_users_allcong_1', 'retweeted_users_allcong_1_new', 'retweeted_users_allcong_1_old')
+    # fill_retweeted_users('allsen', 1, 'retweeted_users_allsen_1', 'retweeted_users_allsen_1_new', 'retweeted_users_allsen_1_old')
+    # fill_retweeted_users('allraces', 1, 'retweeted_users_allraces_1', 'retweeted_users_allraces_1_new', 'retweeted_users_allraces_1_old')
+    # fill_retweeted_users('allcong', 2, 'retweeted_users_allcong_2', 'retweeted_users_allcong_2_new', 'retweeted_users_allcong_2_old')
+    # fill_retweeted_users('allsen', 2, 'retweeted_users_allsen_2', 'retweeted_users_allsen_2_new', 'retweeted_users_allsen_2_old')
+    # fill_retweeted_users('allraces', 2, 'retweeted_users_allraces_2', 'retweeted_users_allraces_2_new', 'retweeted_users_allraces_2_old')
+    # fill_retweeted_users('allcong', 7, 'retweeted_users_allcong_7', 'retweeted_users_allcong_7_new', 'retweeted_users_allcong_7_old')
+    # fill_retweeted_users('allsen', 7, 'retweeted_users_allsen_7', 'retweeted_users_allsen_7_new', 'retweeted_users_allsen_7_old')
+    # fill_retweeted_users('allraces', 7, 'retweeted_users_allraces_7', 'retweeted_users_allraces_7_new', 'retweeted_users_allraces_7_old')
+    # fill_retweeted_users('allcong', 14, 'retweeted_users_allcong_14', 'retweeted_users_allcong_14_new', 'retweeted_users_allcong_14_old')
+    # fill_retweeted_users('allsen', 14, 'retweeted_users_allsen_14', 'retweeted_users_allsen_14_new', 'retweeted_users_allsen_14_old')
+    # fill_retweeted_users('allraces', 14, 'retweeted_users_allraces_14', 'retweeted_users_allraces_14_new', 'retweeted_users_allraces_14_old')
+    # fill_retweeted_users('allcong', 28, 'retweeted_users_allcong_28', 'retweeted_users_allcong_28_new', 'retweeted_users_allcong_28_old')
+    # fill_retweeted_users('allsen', 28, 'retweeted_users_allsen_28', 'retweeted_users_allsen_28_new', 'retweeted_users_allsen_28_old')
+    # fill_retweeted_users('allraces', 28, 'retweeted_users_allraces_28', 'retweeted_users_allraces_28_new', 'retweeted_users_allraces_28_old')
+    #
 
     fill_retweeted_tweets('allcong', 1, 'retweeted_tweets_allcong_1', 'retweeted_tweets_allcong_1_new', 'retweeted_tweets_allcong_1_old')
     fill_retweeted_tweets('allsen', 1, 'retweeted_tweets_allsen_1', 'retweeted_tweets_allsen_1_new', 'retweeted_tweets_allsen_1_old')
@@ -381,9 +386,9 @@ def run_all():
     fill_retweeted_tweets('allcong', 7, 'retweeted_tweets_allcong_7', 'retweeted_tweets_allcong_7_new', 'retweeted_tweets_allcong_7_old')
     fill_retweeted_tweets('allsen', 7, 'retweeted_tweets_allsen_7', 'retweeted_tweets_allsen_7_new', 'retweeted_tweets_allsen_7_old')
     fill_retweeted_tweets('allraces', 7, 'retweeted_tweets_allraces_7', 'retweeted_tweets_allraces_7_new', 'retweeted_tweets_allraces_7_old')
-    fill_retweeted_tweets('allcong', 14, 'retweeted_tweets_allcong_28', 'retweeted_tweets_allcong_28_new', 'retweeted_tweets_allcong_28_old')
-    fill_retweeted_tweets('allsen', 14, 'retweeted_tweets_allsen_28', 'retweeted_tweets_allsen_28_new', 'retweeted_tweets_allsen_28_old')
-    fill_retweeted_tweets('allraces', 14, 'retweeted_tweets_allraces_28', 'retweeted_tweets_allraces_28_new', 'retweeted_tweets_allraces_28_old')
+    fill_retweeted_tweets('allcong', 14, 'retweeted_tweets_allcong_14', 'retweeted_tweets_allcong_14_new', 'retweeted_tweets_allcong_14_old')
+    fill_retweeted_tweets('allsen', 14, 'retweeted_tweets_allsen_14', 'retweeted_tweets_allsen_14_new', 'retweeted_tweets_allsen_14_old')
+    fill_retweeted_tweets('allraces', 14, 'retweeted_tweets_allraces_14', 'retweeted_tweets_allraces_14_new', 'retweeted_tweets_allraces_14_old')
     fill_retweeted_tweets('allcong', 28, 'retweeted_tweets_allcong_28', 'retweeted_tweets_allcong_28_new', 'retweeted_tweets_allcong_28_old')
     fill_retweeted_tweets('allsen', 28, 'retweeted_tweets_allsen_28', 'retweeted_tweets_allsen_28_new', 'retweeted_tweets_allsen_28_old')
     fill_retweeted_tweets('allraces', 28, 'retweeted_tweets_allraces_28', 'retweeted_tweets_allraces_28_new', 'retweeted_tweets_allraces_28_old')
