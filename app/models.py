@@ -739,7 +739,7 @@ class Retweeted_Tweets_7(db.Model):
         format(self.post_id)
 
 class Retweeted_Tweets_14(db.Model):
-    __tablename__ =  'retweeted_tweets_7'
+    __tablename__ =  'retweeted_tweets_14'
     rank = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(25), nullable=False)
     original_poster = db.Column(db.String(50), nullable=False)
