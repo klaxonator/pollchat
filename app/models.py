@@ -225,28 +225,28 @@ class Post_extended(db.Model):
     row_id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String)
     user_id = db.Column(db.String, db.ForeignKey('User.user_id'), nullable=False)
-    text = db.Column(db.String, nullable=False)
+    #text = db.Column(db.String, nullable=False)
     created_at = db.Column(db.String, nullable=False, index=True)
     created_at_dt = db.Column(db.DateTime, index=True)
-    reply_to_user_id = db.Column(db.String)
-    reply_to_scrname = db.Column(db.String)
-    reply_to_status_id = db.Column(db.String)
+    #reply_to_user_id = db.Column(db.String)
+    #reply_to_scrname = db.Column(db.String)
+    #reply_to_status_id = db.Column(db.String)
     retweet_count = db.Column(db.Integer)
-    favorite_count = db.Column(db.Integer)
+    #favorite_count = db.Column(db.Integer)
 
     is_retweet = db.Column(db.Integer)
     original_tweet_id = db.Column(db.String)
-    original_tweet_retweets = db.Column(db.Integer)
+    #original_tweet_retweets = db.Column(db.Integer)
     original_text = db.Column(db.String)
     original_tweet_created_at = db.Column(db.String)
-    original_tweet_likes = db.Column(db.Integer)
+    #original_tweet_likes = db.Column(db.Integer)
     original_author_id = db.Column(db.String)
     original_author_scrname = db.Column(db.String, index=True)
 
     polarity = db.Column(db.Integer)
     polarity_val = db.Column(db.String)
 
-    tweet_html = db.Column(db.String)
+    #tweet_html = db.Column(db.String)
     hashtag = db.Column(db.String)
     district_name = db.Column(db.String)
     dist_type = db.Column(db.Integer)
@@ -258,29 +258,21 @@ class Post_extended(db.Model):
     def __repr__(self):
         return "Post_extended object for district {0}".format(self.district_name)
 
-    def __init__(self, post_id, user_id, text, created_at, created_at_dt,
-     reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
-     favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
-     original_text, original_tweet_created_at, original_tweet_likes, original_author_id,
+    def __init__(self, post_id, user_id, created_at, created_at_dt,
+     retweet_count, is_retweet, original_tweet_id,
+     original_text, original_tweet_created_at, original_author_id,
      original_author_scrname, polarity, polarity_val, hashtag, district_name,
      dist_type, user_scrname):
         self.post_id = post_id
         self.user_id = user_id
-        self.text = text
         self.created_at = created_at
         self.created_at_dt = created_at_dt
-        self.reply_to_user_id = reply_to_user_id
-        self.reply_to_scrname = reply_to_scrname
-        self.reply_to_status_id = reply_to_status_id
         self.retweet_count = retweet_count
-        self.favorite_count = favorite_count
 
         self.is_retweet = is_retweet
         self.original_tweet_id = original_tweet_id
-        self.original_tweet_retweets = original_tweet_retweets
         self.original_text = original_text
         self.original_tweet_created_at = original_tweet_created_at
-        self.original_tweet_likes = original_tweet_likes
         self.original_author_id = original_author_id
         self.original_author_scrname = original_author_scrname
 
