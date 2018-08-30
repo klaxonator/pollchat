@@ -152,7 +152,7 @@ def district(dynamic):
     return render_template('district.html', dynamic=dynamic, time_delta=time_delta, \
     url=url, dist_hashes=dist_hashes, top_tweeters=top_tweeters, \
     most_retweeted=most_retweeted, most_retweeted_tweets=most_retweeted_tweets, \
-    t_form=ChangeTimeForm(), get_tweet=get_tweet, dist_obj=dist_obj, \
+    t_form=ChangeTimeForm(), get_tweet=get_tweet, \
     test_insert=test_insert, distlist=distlist, hash_table_rows=hash_table_rows,\
     most_retweeted_list=most_retweeted_list, most_retweeted_tweet_list=\
     most_retweeted_tweet_list)

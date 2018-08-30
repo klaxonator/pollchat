@@ -46,7 +46,7 @@ class AllCongSearchForm(FlaskForm):
     scope_search = SelectField(u'Scope', choices=[
             ('allcong', 'All competitive 2018 House races'),
             ('allsen', 'All competitive 2018 Senate races'),
-            ('allraces', 'All competitive 2018 congressional races'),
+            ('allraces', 'All competitive 2018 U.S. Congress races'),
     ])
     #phrase_search = StringField('phrase search', validators=[DataRequired()])
     allcong_time_delta = SelectField(u'Time period', choices=[

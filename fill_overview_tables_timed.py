@@ -29,11 +29,16 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
 
     #CREATE CONNECTION FOR DIRECT DB ACCESS
     conn = db.engine.connect()
+    print("connected")
     conn.execute("DROP TABLE IF EXISTS {0}, {1};".format(table_new, table_old))
+    print("dropped tables")
     if time_delta == 14:
         conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE dist_activity_{1}_1;'.format(table, dist_group))
+    print("created base table")
     conn.execute('CREATE TABLE {0} LIKE {1};'.format(table_new, table))
-    conn.execute("DELETE FROM {0};".format(table_new))
+    print("created table {}".format(table_new))
+
+    #conn.execute("DELETE FROM {0};".format(table_new))
 
     #GET ORDERED LIST OF DISTRICTS AND ACTIVITY COUNT
 
@@ -95,7 +100,7 @@ def fill_hash_activity(dist_group, time_delta, table, table_new, table_old):
     if time_delta == 14:
         conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE hash_activity_{1}_1;'.format(table, dist_group))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
-    conn.execute("DELETE FROM {0}".format(table_new))
+    #conn.execute("DELETE FROM {0}".format(table_new))
 
     #GET ORDERED LIST OF HASHTAGS AND ACTIVITY COUNT
 
@@ -149,7 +154,7 @@ def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
     if time_delta == 14:
         conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE top_tweeters_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
-    conn.execute("DELETE FROM {0}".format(table_new))
+    #conn.execute("DELETE FROM {0}".format(table_new))
 
     #GET ORDERED LIST OF HASHTAGS AND ACTIVITY COUNT
 
@@ -210,7 +215,7 @@ def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
     if time_delta == 14:
         conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_users_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
-    conn.execute("DELETE FROM {0}".format(table_new))
+    #conn.execute("DELETE FROM {0}".format(table_new))
 
     #GET ORDERED LIST OF HASHTAGS AND ACTIVITY COUNT
 
@@ -259,7 +264,7 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
     if time_delta == 14:
         conn.execute('CREATE TABLE IF NOT EXISTS {0} LIKE retweeted_tweets_1;'.format(table))
     conn.execute('CREATE TABLE {0} LIKE {1}'.format(table_new, table))
-    conn.execute("DELETE FROM {0}".format(table_new))
+    #conn.execute("DELETE FROM {0}".format(table_new))
 
     #Get uncleaned list of top retweeted tweet IDS
 

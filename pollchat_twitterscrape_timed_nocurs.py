@@ -6,6 +6,7 @@ import time
 from app.helpers import skip_list, get_tweet, distdict_short
 from app import app, db
 import fill_overview_tables_timed as fill
+import app.graph_functions as gf
 
 #import preprocessor as p
 from textblob import TextBlob
@@ -496,6 +497,8 @@ def run_twitterscrape():
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
+
+    gf.fill_graphs()
 
 if __name__ == "__main__":
     run_twitterscrape()

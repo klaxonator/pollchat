@@ -179,7 +179,7 @@ def get_hashrows_overview(distgroup):
     #Get top line (first row)
     this_top_line = top_line_all(distgroup=distgroup, var_type='hashtags')
 
-    #start with current time as endtime
+    #start with midnight of current day as endtime
     end_date = str_today
     shrt_end_date = date.today().strftime('%b %d')
 
@@ -227,22 +227,31 @@ def get_hashrows_overview(distgroup):
     #Reverse so that earliest row is first, latest last
     rows.reverse()
 
-
     rows_pickled = pickle.dumps(rows)
 
-    hash_add = District_graphs(str_today, distgroup, rows_pickled)
+    # get district row as object if exists
+    check = db.session.query(District_graphs).\
+    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.district_name==distgroup).first()
 
-    try:
-        db.session.add(hash_add)
-        print('added to session')
+    #IF district row for today already exists, update
+    if check != None:
+        check.chart_rows = rows_pickled
+        try:
+            db.session.add(check)
+            db.session.commit()
+        except:
+            db.session.rollback()
 
-        db.session.commit()
-        print('committed')
-    except:
-        db.session.rollback()
+    else:
 
+        hash_add = District_graphs(str_today, distgroup, rows_pickled)
 
-    return rows
+        try:
+            db.session.add(hash_add)
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 
 def get_hash_rows(this_district):
@@ -252,7 +261,7 @@ def get_hash_rows(this_district):
     #Get top line (first row)
     this_top_line = top_line_generic(this_district, var_type='hashtags')
 
-    #start with current time as endtime
+    #start with midnight of current day as endtime
     end_date = str_today
     shrt_end_date = date.today().strftime('%b %d')
 
@@ -298,13 +307,29 @@ def get_hash_rows(this_district):
 
     rows_pickled = pickle.dumps(rows)
 
-    hash_add = District_graphs(str_today, this_district, rows_pickled)
+    # get district row as object if exists
+    check = db.session.query(District_graphs).\
+    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.district_name==this_district).first()
 
-    try:
-        db.session.add(hash_add)
-        db.session.commit()
-    except:
-        db.session.rollback()
+    #IF district row for today already exists, update
+    if check != None:
+        check.chart_rows = rows_pickled
+        try:
+            db.session.add(check)
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+    else:
+
+        hash_add = District_graphs(str_today, this_district, rows_pickled)
+
+        try:
+            db.session.add(hash_add)
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 
 
@@ -322,6 +347,8 @@ def fill_graphs():
     with open('app/comp_races_parsed.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
+            if row[0][1:5] == 'ks04':
+                break
             print(row[0][1:5])
             get_hash_rows(row[0][1:5])
 
@@ -332,160 +359,10 @@ def fill_graphs():
         for row in reader:
             get_hash_rows(row[0][1:6])
 
+    with open('logs/twitterscrape_log.txt', 'a') as fw:
+        fw.write('Updated graph data at {}\n'.format(datetime.now()))
 
-
-
-def get_hash_dict_key(this_district):
-
-    #Get 6-item top line for table,
-    this_top_line = top_line_generic(this_district, var_type='hashtags')
-
-    #Create date object for first row
-    end_date = date.today()
-    str_end_date = end_date.strftime('%Y-%m-%d %H:%M:%S')
-    str_end_date_sm = end_date.strftime('%Y-%m-%d')
-
-    beg_date = end_date - timedelta(days=1)
-    str_beg_date = beg_date.strftime('%Y-%m-%d %H:%M:%S')
-    str_beg_date_sm = beg_date.strftime('%Y-%m-%d')
-
-    #CREATE basic top-level (of 2 levels) dictionary container -- to hold dates
-    date_dict = {}
-    date_dict[str_end_date_sm] = ""
-
-    #Create second-level container for (<hashtag>: <number of appearances>)
-    hash_dict = {}
-
-    for this_hashtag in this_top_line[1:]:
-
-        date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
-        join(Post.districts).join(Post.hashtags).\
-        filter(District.district_name==this_district).filter(Hashtag.hashtag==this_hashtag).\
-        filter(Post.created_at > str_beg_date).filter(Post.created_at <= str_end_date).first()
-
-        hash_dict[this_hashtag] = date_hash_num[0]
-
-    date_dict[str_end_date_sm] = hash_dict
-
-    return date_dict
-
-
-def get_hash_dict_modular(this_district, end_date, this_top_line, beg_date):
-
-    #Create second-level container for (<hashtag>: <number of appearances>)
-    hash_dict = {}
-
-    #fill hash_dict container with items from this_top_line
-    for this_hashtag in this_top_line[1:]:
-
-        date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
-        join(Post.districts).join(Post.hashtags).\
-        filter(District.district_name==this_district).filter(Hashtag.hashtag==this_hashtag).\
-        filter(Post.created_at > beg_date).filter(Post.created_at <= end_date).first()
-
-        hash_dict[this_hashtag] = date_hash_num[0]
-
-    return hash_dict
-
-def create_hash_dict(this_district):
-    #Import or create main dict container
-    date_dict = {} #NOTE: to be changed to import if statement
-
-    #Get 6-item top line for table,
-    this_top_line = top_line_generic(this_district, var_type='hashtags')
-
-    #start with midnight current day as endtime
-    end_date = str_today
-    shrt_end_date = date.today().strftime('%b %d')
-
-
-    for x in range(1,11):
-        beg_date = get_beg_date(x)
-
-        #Get date_dict <value> (a dict) for key=end_date
-        hash_dict_day = get_hash_dict_modular(this_district, end_date, this_top_line, beg_date[0])
-        print(hash_dict_day)
-
-        #Add key:value pair (<shrt_end_date>: <hash_dict_day> to date_dict
-        date_dict[shrt_end_date] = hash_dict_day
-
-        #reset dates for next loop
-        end_date = beg_date[0]
-        shrt_end_date = beg_date[1]
-
-        print('Finished with day -{}'.format(x))
-
-    return date_dict
-
-def get_user_dict_modular(this_district, end_date, this_top_line, beg_date):
-
-    #Create second-level container for (<hashtag>: <number of appearances>)
-    user_dict = {}
-
-    #fill hash_dict container with items from this_top_line
-    for this_user in this_top_line[1:]:
-
-        date_user_num = db.session.query(func.count(User.user_scrname)).\
-        join(Post.user).join(Post.districts).\
-        filter(District.district_name==this_district).filter(User.user_scrname==this_user).\
-        filter(Post.created_at > beg_date).filter(Post.created_at <= end_date).first()
-
-        user_dict[this_user] = date_user_num[0]
-
-    return user_dict
-
-def create_user_dict(this_district):
-    #Import or create main dict container
-    date_dict = {} #NOTE: to be changed to import if statement
-
-    #Get 6-item top line for table,
-    this_top_line = top_line_generic(this_district, var_type='users')
-
-    #start with midnight current day as endtime
-    end_date = str_today
-    shrt_end_date = date.today().strftime('%b %d')
-
-
-    for x in range(1,11):
-        beg_date = get_beg_date(x)
-
-        #Get date_dict <value> (a dict) for key=end_date
-        user_dict_day = get_user_dict_modular(this_district, end_date, this_top_line, beg_date[0])
-        print(user_dict_day)
-
-        #Add key:value pair (<shrt_end_date>: <hash_dict_day> to date_dict
-        date_dict[shrt_end_date] = user_dict_day
-
-        #reset dates for next loop
-        end_date = beg_date[0]
-        shrt_end_date = beg_date[1]
-
-        print('Finished with day -{}'.format(x))
-
-    return date_dict
-
-def save_dicts(this_district):
-
-    # for item in district_list:
-
-    hash_dict = create_hash_dict(this_district)
-
-    print('I made a hash dictionary')
-
-    user_dict = create_user_dict(this_district)
-
-    print('I made a user dictionary')
-
-    today = date.today().strftime('%Y-%m-%d')
-
-    new_dict = {today:
-                    {
-                    "hashdict": hash_dict,
-                    "userdict": user_dict
-                    }
-                }
-    return new_dict
-
+# Chart for botspy.html page
 def botweather_chart():
     this_top_line = ["Date", "No. of posts"]
 
@@ -534,6 +411,8 @@ def botweather_chart():
 
     return rows
 
+
+# Chart for screen_name.html page
 def scrname_chart(screen_name):
     this_top_line = ["Date", "No. of original posts", "No. of retweets"]
 
@@ -592,3 +471,8 @@ def scrname_chart(screen_name):
     rows.reverse()
 
     return rows
+
+
+
+if __name__ == '__main__':
+    fill_graphs()

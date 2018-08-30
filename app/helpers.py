@@ -673,19 +673,24 @@ dists = [
 ]
 
 sen_dists = [
-('OHSen', 'Ohio'),
+('AZSen', 'Arizona'),
+('FLSen', 'Florida'),
 ('INSen', 'Indiana'),
-('NDSen', 'North Dakota'),
-('WVSen', 'West Virginia'),
-('NVSen', 'Nevada'),
-('TXSen', 'Texas'),
+('MISen', 'Michigan'),
+('MNSen', 'Minnesota'),
+('MSSen', 'Mississippi'),
+('MOSen', 'Missouri'),
+('MTSen', 'Montana'),
 ('NESen', 'Nebraska'),
-('MSSen', 'Missouri'),
-('MTSen', 'Montana'),
+('NVSen', 'Nevada'),
 ('NJSen', 'New Jersey'),
-('MTSen', 'Montana'),
+('NDSen', 'North Dakota'),
+('OHSen', 'Ohio'),
 ('PASen', 'Pennsylvania'),
 ('TNSen', 'Tennessee'),
+('TXSen', 'Texas'),
+('WVSen', 'West Virginia'),
+('WISen', 'Wisconsin')
 ]
 
 distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
@@ -990,3 +995,15 @@ distdict = {'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar2'],
             'wi06': ['wi06', 'wi-06', '#wi06', '#wi-06', '#wi6', 'wi6'],
             'wi07': ['wi07', 'wi-07', '#wi07', '#wi-07', '#wi7', 'wi7'],
             'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3', 'wv3']}
+
+
+# def hashcache(time_delta):
+#
+#     str_time_range = stringtime(time_delta)
+#
+#     top_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
+#     join(Post.hashtags).\
+#     filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
+#     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+#
+#     for
