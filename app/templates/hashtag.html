@@ -28,7 +28,12 @@
             <div class="py-5 text-left">
                 {% if top_districts[0] %}
                 <h4><p>Used most often in: <em>{{ top_districts[0][3] }}
-                    {{ top_districts[0][4] }}</em></p></h4>
+                    {% if top_districts[0][4]=="sen" %}
+                        (full-state Senate race)
+                    {% else %}
+                        {{ top_districts[0][4] }}
+                    {% endif %}
+                </em></p></h4>
                 <h4><p>Used most often by: <em>@{{ top_users[0][0]}}</em></h4></p>
                 {% else %}
                 <h4><p>No appearances in this time period.</p></h4>

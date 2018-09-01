@@ -270,8 +270,8 @@ def get_tweet_list(db_search_object, distname):
     # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
     # Post.tweet_html, Post.text)
 
-    # db_object in order Post_id, original_author_scrname, retweet_count,\
-    # original_tweet_idk, user_scrname, tweet_html, text, original_text
+    # db_object in order 0)Post_id, 1)original_author_scrname, 2)retweet_count,\
+    # 3)original_tweet_id, 4) user_scrname, 5) tweet_html, 6)text, 7)original_text
 
     most_retweeted_tweets = db_search_object
     seen_tweets = []                #list of tweets used to avoid duplicates
@@ -362,12 +362,12 @@ def get_tweet_list(db_search_object, distname):
 
 def get_tweet_list_nodist(db_search_object):
 
-    # produce list of (Post.post_id, Post.original_author_scrname, \
-    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, \
+    # ROLE produce list of [Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id,  \
     # Post.tweet_html, Post.text)
 
-    # db_object in order Post_id, original_author_scrname, retweet_count,\
-    # original_tweet_idk, user_scrname, tweet_html, text, original_text
+    # db_object in order: 0)Post_id, 1)original_author_scrname, 2)retweet_count,\
+    # 3)original_tweet_id, 4)tweet_html, 5)text, 6)original_text
 
     most_retweeted_tweets = db_search_object
     seen_tweets = []                #list of tweets used to avoid duplicates
@@ -427,26 +427,26 @@ def get_tweet_list_nodist(db_search_object):
 
         # LIST POSITION [4]: Post HTML (to call Tweet)
             #if loop: if tweet_html already exists
-        if db_tweet[5]:
-            tweet.append(db_tweet[5])         #tweet_html
+        # if db_tweet[4]:
+        #     tweet.append(db_tweet[4])         #tweet_html
+        #
+        #     #if no tweet_html, then get HTML from Twitter
+        # else:
+        #     #if RT (if original_tweet_id exists)
+        if db_tweet[3]:
+            try:
+                tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
+                tweet.append(tweet_html)            # add tweet_text
+            except:
+                tweet.append("Can't retrieve Tweet")
 
-            #if no tweet_html, then get HTML from Twitter
+        #if not RT (no original_tweet_id), use post ID
         else:
-            #if RT (if original_tweet_id exists)
-            if db_tweet[3]:
-                try:
-                    tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
-                    tweet.append(tweet_html)            # add tweet_text
-                except:
-                    tweet.append("Can't retrieve Tweet")
-
-            #if not RT (no original_tweet_id), use post ID
-            else:
-                try:
-                    tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
-                    tweet.append(tweet_html)                # add tweet_text
-                except:
-                    tweet.append("Can't retrieve Tweet")
+            try:
+                tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
+                tweet.append(tweet_html)                # add tweet_text
+            except:
+                tweet.append("Can't retrieve Tweet")
 
 
         most_retweeted_tweet_list.append(tweet)
@@ -773,7 +773,14 @@ skip_list = [
     "TheWarrior",
     "fl15_official",
     "cumbria",
-    "Cumbria"
+    "Cumbria",
+    "dog",
+    "lost",
+    "widnes",
+    "cronton",
+    "cheshire",
+    "stillmissing",
+    "sausage"
     ]
 
 distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09'],

@@ -5,13 +5,12 @@ AllCongSearchForm, ChangeTimeForm, BotSearchForm, SenForm
 from app.models import User, Post, District, Hashtag, Url, District_graphs, Post_extended
 from sqlalchemy import func, Date, cast
 from sqlalchemy.dialects.sqlite import DATETIME
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
 test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
 get_tweet_list_nodist, Logger
 import app.graph_functions as gf
 import sys
-from app.graph_functions import str_today
 import pickle
 
 sys.stdout = Logger("logs/pollchat_stdout.txt")
@@ -57,6 +56,11 @@ def district(dynamic):
     url = request.path
 
     str_time_range = stringtime(time_delta)
+
+    #Set str_today within page call, so is correct (today)
+    # NOTE: Possibly faster to do this w/i hash_pickled db lookup
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+    str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
 
     # Most frequently used hashtags column
     dist_hashes = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
@@ -286,6 +290,9 @@ def overview(dynamic):
     url = request.path
     str_time_range = stringtime(time_delta)
 
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+    str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
+
     conn = db.engine.connect()
 
     # GET 10-day table data for hashtag chart from graph_functions module
@@ -495,6 +502,9 @@ def screen_name(dynamic):
     Post.text, Post.original_text).\
     filter(Post.original_author_scrname==dynamic).filter(Post.created_at >= str_time_range).\
     order_by(Post.retweet_count.desc()).all()
+
+    # Use helper function to Get botscore for top five most-retweeted tweets,
+    # create list of [post_id, name, retweet numbers, botscore]
 
     most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 

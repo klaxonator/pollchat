@@ -220,6 +220,7 @@ def twitter_search(query):
                 if (not sinceId):
                     new_tweets = cred.api.search(q=query, count=tweetsPerQry,
                                                 lang='en',
+                                                result_type='mixed',
                                                 include_entities=True,
                                                 tweet_mode="extended")
                     #print("New_tweets length is: {}".format(len(new_tweets)))

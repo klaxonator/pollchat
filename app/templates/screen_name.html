@@ -13,6 +13,7 @@
 
 {% block app_content %}
 
+
 <div class="titlebox" id="top">
     <div class="row">
         <div class="col-sm-12">
@@ -180,6 +181,9 @@
 
 {% block scripts %}
     {{ super() }}
+
+
+
     <script>
         google.charts.load('current', {'packages':['line', 'corechart']});
           google.charts.setOnLoadCallback(drawChart1);
@@ -259,5 +263,7 @@
         });
 
     </script>
+
+
 
 {% endblock %}
