@@ -20,6 +20,28 @@ class Logger(object):
         #you might want to specify some extra behavior here.
         pass
 
+skip_list = [
+    "xiaomi",
+    "visitkingston",
+    "carcamera",
+    "dashcrash",
+    "hshq",
+    "HSHQ",
+    "thewarrior",
+    "TheWarrior",
+    "fl15_official",
+    "cumbria",
+    "Cumbria",
+    "dog",
+    "lost",
+    "widnes",
+    "cronton",
+    "cheshire",
+    "stillmissing",
+    "sausage",
+    "hshq"
+    ]
+
 # Time for functions always uses reference date/time of previous midnight UTC
 def stringtime(time_delta):
     if time_delta == None:
@@ -177,6 +199,8 @@ def get_tweet_list_ids(db_search_object):
         join(Post.user).\
         filter(Post.post_id==db_tweet[0]).first()
 
+        if tweet_texts[3] in skip_list or tweet_texts[6] in skip_list:
+            continue
 
         if db_tweet[3] != 2:
             print('post {} is not a senate post, checking relevance'.format(db_tweet[0]))
@@ -288,6 +312,9 @@ def get_tweet_list(db_search_object, distname):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
+        if db_tweet[1].lower() in skip_list:
+            continue
+
         #Check if district name is in text; skip if Senate district
 
         if distname[2:5] != 'Sen':
@@ -383,6 +410,9 @@ def get_tweet_list_nodist(db_search_object):
         seen_tweets.append(db_tweet[0])
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
+
+        if db_tweet[1].lower in skip_list:
+            continue
 
         #Check if district name is in text; skip if Senate district
 
@@ -482,6 +512,9 @@ def get_tweet_list_dated(db_search_object, time_delta):
         seen_tweets.append(db_tweet[0])
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
+
+        if db_tweet[1].lower() in skip_list:
+            continue
 
         #Check if district name is in text
         check = check_district_relevance(db_tweet)
@@ -762,26 +795,7 @@ test_usergraph_data = [['Date',
  ['May 28', 0, 0, 0, 0, 0]]
 
 
-skip_list = [
-    "xiaomi",
-    "visitkingston",
-    "carcamera",
-    "dashcrash",
-    "hshq",
-    "HSHQ",
-    "thewarrior",
-    "TheWarrior",
-    "fl15_official",
-    "cumbria",
-    "Cumbria",
-    "dog",
-    "lost",
-    "widnes",
-    "cronton",
-    "cheshire",
-    "stillmissing",
-    "sausage"
-    ]
+
 
 distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09'],
              'ca07': ['ca07', 'ca-07', '#ca07', '#ca-07', '#ca7', 'ca 07'],

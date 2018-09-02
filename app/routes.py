@@ -8,7 +8,7 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta, date
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
 test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
-get_tweet_list_nodist, Logger
+get_tweet_list_nodist, Logger, skip_list
 import app.graph_functions as gf
 import sys
 import pickle
@@ -392,6 +392,10 @@ def overview(dynamic):
     tweet_count = 0
     # Each item (tuple) is post_id, poster, count, botscore. Still need HTML
     for item in retweeted_tweets_result:
+
+        # if original_author_scrname is in skip list, skip it
+        if item[1].lower() in skip_list:
+            continue
 
         #create list with attributes
         holding_list = []
