@@ -77,6 +77,9 @@ def get_tweet(post_id, omit_script=True, hide_media=True):
 
 def check_district_relevance(db_tweet):
 
+    #incoming db object in order: Post_id, original_author_scrname, retweet_count,\
+    # original_tweet_id, user_scrname, tweet_html, text, original_text
+
     #Search district associations with post
     db_tweet = db_tweet
 
@@ -103,11 +106,6 @@ def check_district_relevance(db_tweet):
 
     # check if any of district aliases are included in tweet text;
             # if finds a match, return True
-
-            #NOTE: too many variations of search found by twitter in scr_name
-            # if district_keyword in db_tweet[1].lower() or \
-            #   district_keyword in db_tweet[4].lower():
-            #     return False
 
             if db_tweet[7]:
                 if district_keyword in db_tweet[7].lower():
@@ -920,7 +918,13 @@ distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09']
              'MTSen': ['mtsen', '#mtsen', 'mt', 'tester', 'montana', 'rosendale'],
              'NJSen': ['njsen', '#njsen', 'nj', 'menendez', 'new jersey', 'hugin'],
              'PASen': ['pasen', '#pasen', 'pa', 'casey', 'montana', 'barletta'],
-             'TNSen': ['tnsen', '#tnsen', 'tn', 'bredesen', 'tennessee', 'blackburn']
+             'TNSen': ['tnsen', '#tnsen', 'tn', 'bredesen', 'tennessee', 'blackburn'],
+             'MISen': ['misen', '#misen', 'mi', 'stabenow', 'michigan', 'james'],
+             'MOSen': ['mosen', '#mosen', 'mo', 'mccaskill', 'missouri', 'hawley'],
+             'MNSen': ['mnsen', '#mnsen', 'mn', 'smith', 'minnesota', 'housley'],
+             'WISen': ['wisen', '#wisen', 'wi', 'baldwin', 'wisconsin', 'vukmir'],
+             'AZSen': ['azsen', '#azsen', 'az', 'sinema', 'arizona', 'mcsally'],
+             'FLSen': ['flsen', '#flsen', 'fl', 'nelson', 'florida', 'scott'],
              }
 
 distdict = {'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar2'],
