@@ -322,13 +322,13 @@ def get_tweet_list(db_search_object, distname):
 
         #Check if district name is in text; skip if Senate district
 
-        if distname[2:5] != 'Sen':
-            check = check_district_relevance(db_tweet)
+        #if distname[2:5] != 'Sen':
+        check = check_district_relevance(db_tweet)
 
-            if check == False:
-                # print("Skipping tweet_id {}".format(db_tweet[0]))
-                # print("Screenname was: {}".format(db_tweet[4]))
-                continue
+        if check == False:
+            # print("Skipping tweet_id {}".format(db_tweet[0]))
+            # print("Screenname was: {}".format(db_tweet[4]))
+            continue
 
 
 
