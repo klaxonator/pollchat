@@ -39,7 +39,13 @@ skip_list = [
     "cheshire",
     "stillmissing",
     "sausage",
-    "hshq"
+    "hshq",
+    "spursofficial",
+    "teamspeak",
+    "asiangames",
+    "asus_rog",
+    "giveaway",
+    "gaming"
     ]
 
 # Time for functions always uses reference date/time of previous midnight UTC
@@ -312,8 +318,9 @@ def get_tweet_list(db_search_object, distname):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
-        if db_tweet[1].lower() in skip_list:
-            continue
+        if db_tweet[1]:
+            if db_tweet[1].lower() in skip_list:
+                continue
 
         #Check if district name is in text; skip if Senate district
 
@@ -514,8 +521,9 @@ def get_tweet_list_dated(db_search_object, time_delta):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
-        if db_tweet[1].lower() in skip_list:
-            continue
+        if db_tweet[1]:
+            if db_tweet[1].lower() in skip_list:
+                continue
 
         #Check if district name is in text
         check = check_district_relevance(db_tweet)
