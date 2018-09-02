@@ -411,7 +411,7 @@ def get_tweet_list_nodist(db_search_object):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
-        if db_tweet[1].lower in skip_list:
+        if db_tweet[1].lower() in skip_list:
             continue
 
         #Check if district name is in text; skip if Senate district
