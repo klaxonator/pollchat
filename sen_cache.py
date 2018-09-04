@@ -27,8 +27,8 @@ def sen_cache(time_delta):
 
             print(len(dist_hashes))
 
-            top_tweeters = db.session.query(User.user_scrname, \
-            func.count(User.user_scrname), User.user_cap_perc, User.user_id).\
+            top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname),\
+            User.user_cap_perc, User.user_id).\
             join(Post.user).join(Post.districts).\
             filter(District.district_name==dynamic).\
             filter(Post.created_at >= str_time_range).\

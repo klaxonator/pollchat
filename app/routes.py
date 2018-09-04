@@ -65,8 +65,10 @@ def district(dynamic):
     # Most frequently used hashtags column
     dist_hashes = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.districts).join(Post.hashtags).\
-    filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
-    group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+    filter(District.district_name==dynamic).\
+    filter(Post.created_at >= str_time_range).\
+    group_by(Hashtag.hashtag).\
+    order_by(func.count(Hashtag.hashtag).desc()).all()
 
     print('got dist_hashes')
 
@@ -74,8 +76,10 @@ def district(dynamic):
     top_tweeters = db.session.query(User.user_scrname, func.count(User.user_scrname),\
     User.user_cap_perc, User.user_id).\
     join(Post.user).join(Post.districts).\
-    filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
-    group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
+    filter(District.district_name==dynamic).\
+    filter(Post.created_at >= str_time_range).\
+    group_by(User.user_id).\
+    order_by(func.count(User.user_id).desc()).all()
 
     print('got top_tweeters')
 
@@ -83,7 +87,8 @@ def district(dynamic):
     most_retweeted = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.districts).\
-    filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
+    filter(District.district_name==dynamic).\
+    filter(Post.created_at >= str_time_range).\
     filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
