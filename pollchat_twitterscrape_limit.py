@@ -7,13 +7,14 @@ from app.helpers import skip_list, get_tweet, distdict_short
 from app import app, db
 import fill_overview_tables_timed as fill
 import app.graph_functions as gf
+import urllib.request
 
 #import preprocessor as p
 from textblob import TextBlob
 import datetime
 
 #Import all Twitter credentials
-import app.tweepy_cred as cred
+import app.tweepy_cred_mf as cred
 
 
 ##Set up database functions
@@ -443,6 +444,12 @@ def search_cong():
                 print("Finished with district: {}".format(query))
                 db.session.commit()
 
+                #visit district page to cache URL
+                url_visit = 'https://pollchatter.org/district/{}?time_delta=14'.\
+                        format(query[2:6])
+                urllib.request.urlopen(url_visit)
+
+
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
 
@@ -470,6 +477,12 @@ def search_sen():
                 twitter_search(query)
                 db.session.commit()
 
+                #visit district page to cache URL
+                url_visit = 'https://pollchatter.org/district/{}?time_delta=14'.\
+                        format(query[2:7])
+                urllib.request.urlopen(url_visit)
+
+
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
 
@@ -490,9 +503,9 @@ def run_twitterscrape():
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
 
     #Do Senate searchcd
-    search_sen()
-    with open('logs/twitterscrape_log.txt', 'a') as f:
-        f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
+    # search_sen()
+    # with open('logs/twitterscrape_log.txt', 'a') as f:
+    #     f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
     #Do Congress search
     search_cong()

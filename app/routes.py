@@ -1,4 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request
+from flask_wtf import csrf
 from app import app, db
 from app.forms import HashtagSearchForm, PhraseSearchForm, DistrictForm, \
 AllCongSearchForm, ChangeTimeForm, BotSearchForm, SenForm
@@ -174,7 +175,7 @@ def tweet_popup(post_id):
 
 @app.route('/hashtag_search', methods = ['GET', 'POST'])
 def hashtag_search():
-    h_form = HashtagSearchForm()
+    h_form = HashtagSearchForm(meta={'csrf': False})
     if h_form.validate_on_submit():
         dynamic = h_form.hashtag_search.data
         time_delta = h_form.hashtag_time_delta.data
