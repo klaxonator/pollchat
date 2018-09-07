@@ -478,6 +478,7 @@ def search_sen():
                 db.session.commit()
 
                 #visit district page to cache URL
+
                 url_visit = 'https://pollchatter.org/district/{}?time_delta=14'.\
                         format(query[2:7])
                 urllib.request.urlopen(url_visit)
@@ -502,10 +503,10 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as fw:
         fw.write('started twitterscrape at {}\n'.format(datetime.datetime.now()))
 
-    #Do Senate searchcd
-    # search_sen()
-    # with open('logs/twitterscrape_log.txt', 'a') as f:
-    #     f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
+    #Do Senate search
+    search_sen()
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
     #Do Congress search
     search_cong()
