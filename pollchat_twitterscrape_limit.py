@@ -339,7 +339,9 @@ def twitter_search(query):
                 #Use local relevance filter *if not Senate*
                 #NOTE: if this creates garbages in Senate, figure out better filter!!
 
-                if query[4:7] != 'Sen':
+                if query[4:7] == 'Sen':
+                    district_name = query[2:7]
+                else:
                     district_name = query[2:6]
 
 
@@ -525,6 +527,7 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
 
+    #Run function updating graph pickles
     gf.fill_graphs()
 
 if __name__ == "__main__":
