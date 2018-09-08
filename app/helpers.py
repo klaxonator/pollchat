@@ -427,7 +427,9 @@ def get_tweet_list_inperiod(db_search_object):
                 continue
         else:
             print("gonna add that missing tweet")
-            add_tweet(tweet[0])
+            check = add_tweet(tweet[0])
+            if check == False:
+                continue
             print("added it in, gonna look for it again")
 
             user_info = db.session.query(User.user_scrname, User.user_cap_perc, \
@@ -437,8 +439,10 @@ def get_tweet_list_inperiod(db_search_object):
 
 
         #ADD RELEVANCE SEARCH
-
-        tweet_html = get_tweet(tweet[0])
+        try:
+            tweet_html = get_tweet(tweet[0])
+        except:
+            tweet_html = "Can't retrieve tweet"
 
         # list position [0]: post_id
         holding_list.append(tweet[0])
@@ -1363,6 +1367,8 @@ def add_tweet(tweet_id, district_name=None):
                     break
             if district_name != None:
                 break
+    if district_name == None:
+        return False
 
     print("the district name is {}".format(district_name))
 
@@ -1433,3 +1439,4 @@ def add_tweet(tweet_id, district_name=None):
         db.session.rollback()
 
         pass
+    return True
