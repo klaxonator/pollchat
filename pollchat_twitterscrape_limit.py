@@ -18,8 +18,7 @@ import app.tweepy_cred_mf as cred
 
 
 ##Set up database functions
-from app.models import User, Post, Hashtag, District, Url, posthash_assoc,\
- posturl_assoc, postdist_assoc, Post_extended
+from app.models import *
 from sqlalchemy import exc, func
 
 #Instantiate SQLalchemy database connection

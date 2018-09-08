@@ -9,7 +9,7 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta, date
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
 test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
-get_tweet_list_nodist, Logger, skip_list
+get_tweet_list_nodist, Logger, skip_list, get_tweet_list_inperiod
 import app.graph_functions as gf
 import sys
 import pickle
@@ -127,14 +127,28 @@ def district(dynamic):
     order_by(Post.retweet_count.desc()).all()
 
     # Use helper function to Get botscore for top five most-retweeted tweets,
-    # create list of [post_id, name,retweet numbers, botscore]
+    # create list of [post_id, scrname, retweet count, botscore, post_html]
 
     most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets, dynamic)
 
     #most_retweeted_tweet_list_dated = get_tweet_list_dated(db_search_object, time_delta)
 
-
     print('got most_retweeted_list')
+
+    # Get tweets most retweeted in this time period (by counting actual apperances)
+    most_retweeted_inperiod = db.session.query(Post.original_tweet_id,\
+    func.count(Post.original_tweet_id)).\
+    join(Post.districts).\
+    filter(Post.is_retweet == 1).filter(District.district_name==dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    group_by(Post.original_tweet_id, Post.original_author_scrname).\
+    order_by(func.count(Post.original_tweet_id).desc()).all()
+
+    most_retweeted_inperiod_list = get_tweet_list_inperiod(most_retweeted_inperiod)
+
+
+
+    print('got most_retweeted_list_inperiod')
 
     #Get basic district object for district info
     dist_obj = db.session.query(District.state_fullname, District.district, \
@@ -165,7 +179,8 @@ def district(dynamic):
     t_form=ChangeTimeForm(), get_tweet=get_tweet, dist_obj=dist_obj, \
     test_insert=test_insert, distlist=distlist, hash_table_rows=hash_table_rows,\
     most_retweeted_list=most_retweeted_list, most_retweeted_tweet_list=\
-    most_retweeted_tweet_list)
+    most_retweeted_tweet_list,\
+    most_retweeted_inperiod_list=most_retweeted_inperiod_list)
 
 @app.route('/tweet/<post_id>/tweet_popup', methods = ['GET', 'POST'])
 def tweet_popup(post_id):
@@ -421,6 +436,8 @@ def overview(dynamic):
             break
 
     print("got most retweeted tweets")
+
+
 
 
     hash_pickled = db.session.query(District_graphs.chart_rows).\

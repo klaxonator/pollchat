@@ -2,8 +2,17 @@ from app import app, db
 from datetime import datetime, timedelta, date
 import json
 import requests
-from app.models import User, Post, District, Hashtag, Url
+from app.models import *
 import sys
+import tweepy
+import app.tweepy_cred_mf as cred
+import csv
+import sys
+import time
+from textblob import TextBlob
+from sqlalchemy import exc, func
+
+
 
 class Logger(object):
     def __init__(self, logfile):
@@ -124,6 +133,9 @@ def check_district_relevance_st(tweet_texts):
 
     #Incoming db object has Post_id, Post.text, Post.original_text
 
+    #if from get_tweet_list_ids, tweet_texts is: Post.post_id, Post.text, Post.original_text,\
+    # User.user_scrname, Post.tweet_html, Post.original_tweet_id,
+
     #Search district associations with post
     tweet_texts = tweet_texts
 
@@ -206,21 +218,17 @@ def get_tweet_list_ids(db_search_object):
         if tweet_texts[3] in skip_list or tweet_texts[6] in skip_list:
             continue
 
-        if db_tweet[3] != 2:
-            print('post {} is not a senate post, checking relevance'.format(db_tweet[0]))
-            check = check_district_relevance_st(tweet_texts)
+        # check district relevance
+        check = check_district_relevance_st(tweet_texts)
 
 
-            if check == False:
-                # print("skipping tweet_id {0}, \ntext: {1}\n full_text: {2}\nscreen name: {3}\n\n".\
-                # format(tweet_texts[0], tweet_texts[1], tweet_texts[2], tweet_texts[3]))
+        if check == False:
+            # print("skipping tweet_id {0}, \ntext: {1}\n full_text: {2}\nscreen name: {3}\n\n".\
+            # format(tweet_texts[0], tweet_texts[1], tweet_texts[2], tweet_texts[3]))
 
-                skipped_tweets.append(tweet_texts[0])
+            skipped_tweets.append(tweet_texts[0])
 
-                continue
-
-
-        print('going on with post {}'.format(db_tweet[0]))
+            continue
 
         # List: Post_id, orig author name, retweet count, tweet_html, orig ID
         if tweet_texts[6]:
@@ -316,6 +324,7 @@ def get_tweet_list(db_search_object, distname):
         if db_tweet[3]:
             seen_tweets.append(db_tweet[3])
 
+        #If original_author in skiplist, skip
         if db_tweet[1]:
             if db_tweet[1].lower() in skip_list:
                 continue
@@ -332,7 +341,8 @@ def get_tweet_list(db_search_object, distname):
 
 
 
-        #create actual tweet list
+        # create actual tweet list: [post_id, scrname, retweet_count, botscore,
+        # post_html, ]
         tweet = []
 
         # LIST POSITION [0]: Post.post_id
@@ -391,6 +401,75 @@ def get_tweet_list(db_search_object, distname):
             break
 
     return most_retweeted_tweet_list
+
+
+
+def get_tweet_list_inperiod(db_search_object):
+
+    '''Gets list of tweets with info to pass to template, using list of tweets
+    produced by most_retweeted_inperiod. db_search_object is ordered list of original_id,
+    count(original_id)
+
+    Want to return post_id, name, count, botscore, html'''
+
+    most_retweeted_inperiod_list = []
+    count = 0
+    for tweet in db_search_object:
+        holding_list = []
+
+        user_info = db.session.query(User.user_scrname, User.user_cap_perc, \
+        Post.text).\
+        join(Post.user).\
+        filter(Post.post_id==tweet[0]).first()
+
+        if user_info:
+            if user_info[0].lower() in skip_list:
+                continue
+        else:
+            print("gonna add that missing tweet")
+            add_tweet(tweet[0])
+            print("added it in, gonna look for it again")
+
+            user_info = db.session.query(User.user_scrname, User.user_cap_perc, \
+            Post.text).\
+            join(Post.user).\
+            filter(Post.post_id==tweet[0]).first()
+
+
+        #ADD RELEVANCE SEARCH
+
+        tweet_html = get_tweet(tweet[0])
+
+        # list position [0]: post_id
+        holding_list.append(tweet[0])
+        # list position [1]: user_scrname
+        if user_info:
+            holding_list.append(user_info[0])
+        else:
+            holding_list.append("Original post not yet in database")
+
+        # list position [2]: post count
+        holding_list.append(tweet[1])
+
+        # list position [3]: user_cap_perc
+        if user_info:
+            holding_list.append(user_info[1])
+        else:
+            holding_list.append("Original post not yet in database")
+
+        # list position [4]: user_cap_perc
+        holding_list.append(tweet_html)
+
+        print(holding_list)
+
+        most_retweeted_inperiod_list.append(holding_list)
+        count += 1
+        if count == 10:
+            break
+
+    return most_retweeted_inperiod_list
+
+
 
 def get_tweet_list_nodist(db_search_object):
 
@@ -1031,13 +1110,326 @@ distdict = {'ar02': ['ar02', 'ar-02', '#ar02', '#ar-02', '#ar2', 'ar2'],
             'wv03': ['wv03', 'wv-03', '#wv03', '#wv-03', '#wv3', 'wv3']}
 
 
-# def hashcache(time_delta):
-#
-#     str_time_range = stringtime(time_delta)
-#
-#     top_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
-#     join(Post.hashtags).\
-#     filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
-#     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
-#
-#     for
+#Write Twitter variables to DB
+def write_database(post_id, user_id, text, created_at, created_at_dt, reply_to_user_id,
+        reply_to_scrname, reply_to_status_id, retweet_count,
+        favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+        original_text, original_tweet_created_at, original_tweet_likes,
+        original_author_id, original_author_scrname, polarity,
+        polarity_val, tag_list, url_list, user_scrname, user_name,
+        user_location, user_created, user_followers, user_friends,
+        user_statuses, district_name):
+
+    #print("starting db entry for postid = {}".format(post_id))
+
+    if district_name[3:] == 'Sen':
+        district = 'sen'
+        dist_type = 2
+    else:
+        district = district_name[3:]
+        dist_type = 1
+
+    #POST TABLE:
+    #If tweet ID not already in database, add to Post table
+
+    if db.session.query(Post).filter(Post.post_id == post_id).count() == 0:
+
+        #print('adding post')
+        #USER table
+
+        #If User already in User table, update dynamic elements, associate with this post
+        this_user = db.session.query(User).filter(User.user_id == user_id).first()
+        if this_user != None:
+            this_user.user_location = user_location
+            this_user.user_followers = user_followers
+            this_user.user_friends = user_friends
+            this_user.user_statuses = user_statuses
+            db.session.add(this_user)
+
+        #Otherise, add User to user table, associate with this post
+        else:
+            this_user = User(user_id, user_scrname, user_name, user_location,\
+            user_created, user_followers, user_friends, user_statuses)
+            db.session.add(this_user)
+
+        #POST table
+
+        new_post = Post(post_id, user_id, text, created_at, created_at_dt,
+            reply_to_user_id, reply_to_scrname, reply_to_status_id, retweet_count,
+            favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+            original_text, original_tweet_created_at, original_tweet_likes,
+            original_author_id, original_author_scrname, polarity, polarity_val)
+
+        db.session.add(new_post)
+
+        #If original tweet is in database, update its retweeted count. If not, do nothing
+        if original_tweet_id != None:
+            orig_tweet = db.session.query(Post).\
+            filter(Post.post_id == original_tweet_id).first()
+            if orig_tweet != None:
+                orig_tweet.retweet_count = original_tweet_retweets
+                db.session.add(orig_tweet)
+
+        #HASHTAG TABLE
+
+        # If tweet is being added, iterate through tag/url list, and create a
+        # Hashtag/Url table row for each tag
+        for item in tag_list:
+            #If hashtag is not already in Hashtag table, create new row
+            hash_search = db.session.query(Hashtag).\
+            filter(Hashtag.hashtag == item).first()
+            if hash_search == None:
+                new_hashtag = Hashtag(item)
+                db.session.add(new_hashtag)
+            else:
+                new_hashtag = hash_search
+            #Add association to posthash_assoc_table
+            new_post.hashtags.append(new_hashtag)
+            #db.session.add(posthash_assoc.hashtag)
+
+            #add one row to Post_extended per hashtag
+            # NOTE: this means number of rows per post_id = cartesian product
+            # of hashtags times districts (if picked up in search for every dist)
+
+            new_row = Post_extended(post_id, user_id, created_at, created_at_dt,
+                retweet_count, is_retweet, original_tweet_id,
+                original_text, original_tweet_created_at,
+                original_author_id, original_author_scrname, polarity, polarity_val,
+                item, district_name, dist_type, user_scrname)
+
+            db.session.add(new_row)
+            #print("added newrow for hash {}".format(item))
+
+
+        #DISTRICT TABLE
+            #capture District_id from 1st query term:
+        state = district_name[0:3].lower()
+            #Handle Senate districts differently than congressional
+        # if query[4:7] == 'Sen':
+        #     district = 'sen'
+        #     district_name = query[2:7]
+        #     dist_type = 2
+        # else:
+        #     district = query[4:6]
+        #     district_name = query[2:6]
+        #     dist_type = 1
+
+        #Check if district is in DB, add if not
+        district_search = db.session.query(District).\
+        filter(District.district_name == district_name).first()
+
+        if district_search == None:
+            new_district = District(state, district, district_name, dist_type)
+            db.session.add(new_district)
+        else:
+            new_district = district_search
+
+        #Add association to postdist_assoc_table
+        new_post.districts.append(new_district)
+
+
+
+        #URL TABLE
+
+        #if URLS exist, add to db
+        if len(url_list) > 0:
+            for item in url_list:
+                url_search = db.session.query(Url).filter(Url.url == item).first()
+                if url_search == None:
+                    new_url = Url(item)
+                    db.session.add(new_url)
+                else:
+                    new_url = url_search
+
+
+                #Add association to postDistAssoc_table
+            new_post.urls.append(new_url)
+
+
+
+
+        #associate user with post
+        this_user.user_posts.append(new_post)
+
+    #If tweet ID in db (from another dist query), add new association to Post table
+    else:
+        #print('ID there, trying plan B')
+        district_check = db.session.query(District.district_name).\
+        join(Post.districts).\
+        filter(Post.post_id==post_id).all()
+
+        check = 0
+        for result in district_check:               #iterate through associated dists
+            if result[0] == district_name:
+                check = 1
+                #print("already there")                          #if find match, check =  1, do nothing
+        if check == 0:
+            #print("adding newdist")                               # if no match, add to postdist_assoc
+            sql_command = '''INSERT INTO postdist_assoc (post_id, district_name)
+                            VALUES (post_id, district_name);'''
+            conn = db.engine.connect()
+            conn.execute(sql_command)
+            conn.close()
+
+
+def add_tweet(tweet_id, district_name=None):
+
+    print("getting missing tweet now, buster")
+    tweet = cred.api.get_status(tweet_id, include_entities=True,
+                                tweet_mode="extended")
+    print("got the tweet, man")
+
+    #Create variables from JSON data
+    #User table variables
+    user_id = tweet.user.id_str
+    user_scrname = tweet.user.screen_name
+    user_name = tweet.user.name
+    user_location = tweet.user.location
+    user_created = tweet.user.created_at
+    user_followers = tweet.user.followers_count
+    user_friends = tweet.user.friends_count
+    user_statuses = tweet.user.statuses_count
+
+
+    #Post table variables: always in place
+    post_id = tweet.id_str
+    text = tweet.full_text
+    created_at = tweet.created_at                #NOTE: UTC time
+    created_at_dt = tweet.created_at
+
+    #Post table variables: Nullable
+    reply_to_user_id = tweet.in_reply_to_user_id_str
+    reply_to_scrname = tweet.in_reply_to_screen_name
+    reply_to_status_id = tweet.in_reply_to_status_id_str
+    retweet_count = tweet.retweet_count
+
+
+    favorite_count = tweet.favorite_count
+
+    #Retweet status variables: from "retweeted status: Tweet object
+    #TAGS/URLS included here, because may only be included in retweeted status entities
+
+    tag_list = []
+    url_list = []
+
+    print("next on to retweeted status")
+
+    try:
+        if tweet.retweeted_status:
+            is_retweet = True
+            original_tweet_id = tweet.retweeted_status.id_str
+            original_tweet_retweets = tweet.retweeted_status.retweet_count
+            original_text = tweet.retweeted_status.full_text
+
+            original_tweet_created_at = tweet.retweeted_status.created_at
+            original_tweet_likes = tweet.retweeted_status.favorite_count
+            original_author_id = tweet.retweeted_status.user.id_str
+            original_author_scrname = tweet.retweeted_status.user.screen_name
+
+        #Get full list of hashtags in retweeted entities
+            for dict in tweet.retweeted_status.entities['hashtags']:
+                tag_list.append(dict['text'].lower())
+        #Get full list of urls in retweeted entities
+            for dict in tweet.retweeted_status.entities['urls']:
+                url_list.append(dict['expanded_url'])
+    except AttributeError as ae:
+        # print("Error raised: {0}".format(ae))
+        is_retweet = False
+        original_tweet_id = None
+        original_tweet_retweets = None
+        original_text = None
+        original_tweet_created_at = None
+        original_tweet_likes = None
+        original_author_id = None
+        original_author_scrname = None
+
+    #Get simple list of hashtags in top-level (non-RT) tweet
+        for hashtag in tweet.entities["hashtags"]:
+            tag_list.append(hashtag["text"].lower())
+    #Get simple list of urls in top-level (non-RT) tweet
+        for link in tweet.entities["urls"]:
+            url_list.append(link['expanded_url'])
+
+
+
+
+    print("trying this distlist thing")
+
+    if district_name == None:
+        for key, word_list in distdict_short.items():
+            for keyword in word_list:
+                if keyword in text:
+                    district_name = key
+                    break
+            if district_name != None:
+                break
+
+    print("the district name is {}".format(district_name))
+
+
+
+
+    # #Use local relevance filter *if not Senate*
+    # #NOTE: if this creates garbages in Senate, figure out better filter
+    #
+    #
+    # if query[4:7] != 'Sen':
+    #     district_name = query[2:6]
+    #
+    #
+    #     # Check Tweet text for district name to filter out irrelvancies;
+    #     # skip rest of for loop if district name (or aliases) not found
+    #
+    #     check = False
+    #
+    #     for district_alias in distdict_short[district_name]:
+    #         if original_text:
+    #             if district_alias in original_text.lower():
+    #                 check = True
+    #         else:
+    #             if district_alias in text.lower():
+    #                 check = True
+    #     if check == False:
+    #         # print("Tweet rejected, no district reference")
+    #         continue
+
+
+    #TextBlob analysis of tweet sentiment
+    analysis = TextBlob(tweet.full_text)
+    polarity = analysis.sentiment.polarity
+    # print(polarity)
+
+    if polarity > 0:
+        polarity_val = 'positive'
+    elif polarity < 0:
+        polarity_val = 'negative'
+    else:
+        polarity_val = 'neutral'
+
+    print("thought i'd maybe try putting it in the database, hon")
+
+    try:
+        write_database(post_id, user_id, text, created_at,
+                created_at_dt, reply_to_user_id,
+                reply_to_scrname, reply_to_status_id, retweet_count,
+                favorite_count, is_retweet, original_tweet_id, original_tweet_retweets,
+                original_text, original_tweet_created_at, original_tweet_likes,
+                original_author_id, original_author_scrname, polarity,
+                polarity_val, tag_list, url_list, user_scrname, user_name,
+                user_location, user_created, user_followers, user_friends,
+                user_statuses, district_name)
+
+        print("baby, it's in there")
+
+
+    except exc.SQLAlchemyError as e:
+        print("There's a dadgummed database write error for post ID {0}: {1}".\
+        format(post_id, e))
+        print("It's currently {}".format(datetime.datetime.now()))
+
+        with open('logs/twitterscrape_passed.txt', 'a') as pw:
+            pw.write('{}\n'.format(post_id))
+
+        db.session.rollback()
+
+        pass
