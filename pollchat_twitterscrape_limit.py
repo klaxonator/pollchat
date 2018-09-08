@@ -8,6 +8,7 @@ from app import app, db
 import fill_overview_tables_timed as fill
 import app.graph_functions as gf
 import urllib.request
+from app.graph_functions import get_hash_rows
 
 #import preprocessor as p
 from textblob import TextBlob
@@ -444,6 +445,8 @@ def search_cong():
                 twitter_search(query)
                 print("Finished with district: {}".format(query))
                 db.session.commit()
+                get_hash_rows(query[2:6])
+                print("got them hash rows for district {}".format(query[2:6]))
 
                 #visit district page to cache URL
                 url_visit = 'https://pollchatter.org/district/{}?time_delta=14'.\
@@ -477,6 +480,9 @@ def search_sen():
             try:
                 twitter_search(query)
                 db.session.commit()
+
+                get_hash_rows(query[2:7])
+                print("got them hash rows for district {}".format(query[2:7]))
 
                 #visit district page to cache URL
 
