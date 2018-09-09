@@ -284,11 +284,23 @@ def hashtag(dynamic):
 
     print("got most retweeted tweets")
 
+    # Get tweets most retweeted in this time period (by counting actual apperances)
+    most_retweeted_inperiod = db.session.query(Post.original_tweet_id,\
+    func.count(Post.original_tweet_id)).\
+    join(Post.hashtags).\
+    filter(Post.is_retweet == 1).filter(Hashtag.hashtag==dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    group_by(Post.original_tweet_id).\
+    order_by(func.count(Post.original_tweet_id).desc()).all()
+
+    most_retweeted_inperiod_list = get_tweet_list_inperiod(most_retweeted_inperiod)
+
     return render_template('hashtag.html', t_form=ChangeTimeForm(), url=url, \
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
     top_users=top_users, valences=valences, valences_datatable=valences_datatable,
     most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list)
+    most_retweeted_tweet_list=most_retweeted_tweet_list, \
+    most_retweeted_inperiod_list=most_retweeted_inperiod_list)
 
 @app.route('/all_search', methods = ['GET', 'POST'])
 def all_search():

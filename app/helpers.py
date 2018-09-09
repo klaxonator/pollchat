@@ -439,6 +439,7 @@ def get_tweet_list_inperiod(db_search_object):
 
 
         #ADD RELEVANCE SEARCH
+
         try:
             tweet_html = get_tweet(tweet[0])
         except:
@@ -468,7 +469,7 @@ def get_tweet_list_inperiod(db_search_object):
 
         most_retweeted_inperiod_list.append(holding_list)
         count += 1
-        if count == 10:
+        if count == 5:
             break
 
     return most_retweeted_inperiod_list
