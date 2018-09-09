@@ -475,7 +475,7 @@ def search_cong():
 
 def search_sen():
     #Open csv file of competitive districts, iterate through it, searching for each row/district
-    with open('app/comp_races_parsed_sen_test.csv', 'r') as f:
+    with open('app/comp_races_parsed_sen.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
@@ -533,25 +533,25 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('added senate items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
-    # #Do Congress search
-    # search_cong()
-    #
-    #
-    # print(datetime.datetime.now())
-    # time = datetime.datetime.now()
-    #
-    # with open('logs/twitterscrape_log.txt', 'a') as f:
-    #     f.write('added cong items to database, finished at {}\n\n'.format(datetime.datetime.now()))
-    #
-    # #Run function filling overview-cache tables
-    # fill.run_all()
-    #
-    #
-    # with open('logs/twitterscrape_log.txt', 'a') as f:
-    #     f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
-    #
-    # #Run function updating graph pickles
-    # gf.fill_graphs()
+    #Do Congress search
+    search_cong()
+    
+
+    print(datetime.datetime.now())
+    time = datetime.datetime.now()
+
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('added cong items to database, finished at {}\n\n'.format(datetime.datetime.now()))
+
+    #Run function filling overview-cache tables
+    fill.run_all()
+
+
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
+
+    #Run function updating graph pickles
+    gf.fill_graphs()
 
 if __name__ == "__main__":
     run_twitterscrape()
