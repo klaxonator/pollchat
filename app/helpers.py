@@ -1445,10 +1445,14 @@ def add_tweet(tweet_id, district_name=None):
 
 def cache_top_hashtags():
 
+    str_time_range = stringtime(14)
+
     top_hash_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.hashtags).\
+    filter(Post.created_at >= str_time_range).\
     group_by(Hashtag.hashtag).\
     order_by(func.count(Hashtag.hashtag).desc()).all()
+
 
     time_list = [1, 2, 7, 14]
     url_header = {"secret-header": "True"}
