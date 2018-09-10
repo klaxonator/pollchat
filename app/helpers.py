@@ -277,7 +277,7 @@ def populate_tweet_list(tweet_list):
                     tweet_html = get_tweet(item[4])         # get html of original tweet
                     tweet.append(tweet_html)                # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
             #if not RT (no original_tweet_id), use post ID
             else:
@@ -285,7 +285,7 @@ def populate_tweet_list(tweet_list):
                     tweet_html = get_tweet(item[0])         # get html of base tweet
                     tweet.append(tweet_html)                # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
         # LIST POSITION [4]: User Botscore
         botscore = db.session.query(User.user_cap_perc).\
@@ -385,7 +385,7 @@ def get_tweet_list(db_search_object, distname):
                     tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
                     tweet.append(tweet_html)            # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
             #if not RT (no original_tweet_id), use post ID
             else:
@@ -393,7 +393,7 @@ def get_tweet_list(db_search_object, distname):
                     tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
                     tweet.append(tweet_html)                # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
 
         most_retweeted_tweet_list.append(tweet)
@@ -444,7 +444,7 @@ def get_tweet_list_inperiod(db_search_object):
         try:
             tweet_html = get_tweet(tweet[0])
         except:
-            tweet_html = "Can't retrieve tweet"
+            tweet_html = "Tweet unavailable"
 
         # list position [0]: post_id
         holding_list.append(tweet[0])
@@ -559,7 +559,7 @@ def get_tweet_list_nodist(db_search_object):
                 tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
                 tweet.append(tweet_html)            # add tweet_text
             except:
-                tweet.append("Can't retrieve Tweet")
+                tweet.append("Tweet unavailable")
 
         #if not RT (no original_tweet_id), use post ID
         else:
@@ -567,7 +567,7 @@ def get_tweet_list_nodist(db_search_object):
                 tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
                 tweet.append(tweet_html)                # add tweet_text
             except:
-                tweet.append("Can't retrieve Tweet")
+                tweet.append("Tweet unavailable")
 
 
         most_retweeted_tweet_list.append(tweet)
@@ -674,7 +674,7 @@ def get_tweet_list_dated(db_search_object, time_delta):
                     tweet_html = get_tweet(db_tweet[3]) # get html of original tweet
                     tweet.append(tweet_html)            # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
             #if not RT (no original_tweet_id), use post ID
             else:
@@ -682,7 +682,7 @@ def get_tweet_list_dated(db_search_object, time_delta):
                     tweet_html = get_tweet(db_tweet[0])     # get html of base tweet
                     tweet.append(tweet_html)                # add tweet_text
                 except:
-                    tweet.append("Can't retrieve Tweet")
+                    tweet.append("Tweet unavailable")
 
 
         most_retweeted_tweet_list.append(tweet)

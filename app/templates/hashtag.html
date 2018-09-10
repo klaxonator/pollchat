@@ -141,66 +141,11 @@
     </div>
 </div>
 
-{% include '_tweet_table.html' %}
+
 {% include '_inperiod_tweet_table.html' %}
 
 {% endif %}
-<!-- {#
-<div>
-    <div class="table=responsive">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 id="retweets">Most retweeted Tweets</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Ranking</th>
-                            <th>Original poster (OP)</th>
-                            <th>Number of retweets</th>
-                            <th>Tweet text</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in most_retweeted_tweets[0:5] %}
 
-                            <tr>
-                                <td>
-                                    {{ loop.index }}
-                                    <div id="{{ item[0] }}">
-
-                                    </div>
-
-                                </td>
-                                <td><a href={{ url_for('screen_name', dynamic=item[0],
-                                     time_delta=time_delta) }}>{{ item[1] }}</a></td>
-                                <td>{{ item[2] }}</td>
-                                <td>
-                                    <blockquote class="twitter-tweet">
-                                        {{ item[3] }}
-TO BE FIXED IN POSTGRES}                 {% if item[4] %}
-
-                                        <a href="https://twitter.com/{{ item[1] }}/status/{{ item[5] }}">
-                                             {{ moment(get_tweet_datetime(item[4])).format('LL') }}
-                                        </a></blockquote>
-                                        {% endif %}
-
-                                </td>
-
-
-
-
-
-                            </tr>
-
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
-#} -->
 
 {% endblock %}
 

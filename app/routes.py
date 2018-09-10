@@ -18,7 +18,7 @@ sys.stdout = Logger("logs/pollchat_stdout.txt")
 
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET'])
 def index():
     url = request.path
 
@@ -49,7 +49,7 @@ def select_district():
     p_form=PhraseSearchForm(), h_form=HashtagSearchForm(), all_form=AllCongSearchForm(),\
     botform=BotSearchForm(), sen_form=SenForm())
 
-@app.route('/district/<dynamic>', methods=['GET', 'POST'])
+@app.route('/district/<dynamic>', methods=['GET'])
 def district(dynamic):
     print('starting district {}'.format(dynamic))
 
@@ -119,17 +119,17 @@ def district(dynamic):
 
     # Gets list of tweets in time period, ordered by most-retweeted (NOTE: many
     # or most of these retweets may be previous to this period)
-    most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
-    Post.text, Post.original_text).\
-    join(Post.districts).join(Post.user).\
-    filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
-    order_by(Post.retweet_count.desc()).all()
-
-    # Use helper function to Get botscore for top five most-retweeted tweets,
-    # create list of [post_id, scrname, retweet count, botscore, post_html]
-
-    most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets, dynamic)
+    # most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    # Post.text, Post.original_text).\
+    # join(Post.districts).join(Post.user).\
+    # filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
+    # order_by(Post.retweet_count.desc()).all()
+    #
+    # # Use helper function to Get botscore for top five most-retweeted tweets,
+    # # create list of [post_id, scrname, retweet count, botscore, post_html]
+    #
+    # most_retweeted_tweet_list = get_tweet_list(most_retweeted_tweets, dynamic)
 
     #most_retweeted_tweet_list_dated = get_tweet_list_dated(db_search_object, time_delta)
 
@@ -175,18 +175,12 @@ def district(dynamic):
 
     return render_template('district.html', dynamic=dynamic, time_delta=time_delta, \
     url=url, dist_hashes=dist_hashes, top_tweeters=top_tweeters, \
-    most_retweeted=most_retweeted, most_retweeted_tweets=most_retweeted_tweets, \
+    most_retweeted=most_retweeted, \
     t_form=ChangeTimeForm(), get_tweet=get_tweet, dist_obj=dist_obj, \
     test_insert=test_insert, distlist=distlist, hash_table_rows=hash_table_rows,\
-    most_retweeted_list=most_retweeted_list, most_retweeted_tweet_list=\
-    most_retweeted_tweet_list,\
+    most_retweeted_list=most_retweeted_list, \
     most_retweeted_inperiod_list=most_retweeted_inperiod_list)
 
-@app.route('/tweet/<post_id>/tweet_popup', methods = ['GET', 'POST'])
-def tweet_popup(post_id):
-
-    return render_template('tweet_popup.html', post_id=post_id, \
-    get_tweet=get_tweet, test_insert=test_insert)
 
 @app.route('/hashtag_search', methods = ['GET', 'POST'])
 def hashtag_search():
@@ -208,7 +202,7 @@ def hashtag_search():
     p_form=PhraseSearchForm(), d_form=DistrictForm(), all_form=AllCongSearchForm(),\
     botform=BotSearchForm(), sen_form=SenForm())
 
-@app.route('/hashtag/<dynamic>', methods=['GET', 'POST'])
+@app.route('/hashtag/<dynamic>', methods=['GET'])
 def hashtag(dynamic):
 
     print('starting hashtag {}'.format(dynamic))
@@ -268,21 +262,21 @@ def hashtag(dynamic):
 
     print("got valences")
 
-    # Most retweeted tweets column
-    most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
-    Post.text, Post.original_text).\
-    join(Post.hashtags).join(Post.user).\
-    filter(Hashtag.hashtag==dynamic).filter(Post.created_at_dt >= str_time_range).\
-    order_by(Post.retweet_count.desc()).all()
-
-    print("got most retweeted tweets")
-
-    #Get botscore for top five most-retweeted tweets, create list of [post_id, name,
-    # retweet numbers, botscore] to send to template
-    most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
-
-    print("got most retweeted tweets")
+    # # Most retweeted tweets column
+    # most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
+    # Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    # Post.text, Post.original_text).\
+    # join(Post.hashtags).join(Post.user).\
+    # filter(Hashtag.hashtag==dynamic).filter(Post.created_at_dt >= str_time_range).\
+    # order_by(Post.retweet_count.desc()).all()
+    #
+    # print("got most retweeted tweets")
+    #
+    # #Get botscore for top five most-retweeted tweets, create list of [post_id, name,
+    # # retweet numbers, botscore] to send to template
+    # most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
+    #
+    # print("got most retweeted tweets")
 
     # Get tweets most retweeted in this time period (by counting actual apperances)
     most_retweeted_inperiod = db.session.query(Post.original_tweet_id,\
@@ -297,10 +291,9 @@ def hashtag(dynamic):
 
     return render_template('hashtag.html', t_form=ChangeTimeForm(), url=url, \
     dynamic=dynamic, time_delta=time_delta, top_districts=top_districts, \
-    top_users=top_users, valences=valences, valences_datatable=valences_datatable,
-    most_retweeted_tweets=most_retweeted_tweets, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list, \
-    most_retweeted_inperiod_list=most_retweeted_inperiod_list)
+    top_users=top_users, valences=valences, valences_datatable=valences_datatable,\
+    get_tweet=get_tweet, most_retweeted_inperiod_list=most_retweeted_inperiod_list
+    )
 
 @app.route('/all_search', methods = ['GET', 'POST'])
 def all_search():
@@ -315,7 +308,7 @@ def all_search():
     h_form=HashtagSearchForm(), p_form=PhraseSearchForm(), d_form=DistrictForm(),\
     botform=BotSearchForm(), sen_form=SenForm())
 
-@app.route('/overview/<dynamic>', methods = ['GET', 'POST'])
+@app.route('/overview/<dynamic>', methods = ['GET'])
 def overview(dynamic):
 
     print('starting district group {}'.format(dynamic))
@@ -475,7 +468,7 @@ def overview(dynamic):
     )
 
 
-@app.route('/screen_name/<dynamic>', methods = ['GET', 'POST'])
+@app.route('/screen_name/<dynamic>', methods = ['GET'])
 def screen_name(dynamic):
 
     print('starting screen name {}'.format(dynamic))
@@ -610,7 +603,7 @@ def bot_search():
     botform=botform, sen_form=SenForm())
 
 
-@app.route('/botspy/<dynamic>', methods = ['GET', 'POST'])
+@app.route('/botspy/<dynamic>', methods = ['GET'])
 def botspy(dynamic):
     time_delta = request.args.get('time_delta')
     url = request.path
@@ -670,11 +663,11 @@ def doesnt_exist(dynamic):
     return render_template('doesnt_exist.html', dynamic=dynamic,
     url=url)
 
-@app.route('/test', methods = ['GET', 'POST'])
-def test():
-    rows = gf.get_hash_rows('ca49')
-    return render_template('test.html', get_tweet=get_tweet, \
-    test_hashgraph_data=test_hashgraph_data, test_usergraph_data=test_usergraph_data)
+# @app.route('/test', methods = ['GET', 'POST'])
+# def test():
+#     rows = gf.get_hash_rows('ca49')
+#     return render_template('test.html', get_tweet=get_tweet, \
+#     test_hashgraph_data=test_hashgraph_data, test_usergraph_data=test_usergraph_data)
 
 @app.route('/how_to_use')
 def how_to_use():

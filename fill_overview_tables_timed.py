@@ -1,5 +1,6 @@
 import os
-from app.helpers import stringtime, get_tweet_list_ids, populate_tweet_list
+from app.helpers import stringtime, get_tweet_list_ids, populate_tweet_list,\
+    get_tweet_list_inperiod
 from app import app, db
 from app.models import *
 from sqlalchemy import func, Date
@@ -253,7 +254,7 @@ def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
     conn.close()
 
 def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
-
+    print("starting {}".format(table))
     if dist_group == "allcong":
         dist_fig = 1
     if dist_group == "allsen":
@@ -270,37 +271,62 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
 
     str_time_range = stringtime(time_delta)
 
+    # if dist_group == "allcong" or dist_group == "allsen":
+    #     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_tweet_id, \
+    #     Post.retweet_count, District.dist_type).\
+    #     join(Post.districts).\
+    #     filter(Post.created_at >= str_time_range).filter(District.dist_type==dist_fig).\
+    #     order_by(Post.retweet_count.desc()).all()
+    #
+    # else:
+    #     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_tweet_id, \
+    #     Post.retweet_count, District.dist_type).\
+    #     join(Post.districts).\
+    #     filter(Post.created_at >= str_time_range).\
+    #     order_by(Post.retweet_count.desc()).all()
+
+
+
+
     if dist_group == "allcong" or dist_group == "allsen":
-        most_retweeted_tweets = db.session.query(Post.post_id, Post.original_tweet_id, \
-        Post.retweet_count, District.dist_type).\
+        most_retweeted_tweets_inperiod = db.session.query(Post.original_tweet_id,\
+        func.count(Post.original_tweet_id)).\
         join(Post.districts).\
-        filter(Post.created_at >= str_time_range).filter(District.dist_type==dist_fig).\
-        order_by(Post.retweet_count.desc()).all()
+        filter(Post.is_retweet == 1).filter(Post.created_at >= str_time_range).\
+        filter(District.dist_type==dist_fig).\
+        group_by(Post.original_tweet_id).\
+        order_by(func.count(Post.original_tweet_id).desc()).all()
 
     else:
-        most_retweeted_tweets = db.session.query(Post.post_id, Post.original_tweet_id, \
-        Post.retweet_count, District.dist_type).\
+        most_retweeted_tweets_inperiod = db.session.query(Post.original_tweet_id,\
+        func.count(Post.original_tweet_id)).\
         join(Post.districts).\
-        filter(Post.created_at >= str_time_range).\
-        order_by(Post.retweet_count.desc()).all()
+        filter(Post.is_retweet == 1).filter(Post.created_at >= str_time_range).\
+        group_by(Post.original_tweet_id).\
+        order_by(func.count(Post.original_tweet_id).desc()).all()
+
 
     # Get cleaned list of tweet ids (no dupes, w/ district relevance)
     # List returns 20 tweets, with lists of following attributes:
     # [Post.post_id, relevant screen name, retweet_count, tweet_html (if exists),
     # original_tweet_id]
-    tweet_list = get_tweet_list_ids(most_retweeted_tweets)
-    #print(tweet_list[0])
+    # tweet_list = get_tweet_list_ids(most_retweeted_tweets)
+    # #print(tweet_list[0])
+    #
+    # # GET FULL LIST. RETURNS FOLLOWING ATTRIBUTE:
+    # # [Post id, screen name, retweet count, botscore]
+    # populated_list = populate_tweet_list(tweet_list)
 
-    # GET FULL LIST. RETURNS FOLLOWING ATTRIBUTE:
-    # [Post id, screen name, retweet count, botscore]
-    populated_list = populate_tweet_list(tweet_list)
+    # Get list with attributes:
+    # [post_id, user_scrname, post count, user_cap_perc, tweethtml]
+    tweet_list_inperiod = get_tweet_list_inperiod(most_retweeted_tweets_inperiod)
 
     # pprint.pprint(populated_list[0])
     counter = 1
-    for item in populated_list:
+    for item in tweet_list_inperiod:
 
         x = '''INSERT INTO {table} VALUES ({counter}, '{post_id}', '{botscore}', '{name}', {retweets});'''.\
-           format(table=table_new, counter=counter, post_id=item[0], botscore=item[4], name=item[1], retweets=item[2])
+           format(table=table_new, counter=counter, post_id=item[0], botscore=item[3], name=item[1], retweets=item[2])
 
         print(x)
 
@@ -313,6 +339,8 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
     format(table, table_old, table_new, table))
 
     conn.close()
+
+    print("finished with table: {}".format(table))
 
 
 def run_all():
@@ -328,10 +356,10 @@ def run_all():
     fill_dist_activity('allcong', 14, 'dist_activity_allcong_14', 'dist_activity_allcong_14_new', 'dist_activity_allcong_14_old')
     fill_dist_activity('allsen', 14, 'dist_activity_allsen_14', 'dist_activity_allsen_14_new', 'dist_activity_allsen_14_old')
     fill_dist_activity('allraces', 14, 'dist_activity_allraces_14', 'dist_activity_allraces_14_new', 'dist_activity_allraces_14_old')
-    fill_dist_activity('allcong', 28, 'dist_activity_allcong_28', 'dist_activity_allcong_28_new', 'dist_activity_allcong_28_old')
-    fill_dist_activity('allsen', 28, 'dist_activity_allsen_28', 'dist_activity_allsen_28_new', 'dist_activity_allsen_28_old')
-    fill_dist_activity('allraces', 28, 'dist_activity_allraces_28', 'dist_activity_allraces_28_new', 'dist_activity_allraces_28_old')
-
+    # fill_dist_activity('allcong', 28, 'dist_activity_allcong_28', 'dist_activity_allcong_28_new', 'dist_activity_allcong_28_old')
+    # fill_dist_activity('allsen', 28, 'dist_activity_allsen_28', 'dist_activity_allsen_28_new', 'dist_activity_allsen_28_old')
+    # fill_dist_activity('allraces', 28, 'dist_activity_allraces_28', 'dist_activity_allraces_28_new', 'dist_activity_allraces_28_old')
+    #
     fill_hash_activity('allcong', 1, 'hash_activity_allcong_1', 'hash_activity_allcong_1_new', 'hash_activity_allcong_1_old')
     fill_hash_activity('allsen', 1, 'hash_activity_allsen_1', 'hash_activity_allsen_1_new', 'hash_activity_allsen_1_old')
     fill_hash_activity('allraces', 1, 'hash_activity_allraces_1', 'hash_activity_allraces_1_new', 'hash_activity_allraces_1_old')
@@ -344,10 +372,10 @@ def run_all():
     fill_hash_activity('allcong', 14, 'hash_activity_allcong_14', 'hash_activity_allcong_14_new', 'hash_activity_allcong_14_old')
     fill_hash_activity('allsen', 14, 'hash_activity_allsen_14', 'hash_activity_allsen_14_new', 'hash_activity_allsen_14_old')
     fill_hash_activity('allraces', 14, 'hash_activity_allraces_14', 'hash_activity_allraces_14_new', 'hash_activity_allraces_14_old')
-    fill_hash_activity('allcong', 28, 'hash_activity_allcong_28', 'hash_activity_allcong_28_new', 'hash_activity_allcong_28_old')
-    fill_hash_activity('allsen', 28, 'hash_activity_allsen_28', 'hash_activity_allsen_28_new', 'hash_activity_allsen_28_old')
-    fill_hash_activity('allraces', 28, 'hash_activity_allraces_28', 'hash_activity_allraces_28_new', 'hash_activity_allraces_28_old')
-
+    # fill_hash_activity('allcong', 28, 'hash_activity_allcong_28', 'hash_activity_allcong_28_new', 'hash_activity_allcong_28_old')
+    # fill_hash_activity('allsen', 28, 'hash_activity_allsen_28', 'hash_activity_allsen_28_new', 'hash_activity_allsen_28_old')
+    # fill_hash_activity('allraces', 28, 'hash_activity_allraces_28', 'hash_activity_allraces_28_new', 'hash_activity_allraces_28_old')
+    #
     fill_top_tweeters('allcong', 1, 'top_tweeters_allcong_1', 'top_tweeters_allcong_1_new', 'top_tweeters_allcong_1_old')
     fill_top_tweeters('allsen', 1, 'top_tweeters_allsen_1', 'top_tweeters_allsen_1_new', 'top_tweeters_allsen_1_old')
     fill_top_tweeters('allraces', 1, 'top_tweeters_allraces_1', 'top_tweeters_allraces_1_new', 'top_tweeters_allraces_1_old')
@@ -360,10 +388,10 @@ def run_all():
     fill_top_tweeters('allcong', 14, 'top_tweeters_allcong_14', 'top_tweeters_allcong_14_new', 'top_tweeters_allcong_14_old')
     fill_top_tweeters('allsen', 14, 'top_tweeters_allsen_14', 'top_tweeters_allsen_14_new', 'top_tweeters_allsen_14_old')
     fill_top_tweeters('allraces', 14, 'top_tweeters_allraces_14', 'top_tweeters_allraces_14_new', 'top_tweeters_allraces_14_old')
-    fill_top_tweeters('allcong', 28, 'top_tweeters_allcong_28', 'top_tweeters_allcong_28_new', 'top_tweeters_allcong_28_old')
-    fill_top_tweeters('allsen', 28, 'top_tweeters_allsen_28', 'top_tweeters_allsen_28_new', 'top_tweeters_allsen_28_old')
-    fill_top_tweeters('allraces', 28, 'top_tweeters_allraces_28', 'top_tweeters_allraces_28_new', 'top_tweeters_allraces_28_old')
-
+    # fill_top_tweeters('allcong', 28, 'top_tweeters_allcong_28', 'top_tweeters_allcong_28_new', 'top_tweeters_allcong_28_old')
+    # fill_top_tweeters('allsen', 28, 'top_tweeters_allsen_28', 'top_tweeters_allsen_28_new', 'top_tweeters_allsen_28_old')
+    # fill_top_tweeters('allraces', 28, 'top_tweeters_allraces_28', 'top_tweeters_allraces_28_new', 'top_tweeters_allraces_28_old')
+    #
 
     fill_retweeted_users('allcong', 1, 'retweeted_users_allcong_1', 'retweeted_users_allcong_1_new', 'retweeted_users_allcong_1_old')
     fill_retweeted_users('allsen', 1, 'retweeted_users_allsen_1', 'retweeted_users_allsen_1_new', 'retweeted_users_allsen_1_old')
@@ -377,10 +405,10 @@ def run_all():
     fill_retweeted_users('allcong', 14, 'retweeted_users_allcong_14', 'retweeted_users_allcong_14_new', 'retweeted_users_allcong_14_old')
     fill_retweeted_users('allsen', 14, 'retweeted_users_allsen_14', 'retweeted_users_allsen_14_new', 'retweeted_users_allsen_14_old')
     fill_retweeted_users('allraces', 14, 'retweeted_users_allraces_14', 'retweeted_users_allraces_14_new', 'retweeted_users_allraces_14_old')
-    fill_retweeted_users('allcong', 28, 'retweeted_users_allcong_28', 'retweeted_users_allcong_28_new', 'retweeted_users_allcong_28_old')
-    fill_retweeted_users('allsen', 28, 'retweeted_users_allsen_28', 'retweeted_users_allsen_28_new', 'retweeted_users_allsen_28_old')
-    fill_retweeted_users('allraces', 28, 'retweeted_users_allraces_28', 'retweeted_users_allraces_28_new', 'retweeted_users_allraces_28_old')
-
+    # fill_retweeted_users('allcong', 28, 'retweeted_users_allcong_28', 'retweeted_users_allcong_28_new', 'retweeted_users_allcong_28_old')
+    # fill_retweeted_users('allsen', 28, 'retweeted_users_allsen_28', 'retweeted_users_allsen_28_new', 'retweeted_users_allsen_28_old')
+    # fill_retweeted_users('allraces', 28, 'retweeted_users_allraces_28', 'retweeted_users_allraces_28_new', 'retweeted_users_allraces_28_old')
+    #
 
     fill_retweeted_tweets('allcong', 1, 'retweeted_tweets_allcong_1', 'retweeted_tweets_allcong_1_new', 'retweeted_tweets_allcong_1_old')
     fill_retweeted_tweets('allsen', 1, 'retweeted_tweets_allsen_1', 'retweeted_tweets_allsen_1_new', 'retweeted_tweets_allsen_1_old')
@@ -394,9 +422,9 @@ def run_all():
     fill_retweeted_tweets('allcong', 14, 'retweeted_tweets_allcong_14', 'retweeted_tweets_allcong_14_new', 'retweeted_tweets_allcong_14_old')
     fill_retweeted_tweets('allsen', 14, 'retweeted_tweets_allsen_14', 'retweeted_tweets_allsen_14_new', 'retweeted_tweets_allsen_14_old')
     fill_retweeted_tweets('allraces', 14, 'retweeted_tweets_allraces_14', 'retweeted_tweets_allraces_14_new', 'retweeted_tweets_allraces_14_old')
-    fill_retweeted_tweets('allcong', 28, 'retweeted_tweets_allcong_28', 'retweeted_tweets_allcong_28_new', 'retweeted_tweets_allcong_28_old')
-    fill_retweeted_tweets('allsen', 28, 'retweeted_tweets_allsen_28', 'retweeted_tweets_allsen_28_new', 'retweeted_tweets_allsen_28_old')
-    fill_retweeted_tweets('allraces', 28, 'retweeted_tweets_allraces_28', 'retweeted_tweets_allraces_28_new', 'retweeted_tweets_allraces_28_old')
+    # fill_retweeted_tweets('allcong', 28, 'retweeted_tweets_allcong_28', 'retweeted_tweets_allcong_28_new', 'retweeted_tweets_allcong_28_old')
+    # fill_retweeted_tweets('allsen', 28, 'retweeted_tweets_allsen_28', 'retweeted_tweets_allsen_28_new', 'retweeted_tweets_allsen_28_old')
+    # fill_retweeted_tweets('allraces', 28, 'retweeted_tweets_allraces_28', 'retweeted_tweets_allraces_28_new', 'retweeted_tweets_allraces_28_old')
 
 
 
