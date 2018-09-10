@@ -3,7 +3,7 @@ import csv
 import sys
 import tweepy
 import time
-from app.helpers import skip_list, get_tweet, distdict_short
+from app.helpers import skip_list, get_tweet, distdict_short, cache_top_hashtags
 from app import app, db
 import fill_overview_tables_timed as fill
 import app.graph_functions as gf
@@ -535,7 +535,7 @@ def run_twitterscrape():
 
     #Do Congress search
     search_cong()
-    
+
 
     print(datetime.datetime.now())
     time = datetime.datetime.now()
@@ -543,15 +543,19 @@ def run_twitterscrape():
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('added cong items to database, finished at {}\n\n'.format(datetime.datetime.now()))
 
-    #Run function filling overview-cache tables
+    # Run function filling overview-cache tables
     fill.run_all()
 
 
     with open('logs/twitterscrape_log.txt', 'a') as f:
         f.write('filled all cache tables, finished at {}\n\n'.format(datetime.datetime.now()))
 
-    #Run function updating graph pickles
+    # Run function updating graph pickles
     gf.fill_graphs()
+
+    # Run helper function caching top hashtags
+    cache_top_hashtags()
+
 
 if __name__ == "__main__":
     run_twitterscrape()

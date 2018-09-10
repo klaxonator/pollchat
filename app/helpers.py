@@ -463,7 +463,7 @@ def get_tweet_list_inperiod(db_search_object):
         else:
             holding_list.append("Original post not yet in database")
 
-        # list position [4]: user_cap_perc
+        # list position [4]: tweet_html
         holding_list.append(tweet_html)
 
         print(holding_list)
