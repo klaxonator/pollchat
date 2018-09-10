@@ -11,6 +11,7 @@ import sys
 import time
 from textblob import TextBlob
 from sqlalchemy import exc, func
+import urllib.request
 
 
 
@@ -1441,3 +1442,25 @@ def add_tweet(tweet_id, district_name=None):
 
         pass
     return True
+
+def cache_top_hashtags():
+
+    top_hash_list = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
+    join(Post.hashtags).\
+    group_by(Hashtag.hashtag).\
+    order_by(func.count(Hashtag.hashtag).desc()).all()
+
+    time_list = [1, 2, 7, 14]
+    url_header = {"secret-header": "True"}
+
+    print(top_hash_list[0:10])
+    for result in top_hash_list[0:20]:
+        for figure in time_list:
+            url_visit = 'https://pollchatter.org/hashtag/{0}?time_delta={1}'.\
+                    format(result[0], figure)
+            req = urllib.request.Request(url_visit, headers = url_header)
+            print(url_visit)
+            print(req.header_items())
+            page = urllib.request.urlopen(req)
+            print("got url for time_delta={}".format(figure))
+            print(page.info().as_string())
