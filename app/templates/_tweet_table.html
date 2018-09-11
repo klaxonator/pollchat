@@ -26,7 +26,9 @@
                                     {{ loop.index }}
                                 </td>
                                 <td class="hidden-xs">
-                                    {{ item[1] }}
+                                    <a href={{ url_for('screen_name', dynamic=item[1],
+                                        time_delta=time_delta) }}>
+                                    {{ item[1] }}</a>
                                 </td>
                                 <td class="hidden-xs">{{ item[2] }}</td>
                                 <td>
