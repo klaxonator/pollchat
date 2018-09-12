@@ -1473,3 +1473,47 @@ def cache_top_hashtags():
             page = urllib.request.urlopen(req)
             print("got url for time_delta={}".format(figure))
             print(page.info().as_string())
+
+def cache_dists():
+
+    time_list = [1, 2, 7, 14]
+    url_header = {"secret-header": "True"}
+
+    for figure in time_list:
+        # get senate districts
+        with open('app/comp_races_parsed_sen.csv', 'r') as f:
+            reader = csv.reader(f)
+
+            for row in reader:
+                #Create search query with quotation marks, to limit to exact matches
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                    '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
+
+                url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                        format(query[2:7], figure)
+                req = urllib.request.Request(url_visit, headers = url_header)
+                print(req.header_items())
+                page = urllib.request.urlopen(req)
+                print("got url for time_delta={}".format(figure))
+                print(page.info().as_string())
+
+        # Get cong districts
+        with open('app/comp_races_parsed.csv', 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                #Create search query with quotation marks, to limit to exact matches
+                if row[4] != "":
+                    query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
+                else:
+                    query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
+
+                url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                        format(query[2:6], figure)
+                req = urllib.request.Request(url_visit, headers = url_header)
+                print(req.header_items())
+                page = urllib.request.urlopen(req)
+                print("got url for time_delta={}".format(figure))
+                print(page.info().as_string())

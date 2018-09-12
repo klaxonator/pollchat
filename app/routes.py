@@ -541,6 +541,16 @@ def screen_name(dynamic):
     most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
 
+    most_retweeted_inperiod = db.session.query(Post.original_tweet_id,\
+    func.count(Post.original_tweet_id)).\
+    join(Post.user).\
+    filter(Post.is_retweet == 1).filter(User.user_name==dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    group_by(Post.original_tweet_id).\
+    order_by(func.count(Post.original_tweet_id).desc()).all()
+
+    most_retweeted_inperiod_list = get_tweet_list_inperiod(most_retweeted_inperiod)
+
     #Get data for double-7 chart
     scrname_chart = gf.scrname_chart(dynamic)
 
