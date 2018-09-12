@@ -567,7 +567,8 @@ def screen_name(dynamic):
         retweeted_users_total=retweeted_users_total, who_retweets=who_retweets,\
         user_created_date=user_created_date, most_retweeted_tweets=most_retweeted_tweets,\
         scrname_chart=scrname_chart, hticks=hticks, get_tweet=get_tweet, \
-        most_retweeted_tweet_list=most_retweeted_tweet_list)
+        most_retweeted_tweet_list=most_retweeted_tweet_list,
+        most_retweeted_inperiod_list=most_retweeted_inperiod_list)
 
     else:
         return render_template('doesnt_exist.html', dynamic=dynamic)
