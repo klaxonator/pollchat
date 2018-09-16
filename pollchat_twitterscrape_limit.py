@@ -556,6 +556,9 @@ def run_twitterscrape():
     # Run helper function caching top hashtags
     cache_top_hashtags()
 
+    with open('logs/twitterscrape_log.txt', 'a') as f:
+        f.write('finished caching at {}\n\n'.format(datetime.datetime.now()))
+
 
 if __name__ == "__main__":
     run_twitterscrape()

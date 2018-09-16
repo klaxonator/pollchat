@@ -1463,7 +1463,7 @@ def cache_top_hashtags():
     url_header = {"secret-header": "True"}
 
     print(top_hash_list[0:10])
-    for result in top_hash_list[0:20]:
+    for result in top_hash_list[0:40]:
         for figure in time_list:
             url_visit = 'https://pollchatter.org/hashtag/{0}?time_delta={1}'.\
                     format(result[0], figure)
@@ -1473,6 +1473,27 @@ def cache_top_hashtags():
             page = urllib.request.urlopen(req)
             print("got url for time_delta={}".format(figure))
             print(page.info().as_string())
+
+def cache_overviews():
+
+
+    group_list = ['allcong', 'allsen', 'allraces']
+    time_list = [1, 2, 7, 14]
+    url_header = {"secret-header": "True"}
+
+    for group in group_list:
+        for figure in time_list:
+
+            url_visit = 'https://pollchatter.org/overview/{0}?time_delta={}'.\
+                format(group, figure)
+            req = urllib.request.Request(url_visit, headers = url_header)
+            print(req.header_items())
+            page = urllib.request.urlopen(req)
+            print("got url for {}, time_delta={}".format(group, figure))
+            print(page.info().as_string())
+
+
+
 
 def cache_dists():
 
