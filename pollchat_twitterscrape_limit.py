@@ -553,6 +553,9 @@ def run_twitterscrape():
     # Run function updating graph pickles
     gf.fill_graphs()
 
+    # Cache overview pages
+    cache_overviews()
+
     # Run helper function caching top hashtags
     cache_top_hashtags()
 
