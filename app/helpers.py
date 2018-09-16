@@ -1484,12 +1484,12 @@ def cache_overviews():
     for group in group_list:
         for figure in time_list:
 
-            url_visit = 'https://pollchatter.org/overview/{0}?time_delta={}'.\
+            url_visit = 'https://pollchatter.org/overview/{0}?time_delta={1}'.\
                 format(group, figure)
             req = urllib.request.Request(url_visit, headers = url_header)
             print(req.header_items())
             page = urllib.request.urlopen(req)
-            print("got url for {}, time_delta={}".format(group, figure))
+            print("got url for {0}, time_delta={1}".format(group, figure))
             print(page.info().as_string())
 
 
