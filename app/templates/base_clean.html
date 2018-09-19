@@ -121,7 +121,8 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
 
 {% block footer %}
     <footer class="container-fluid text-center">
-        <p>PollChatter is a <a href="https://www.mayflyresearch.com">Mayfly Research</a> project</p>
+        <p>PollChatter is a <a href="https://www.mayflyresearch.com">Mayfly Research</a>
+            project. Read our <a href={{ url_for('privacy') }}>privacy policy</a></p>
     </footer>
 </div>
 {% endblock %}
@@ -132,7 +133,9 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
 
 {% block scripts %}
     {{ super() }}
-    {{ moment.include_moment() }}
+
+    {#
+        {{ moment.include_moment() }}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
     </script>
 
@@ -143,7 +146,7 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
             $('[data-toggle="popover"]').popover()
         })
     </script>
-{#
+
     <script>
     //TWITTER
         window.twttr = (function (d,s,id) {
@@ -159,10 +162,10 @@ data-spy="scroll" data-target="#menu-content" data-offset="80"
 
             }(document, "script", "twitter-wjs"));
     </script>
-#}
+
 <script id="twitter-wjs" type="text/javascript" async
 defer src="//platform.twitter.com/widgets.js"></script>
-
+#}
 <!-- Matomo
 <script type="text/javascript">
   var _paq = _paq || [];

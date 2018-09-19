@@ -667,11 +667,18 @@ def about():
 
     return render_template('about.html', url=url)
 
+@app.route('/privacy')
+def privacy():
+    url = request.path
+
+    return render_template('privacy.html', url=url)
+
 @app.route('/doesnt_exist/<dynamic>')
 def doesnt_exist(dynamic):
     url = request.path
     return render_template('doesnt_exist.html', dynamic=dynamic,
     url=url)
+
 
 # @app.route('/test', methods = ['GET', 'POST'])
 # def test():
