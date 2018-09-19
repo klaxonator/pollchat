@@ -123,6 +123,16 @@ a:active {
       text-decoration: underline;
 }
 
+a.footer_link:link, a.footer_link:visited {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+a.footer_link:hover, a.footer_link:active {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
 a.text-nocolor, a.text-nocolor:link, {
     color: #353737 !important;
 }
