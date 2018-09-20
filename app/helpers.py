@@ -839,8 +839,7 @@ distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
  'TXSen', 'NESen', 'MSSen', 'MTSen','NJSen', 'PASen', 'TNSen', 'MISen', 'MOSen',
  'MNSen', 'WISen', 'AZSen', 'FLSen', 'ohsen', 'insen', 'ndsen', 'wvsen', 'nvsen',
  'txsen', 'nesen', 'mssen', 'mtsen','njsen', 'pasen', 'tnsen', 'misen', 'mosen',
- 'mnsen', 'wisen', 'azsen', 'flsen']
-
+ 'mnsen', 'wisen', 'azsen', 'flsen','ny27','fl06', 'co03', 'ny25','tx31']
 
 
 
