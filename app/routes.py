@@ -9,22 +9,29 @@ from sqlalchemy.dialects.sqlite import DATETIME
 from datetime import datetime, timedelta, date
 from app.helpers import stringtime, get_tweet, test_insert, test_hashgraph_data, \
 test_usergraph_data, distlist, get_tweet_datetime, get_tweet_list, \
-get_tweet_list_nodist, Logger, skip_list, get_tweet_list_inperiod
+get_tweet_list_nodist, Logger, skip_list, get_tweet_list_inperiod, str_today
 import app.graph_functions as gf
 import sys
 import pickle
+import feedparser
 
 sys.stdout = Logger("logs/pollchat_stdout.txt")
+
+
+def blogfeed():
+    feed = feedparser.parse('http://www.mayflyresearch.com/feed')
+    return feed
 
 
 @app.route('/')
 @app.route('/index', methods=['GET'])
 def index():
     url = request.path
+    feed = blogfeed()
 
-    return render_template('index.html', title ='Home', d_form=DistrictForm(), \
+    return render_template('index_withblog.html', title ='Home', d_form=DistrictForm(), \
     h_form=HashtagSearchForm(), p_form=PhraseSearchForm(), all_form=AllCongSearchForm(),\
-    botform=BotSearchForm(), sen_form=SenForm(), url=url)
+    botform=BotSearchForm(), sen_form=SenForm(), url=url, feed=feed)
 
 @app.route('/select_district', methods = ['GET', 'POST'])
 def select_district():
@@ -57,17 +64,18 @@ def district(dynamic):
     url = request.path
 
     str_time_range = stringtime(time_delta)
+    today = str_today()
 
     #Set str_today within page call, so is correct (today)
     # NOTE: Possibly faster to do this w/i hash_pickled db lookup
-    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
-    str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
+    #today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+    #str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
 
     # Most frequently used hashtags column
     dist_hashes = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.districts).join(Post.hashtags).\
     filter(District.district_name==dynamic).\
-    filter(Post.created_at >= str_time_range).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(Hashtag.hashtag).\
     order_by(func.count(Hashtag.hashtag).desc()).all()
 
@@ -78,7 +86,7 @@ def district(dynamic):
     User.user_cap_perc, User.user_id).\
     join(Post.user).join(Post.districts).\
     filter(District.district_name==dynamic).\
-    filter(Post.created_at >= str_time_range).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(User.user_id).\
     order_by(func.count(User.user_id).desc()).all()
 
@@ -89,7 +97,7 @@ def district(dynamic):
     func.count(Post.original_author_scrname)).\
     join(Post.districts).\
     filter(District.district_name==dynamic).\
-    filter(Post.created_at >= str_time_range).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
@@ -123,7 +131,7 @@ def district(dynamic):
     # Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     # Post.text, Post.original_text).\
     # join(Post.districts).join(Post.user).\
-    # filter(District.district_name==dynamic).filter(Post.created_at >= str_time_range).\
+    # filter(District.district_name==dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     # order_by(Post.retweet_count.desc()).all()
     #
     # # Use helper function to Get botscore for top five most-retweeted tweets,
@@ -140,7 +148,7 @@ def district(dynamic):
     func.count(Post.original_tweet_id)).\
     join(Post.districts).\
     filter(Post.is_retweet == 1).filter(District.district_name==dynamic).\
-    filter(Post.created_at_dt >= str_time_range).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(Post.original_tweet_id, Post.original_author_scrname).\
     order_by(func.count(Post.original_tweet_id).desc()).all()
 
@@ -161,7 +169,7 @@ def district(dynamic):
     #Using 3-day index for top-row hashtags to spotlight
     #hash_table_rows = gf.get_hash_rows(dynamic)
     hash_pickled = db.session.query(District_graphs.chart_rows).\
-    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.reference_date==today).\
     filter(District_graphs.district_name==dynamic).first()
 
     if hash_pickled != None:
@@ -358,7 +366,7 @@ def overview(dynamic):
 
     # RETURN THIS TO TEMPLATE
     all_tweets = db.session.query(func.count(Post.post_id)).\
-    filter(Post.created_at >= str_time_range).first()
+    filter(Post.created_at_dt >= str_time_range).first()
 
     print("got all tweets")
 
@@ -480,14 +488,14 @@ def screen_name(dynamic):
     # What hashtags are used most frequently by this screen name
     top_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
     # Which districts are referenced most frequently by screen name
     top_districts = db.session.query(District.district_name, \
     func.count(District.district_name)).\
     join(Post.districts).join(Post.user).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     group_by(District.district_name).order_by(func.count(District.district_name).\
     desc()).all()
 
@@ -501,7 +509,7 @@ def screen_name(dynamic):
     retweeted_users_period = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.user).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
@@ -520,7 +528,7 @@ def screen_name(dynamic):
     who_retweets = db.session.query(User.user_scrname, \
     func.count(User.user_scrname)).\
     join(Post.user).\
-    filter(Post.original_author_scrname == dynamic).filter(Post.created_at >= str_time_range).\
+    filter(Post.original_author_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     group_by(User.user_scrname).\
     order_by(func.count(User.user_scrname).desc()).all()
 
@@ -532,7 +540,7 @@ def screen_name(dynamic):
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, Post.tweet_html,
     Post.text, Post.original_text).\
-    filter(Post.original_author_scrname==dynamic).filter(Post.created_at >= str_time_range).\
+    filter(Post.original_author_scrname==dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     order_by(Post.retweet_count.desc()).all()
 
     # Use helper function to Get botscore for top five most-retweeted tweets,
@@ -622,19 +630,19 @@ def botspy(dynamic):
     most_active = db.session.query(User.user_scrname, User.user_cap_perc,\
     func.count(Post.post_id), User.user_id).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at >= str_time_range).\
+    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     group_by(User.user_id).order_by(func.count(Post.post_id).desc()).all()
 
     bot_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at >= str_time_range).\
+    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
     Post.text, Post.original_text).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at >= str_time_range).\
+    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
     filter(Post.is_retweet == 0).\
     order_by(Post.retweet_count.desc()).all()
 
@@ -680,14 +688,20 @@ def doesnt_exist(dynamic):
     url=url)
 
 
-# @app.route('/test', methods = ['GET', 'POST'])
-# def test():
-#     rows = gf.get_hash_rows('ca49')
-#     return render_template('test.html', get_tweet=get_tweet, \
-#     test_hashgraph_data=test_hashgraph_data, test_usergraph_data=test_usergraph_data)
+@app.route('/test', methods = ['GET', 'POST'])
+def test():
+    feed = blogfeed()
+    return render_template('test.html', feed=feed)
 
 @app.route('/how_to_use')
 def how_to_use():
     url = request.path
 
     return render_template('how_to_use.html', url=url)
+
+# @app.route('/blogfeed')
+# def blogfeed():
+#     feed = feedparser.parse('http://www.mayflyresearch.com/feed')
+#
+#
+#     return render_template('_blogfeed.html', feed=feed)
