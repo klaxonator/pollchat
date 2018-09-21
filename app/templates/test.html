@@ -4,8 +4,42 @@
 
 <h1>THIS IS A TEST</h1>
 
+<div id="graphs">
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="linechart1" class="chart"></div>
+        </div>
+        <div class="col-sm-6">
+            <div id="linechart2" class="chart"></div>
+        </div>
+    </div>
+</div>
+<br><br><br>
 
-{% include '_blogfeed.html' %}
+<div id="graphs">
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="linechart3" class="chart"></div>
+        </div>
+        <div class="col-sm-6">
+            <div id="linechart4" class="chart"></div>
+        </div>
+    </div>
+</div>
+<br><br><br>
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8"><div id="linechart5" class="chart"></div></div>
+    <div class="col-sm-2"></div>
+</div>
+<br><br><br>
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8"><div id="linechart6" class="chart"></div></div></div>
+    <div class="col-sm-2"></div>
+</div>
+
+
 
 <br><br><br>
 
@@ -16,6 +50,140 @@
 {% block scripts %}
     {{ super() }}
 
-    
+    <script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', {'packages':['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawChart1);
+
+    // Draw the chart and set the chart values
+    function drawChart1() {
+        var data = google.visualization.arrayToDataTable(
+            {{ rows|tojson }}
+        );
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+             title: 'Hashtag frequency (top 5 as of today)',
+             legend: { position: 'bottom' }
+        };
+
+        var chart1 = new google.visualization.LineChart(document.getElementById('linechart1'));
+
+        chart1.draw(data, options);
+    }
+
+    google.charts.setOnLoadCallback(drawChart2);
+
+    // Draw the chart and set the chart values
+    function drawChart2() {
+        var data = google.visualization.arrayToDataTable(
+            {{ test_usergraph_data|tojson }}
+        );
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+             title: 'Top users, Number of tweets per day (top 5 as of today)',
+             legend: { position: 'bottom' }
+        };
+
+        var chart2 = new google.visualization.LineChart(document.getElementById('linechart2'));
+
+        chart2.draw(data, options);
+    }
+
+
+    google.charts.setOnLoadCallback(drawChart3);
+
+    function drawChart3() {
+
+      var data = new google.visualization.arrayToDataTable(
+          {{ test_usergraph_data|tojson }}
+      );
+
+      var options = {
+        chart: {
+          title: 'Top Tweeters in this district',
+          subtitle: 'by number of tweets per day'
+        }
+
+
+      };
+
+      var chart3 = new google.charts.Line(document.getElementById('linechart3'));
+
+      chart3.draw(data, google.charts.Line.convertOptions(options));
+    }
+
+    google.charts.setOnLoadCallback(drawChart4);
+
+    function drawChart4() {
+
+      var data = new google.visualization.arrayToDataTable(
+          {{ test_hashgraph_data|tojson }}
+      );
+
+      var options = {
+        chart: {
+          title: 'Top hashtags in this district',
+          subtitle: 'by appearances per day'
+        }
+
+
+      };
+
+      var chart4 = new google.charts.Line(document.getElementById('linechart4'));
+
+      chart4.draw(data, google.charts.Line.convertOptions(options));
+    }
+    google.charts.setOnLoadCallback(drawChart5);
+
+    // Draw the chart and set the chart values
+    function drawChart5() {
+        var data = google.visualization.arrayToDataTable(
+            {{ test_usergraph_data|tojson }}
+        );
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {
+             title: 'Top users, Number of tweets per day (top 5 as of today)',
+             legend: { position: 'bottom' }
+        };
+
+        var chart5 = new google.visualization.LineChart(document.getElementById('linechart5'));
+
+        chart5.draw(data, options);
+    }
+
+    google.charts.setOnLoadCallback(drawChart6);
+
+    function drawChart6() {
+
+      var data = new google.visualization.arrayToDataTable(
+          {{ rows|tojson }}
+      );
+
+      var options = {
+        chart: {
+          title: 'Top Tweeters in this district',
+          subtitle: 'by number of tweets per day'
+        }
+
+
+      };
+
+      var chart6 = new google.charts.Line(document.getElementById('linechart6'));
+
+      chart6.draw(data, google.charts.Line.convertOptions(options));
+    }
+
+    $(window).resize(function(){
+        drawChart1();
+        drawChart2();
+        drawChart3();
+        drawChart4();
+        drawChart5();
+        drawChart6();
+    });
+    </script>
 
 {% endblock %}

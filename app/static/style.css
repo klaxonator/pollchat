@@ -146,15 +146,6 @@ li:active {
     color: #1B6186;
 }
 
-.blogdate {
-    text-indent: 5%;
-
-
-}
-
-.blogtext {
-    line-height: .5;
-}
 .text-nocolor, text-nocolor:link {
     color: #353737;
 }
