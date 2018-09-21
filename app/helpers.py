@@ -27,7 +27,7 @@ class Logger(object):
     def flush(self):
         #this flush method is needed for python 3 compatibility.
         #this handles the flush command by doing nothing.
-        #you might want to specify some extra behavior here.
+        #put extra behavior here?
         pass
 
 skip_list = [
@@ -58,11 +58,20 @@ skip_list = [
     "gaming"
     ]
 
+
+def str_today():
+    #Set beginning of searches at midnight, so have full-day comparisons
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+
+    str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
+    return str_today
+
 # Time for functions always uses reference date/time of previous midnight UTC
+# Means that 1-day search will be 24 hours plus however many hours into day it is
 def stringtime(time_delta):
     if time_delta == None:
         time_delta = "7"
-    today = datetime.combine(date.today(), datetime.min.time())
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
     time_range = today - timedelta(days=int(time_delta))
     str_time_range = time_range.strftime('%Y-%m-%d')
     return str_time_range
