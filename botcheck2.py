@@ -17,11 +17,20 @@ from sqlalchemy import Column, Integer, String, Float, func
 str_time_range = stringtime(14)
 
 #GET ALL USER OBJECTS, in order of posting volume last 14 days
+# users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
+# join(Post.user).\
+# filter(Post.created_at >= str_time_range).\
+# group_by(User.user_scrname).\
+# order_by(func.count(User.user_scrname).desc()).all()
+
 users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
-join(Post.user).\
+join(Post.user).join(Post.districts).\
 filter(Post.created_at >= str_time_range).\
+filter(District.district_name == "TXSen").\
 group_by(User.user_scrname).\
 order_by(func.count(User.user_scrname).desc()).all()
+
+
 
 bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **twitter_app_auth)
 

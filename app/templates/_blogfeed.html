@@ -1,0 +1,17 @@
+
+
+<!-- <h4 class="py-5 text-center">Latest observations</h4> -->
+{% for entry in feed['entries'][:3] %}
+<div class="blogtext">
+
+    <p><ul>
+        <li><a class="blogtext" href="{{ entry['link'] }}">
+            {{ entry['title'] }}
+        </a></li>
+    </ul>
+    </p>
+    <p class="blogdate"><small>
+        {{ entry['published'] }} </small>
+    </p>
+</div>
+{% endfor %}

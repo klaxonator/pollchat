@@ -147,7 +147,7 @@ li:active {
 }
 
 .blogdate {
-    text-indent: 5%;
+    text-indent: 10%;
 
 
 }
@@ -155,6 +155,17 @@ li:active {
 .blogtext {
     line-height: .5;
 }
+
+a.blogtext:link, a.blogtext:visited {
+    color: #626567;
+    text-decoration: none;
+}
+
+a.blogtext:hover, a.blogtext:active {
+    color: red;
+    text-decoration: underline;
+}
+
 .text-nocolor, text-nocolor:link {
     color: #353737;
 }

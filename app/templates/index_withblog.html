@@ -1,0 +1,195 @@
+{% extends "base_clean.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+
+    <div class="titlebox">
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                <div class="py-5 text-center">
+                    <h2>
+                        Welcome to PollChatter<br>
+                        <small class="text-muted">Transparency for election-related Tweets</small>
+                    </h2>
+                    <hr class="my-4">
+                </div>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+
+                <div class="py-5 text-left">
+
+                    {% include '_blogfeed.html' %}
+
+                </div>
+                <div class="text-right blogdate">
+                    <a class="blogtext" href="http://www.mayflyresearch.com/blog">
+                        << More >>
+                    </a>
+                </div>
+
+                <hr class="my-4">
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
+
+
+<br>
+<br>
+
+<h3>What's being tweeted in a specific competitive congressional district?</h3>
+
+
+<div>
+    <form class="form" name="d_form" action="{{ url_for('select_district') }}" method="post" role="form">
+
+
+        <div class="form-group">
+            {{ d_form.hidden_tag() }}
+            {{ wtf.form_errors(d_form, hiddens="only") }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(d_form.select_district) }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(d_form.district_time_delta) }}
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            {{ wtf.form_field(d_form.submit_district) }}
+        </div>
+
+    </form>
+</div>
+
+<h3>What's being tweeted about a specific competitive Senate race?</h3>
+
+<div>
+    <form class="form" name="sen_form" action="{{ url_for('select_district') }}" method="post" role="form">
+
+
+        <div class="form-group">
+            {{ sen_form.hidden_tag() }}
+            {{ wtf.form_errors(sen_form, hiddens="only") }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(sen_form.select_district) }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(sen_form.district_time_delta) }}
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            {{ wtf.form_field(sen_form.submit_district) }}
+        </div>
+
+    </form>
+</div>
+
+<div>
+    <h3>How is a specific hashtag being used in election-related Tweets?</h3>
+
+
+    <form class="form" name='h_form' action="{{ url_for('hashtag_search') }}" method="post">
+        <div class="form-group">
+            {{ h_form.hidden_tag() }}
+            {{ wtf.form_errors(h_form, hiddens="only") }}
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(h_form.hashtag_search) }}
+            </div>
+
+            <div class="form-group col-md-6">
+                {{ wtf.form_field(h_form.hashtag_time_delta) }}
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            {{ wtf.form_field(h_form.submit_hash) }}
+        </div>
+
+    </form>
+</div>
+
+    {#
+    <h3>How a particular word or phrase is being used in election-related Tweets?</h3>
+
+    <form name='p_form' action="{{ url_for('phrase_search') }}" method="post">
+        {{ p_form.hidden_tag() }}
+        <p>
+            {{ p_form.phrase_search.label }}<br>
+            {{ p_form.phrase_search(size=32) }}<br>
+            {% for error in p_form.phrase_search.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ p_form.submit_phrase()}}
+        </p>
+    </form>
+    #}
+
+<div>
+    <h3>What patterns are emerging on Twitter across all competitive districts?</h3>
+
+    <form class="form" name='all_form' action="{{ url_for('all_search') }}" method="post">
+        {{ all_form.hidden_tag() }}
+        {{ wtf.form_errors(all_form, hiddens="only") }}
+        <div class="form-row">
+            <div class="form-group col-sm-6">
+                {{ wtf.form_field(all_form.scope_search) }}
+            </div>
+
+            <div class="form-group col-sm-6">
+                {{ wtf.form_field(all_form.allcong_time_delta) }}
+            </div>
+        </div>
+        <div class="form-group text-right">
+            {{ wtf.form_field(all_form.submit_allcong_search) }}
+        </div>
+    </form>
+</div>
+
+<div>
+    <h3>How are bot-like users using Twitter for electoral purposes?</h3>
+
+    <form class="form" name='botform' action="{{ url_for('bot_search') }}" method="post">
+        {{ botform.hidden_tag() }}
+        {{ wtf.form_errors(botform, hiddens="only") }}
+        <div class="form-row">
+            <div class="form-group col-sm-6">
+                {{ wtf.form_field(botform.scope_search) }}
+            </div>
+
+            <div class="form-group col-sm-6">
+                {{ wtf.form_field(botform.botform_time_delta) }}
+            </div>
+        </div>
+        <div class="form-group text-right">
+            {{ wtf.form_field(botform.submit_botform_search) }}
+        </div>
+    </form>
+</div>
+
+{#    All congressional districts
+    All open senate districts
+    All 2018 U.S. Congress races
+#}
+
+
+{% endblock %}
