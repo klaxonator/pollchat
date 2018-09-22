@@ -1,6 +1,6 @@
 import os
 from app.helpers import stringtime, get_tweet_list_ids, populate_tweet_list,\
-    get_tweet_list_inperiod
+    get_tweet_list_inperiod, str_today
 from app import app, db
 from app.models import *
 from sqlalchemy import func, Date
@@ -16,7 +16,7 @@ import pprint
 # -- populate my_summary_new as desired
 # mysql> RENAME TABLE my_summary TO my_summary_old, my_summary_new TO my_summary;
 
-
+today = str_today()
 
 #NOTE: adding dist_group = allcong, allsen, allraces
 
@@ -50,7 +50,8 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
         most_active = db.session.query(District.district_name,\
         func.count(District.district_name)).\
         join(Post.districts).\
-        filter(Post.created_at >= str_time_range).filter(District.dist_type==dist_fig).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
+        filter(District.dist_type==dist_fig).\
         group_by(District.district_name).\
         order_by(func.count(District.district_name).desc()).all()
 
@@ -60,7 +61,7 @@ def fill_dist_activity(dist_group, time_delta, table, table_new, table_old):
         most_active = db.session.query(District.district_name,\
         func.count(District.district_name)).\
         join(Post.districts).\
-        filter(Post.created_at >= str_time_range).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(District.district_name).\
         order_by(func.count(District.district_name).desc()).all()
 
@@ -111,14 +112,15 @@ def fill_hash_activity(dist_group, time_delta, table, table_new, table_old):
         all_hashes = db.session.query(Hashtag.hash_id, Hashtag.hashtag,\
         func.count(Hashtag.hash_id)).\
         join(Post.hashtags).join(Post.districts).\
-        filter(Post.created_at >= str_time_range).filter(District.dist_type==dist_fig).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
+        filter(District.dist_type==dist_fig).\
         group_by(Hashtag.hash_id).order_by(func.count(Hashtag.hash_id).desc()).all()
 
     else:
         all_hashes = db.session.query(Hashtag.hash_id, Hashtag.hashtag,\
         func.count(Hashtag.hash_id)).\
         join(Post.hashtags).join(Post.districts).\
-        filter(Post.created_at >= str_time_range).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(Hashtag.hash_id).order_by(func.count(Hashtag.hash_id).desc()).all()
 
 
@@ -166,7 +168,8 @@ def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
         top_tweeters = db.session.query(User.user_id, User.user_scrname,\
         User.user_cap_perc, func.count(User.user_scrname)).\
         join(Post.user).join(Post.districts).\
-        filter(Post.created_at >= str_time_range).filter(District.dist_type==dist_fig).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
+        filter(District.dist_type==dist_fig).\
         group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
 
     else:
@@ -174,7 +177,7 @@ def fill_top_tweeters(dist_group, time_delta, table, table_new, table_old):
         top_tweeters = db.session.query(User.user_id, User.user_scrname,\
         User.user_cap_perc, func.count(User.user_scrname)).\
         join(Post.user).\
-        filter(Post.created_at >= str_time_range).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(User.user_id).order_by(func.count(User.user_id).desc()).all()
 
 
@@ -226,15 +229,16 @@ def fill_retweeted_users(dist_group, time_delta, table, table_new, table_old):
         retweeted_users = db.session.query(Post.original_author_scrname, \
         func.count(Post.original_author_scrname)).\
         join(Post.districts).\
-        filter(Post.original_author_scrname != "").filter(Post.created_at >= str_time_range).\
-        filter(District.dist_type==dist_fig).\
+        filter(Post.original_author_scrname != "").filter(District.dist_type==dist_fig).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(Post.original_author_scrname).order_by(func.count(Post.original_author_scrname).\
         desc()).all()
 
     else:
         retweeted_users = db.session.query(Post.original_author_scrname, \
         func.count(Post.original_author_scrname)).\
-        filter(Post.original_author_scrname != "").filter(Post.created_at >= str_time_range).\
+        filter(Post.original_author_scrname != "").\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(Post.original_author_scrname).order_by(func.count(Post.original_author_scrname).\
         desc()).all()
 
@@ -292,8 +296,8 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
         most_retweeted_tweets_inperiod = db.session.query(Post.original_tweet_id,\
         func.count(Post.original_tweet_id)).\
         join(Post.districts).\
-        filter(Post.is_retweet == 1).filter(Post.created_at >= str_time_range).\
-        filter(District.dist_type==dist_fig).\
+        filter(Post.is_retweet == 1).filter(District.dist_type==dist_fig).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(Post.original_tweet_id).\
         order_by(func.count(Post.original_tweet_id).desc()).all()
 
@@ -301,7 +305,8 @@ def fill_retweeted_tweets(dist_group, time_delta, table, table_new, table_old):
         most_retweeted_tweets_inperiod = db.session.query(Post.original_tweet_id,\
         func.count(Post.original_tweet_id)).\
         join(Post.districts).\
-        filter(Post.is_retweet == 1).filter(Post.created_at >= str_time_range).\
+        filter(Post.is_retweet == 1).\
+        filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
         group_by(Post.original_tweet_id).\
         order_by(func.count(Post.original_tweet_id).desc()).all()
 
