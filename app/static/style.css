@@ -148,12 +148,13 @@ li:active {
 
 .blogdate {
     text-indent: 10%;
+    line-height: .5;
 
 
 }
 
 .blogtext {
-    line-height: .5;
+    line-height: 1.2;
 }
 
 a.blogtext:link, a.blogtext:visited {
