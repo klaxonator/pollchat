@@ -627,22 +627,28 @@ def botspy(dynamic):
     url = request.path
     str_time_range = stringtime(time_delta)
 
+
+    today = str_today()
+
     most_active = db.session.query(User.user_scrname, User.user_cap_perc,\
     func.count(Post.post_id), User.user_id).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(User.user_cap_perc >= 60.0).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(User.user_id).order_by(func.count(Post.post_id).desc()).all()
 
     bot_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(User.user_cap_perc >= 60.0).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
-    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,
+    Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
     Post.text, Post.original_text).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(User.user_cap_perc >= 60.0).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     filter(Post.is_retweet == 0).\
     order_by(Post.retweet_count.desc()).all()
 
