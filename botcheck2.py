@@ -17,18 +17,18 @@ from sqlalchemy import Column, Integer, String, Float, func
 str_time_range = stringtime(14)
 
 #GET ALL USER OBJECTS, in order of posting volume last 14 days
-# users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
-# join(Post.user).\
-# filter(Post.created_at >= str_time_range).\
-# group_by(User.user_scrname).\
-# order_by(func.count(User.user_scrname).desc()).all()
-
 users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
-join(Post.user).join(Post.districts).\
+join(Post.user).\
 filter(Post.created_at >= str_time_range).\
-filter(District.district_name == "TXSen").\
 group_by(User.user_scrname).\
 order_by(func.count(User.user_scrname).desc()).all()
+
+# users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
+# join(Post.user).join(Post.districts).\
+# filter(Post.created_at >= str_time_range).\
+# filter(District.district_name == "TXSen").\
+# group_by(User.user_scrname).\
+# order_by(func.count(User.user_scrname).desc()).all()
 
 
 
@@ -36,13 +36,17 @@ bom = botometer.Botometer(wait_on_rate_limit=True, mashape_key=mashape_key, **tw
 
 x = 0
 
+count = 0
 
-
-# Iterate through first 2000 top posters
-for item in users[0:3]:
+# Iterate through top posters until reach limit
+for item in users:
 
     this_user = db.session.query(User).\
     filter(User.user_scrname==item[0]).first()
+
+    # skip if already has a value
+    if this_user.user_cap_perc != None:
+        continue
 
     # format botometer search
 
