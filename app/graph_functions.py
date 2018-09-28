@@ -186,6 +186,12 @@ def get_hashrows_overview(distgroup):
     #Create container for individual rows
     new_row = []
 
+    if distgroup == "allcong":
+        dist_fig = 1
+    elif distgroup == "allsen":
+        dist_fig = 2
+    elif distgroup == "allraces":
+        dist_fig = 3
 
     #Populate other rows with hashtag quantities by date
 
@@ -205,10 +211,20 @@ def get_hashrows_overview(distgroup):
         for this_hashtag in this_top_line[1:]:
 
 
-            date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
-            join(Post.hashtags).\
-            filter(Hashtag.hashtag==this_hashtag).\
-            filter(Post.created_at > beg_date[0]).filter(Post.created_at <= end_date).first()
+            if distgroup == "allcong" or distgroup == "allsen":
+                date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
+                join(Post.hashtags).\
+                filter(Hashtag.hashtag==this_hashtag).\
+                filter(District.dist_type==dist_fig).\
+                filter(Post.created_at > beg_date[0]).\
+                filter(Post.created_at <= end_date).first()
+
+            else:
+                date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
+                join(Post.hashtags).\
+                filter(Hashtag.hashtag==this_hashtag).\
+                filter(Post.created_at > beg_date[0]).\
+                filter(Post.created_at <= end_date).first()
 
             new_row.append(date_hash_num[0])
             print('Finished with hashtag: {}'.format(this_hashtag))
