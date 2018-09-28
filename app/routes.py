@@ -493,7 +493,7 @@ def screen_name(dynamic):
     filter(User.user_scrname == dynamic).\
     filter(Post.created_at_dt >= str_time_range).\
     filter(Post.created_at_dt < today).\
-    group_by(Hashtag.hashtag).
+    group_by(Hashtag.hashtag).\
     order_by(func.count(Hashtag.hashtag).desc()).all()
 
     # Which districts are referenced most frequently by screen name
@@ -518,7 +518,7 @@ def screen_name(dynamic):
     func.count(Post.original_author_scrname)).\
     join(Post.user).\
     filter(User.user_scrname == dynamic).\
-    filter(Post.created_at_dt >= str_time_range).
+    filter(Post.created_at_dt >= str_time_range).\
     filter(Post.created_at_dt < today).\
     filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
