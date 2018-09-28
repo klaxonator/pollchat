@@ -485,18 +485,26 @@ def screen_name(dynamic):
     url = request.path
     str_time_range = stringtime(time_delta)
 
+    today = str_today()
+
     # What hashtags are used most frequently by this screen name
     top_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
-    group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
+    filter(User.user_scrname == dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    filter(Post.created_at_dt < today).\
+    group_by(Hashtag.hashtag).
+    order_by(func.count(Hashtag.hashtag).desc()).all()
 
     # Which districts are referenced most frequently by screen name
     top_districts = db.session.query(District.district_name, \
     func.count(District.district_name)).\
     join(Post.districts).join(Post.user).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
-    group_by(District.district_name).order_by(func.count(District.district_name).\
+    filter(User.user_scrname == dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    filter(Post.created_at_dt < today).\
+    group_by(District.district_name).\
+    order_by(func.count(District.district_name).\
     desc()).all()
 
     user_obj = db.session.query(User).filter(User.user_scrname==dynamic).first()
@@ -509,7 +517,9 @@ def screen_name(dynamic):
     retweeted_users_period = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.user).\
-    filter(User.user_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(User.user_scrname == dynamic).\
+    filter(Post.created_at_dt >= str_time_range).
+    filter(Post.created_at_dt < today).\
     filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
@@ -519,7 +529,8 @@ def screen_name(dynamic):
     retweeted_users_total = db.session.query(Post.original_author_scrname, \
     func.count(Post.original_author_scrname)).\
     join(Post.user).\
-    filter(User.user_scrname == dynamic).filter(Post.original_author_scrname != "").\
+    filter(User.user_scrname == dynamic).\
+    filter(Post.original_author_scrname != "").\
     group_by(Post.original_author_scrname).\
     order_by(func.count(Post.original_author_scrname).desc()).all()
 
@@ -528,7 +539,9 @@ def screen_name(dynamic):
     who_retweets = db.session.query(User.user_scrname, \
     func.count(User.user_scrname)).\
     join(Post.user).\
-    filter(Post.original_author_scrname == dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(Post.original_author_scrname == dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    filter(Post.created_at_dt < today).\
     group_by(User.user_scrname).\
     order_by(func.count(User.user_scrname).desc()).all()
 
@@ -540,7 +553,9 @@ def screen_name(dynamic):
     most_retweeted_tweets = db.session.query(Post.post_id, Post.original_author_scrname, \
     Post.retweet_count, Post.original_tweet_id, Post.tweet_html,
     Post.text, Post.original_text).\
-    filter(Post.original_author_scrname==dynamic).filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < str_today).\
+    filter(Post.original_author_scrname==dynamic).\
+    filter(Post.created_at_dt >= str_time_range).\
+    filter(Post.created_at_dt < today).\
     order_by(Post.retweet_count.desc()).all()
 
     # Use helper function to Get botscore for top five most-retweeted tweets,
