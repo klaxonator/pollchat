@@ -213,7 +213,7 @@ def get_hashrows_overview(distgroup):
 
             if distgroup == "allcong" or distgroup == "allsen":
                 date_hash_num = db.session.query(func.count(Hashtag.hashtag)).\
-                join(Post.hashtags).\
+                join(Post.hashtags).join(Post.districts).\
                 filter(Hashtag.hashtag==this_hashtag).\
                 filter(District.dist_type==dist_fig).\
                 filter(Post.created_at > beg_date[0]).\
