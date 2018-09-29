@@ -3,7 +3,7 @@
 from app import app, db
 from datetime import datetime, date, timedelta
 from app.helpers import dists as district_list
-from app.helpers import distlist
+from app.helpers import distlist, str_today, today
 from app.models import User, Post, District, Hashtag, Url, District_graphs
 from sqlalchemy import Column, Integer, String, Float, func
 import pickle
@@ -11,13 +11,14 @@ import csv
 
 
 
-#Set beginning of searches at midnight, so have full-day comparisons
-today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
-
-str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
+# #Set beginning of searches at midnight, so have full-day comparisons
+# today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+#
+# str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
 
 
 def get_beg_date(time_delta):
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
     beg_date = today - timedelta(days=time_delta)
     str_beg_date = beg_date.strftime("%Y-%m-%d %H:%M:%S")
     shrt_beg_date = beg_date.strftime('%b %d')
@@ -43,6 +44,7 @@ def top_line_all(distgroup, var_type, index=3):
 
     top_line = []
     top_line.append('Date')
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
 
     #Get beginning of time range (to expand if insufficient posts)
     beg_range = today - timedelta(days=index)
@@ -121,6 +123,7 @@ def top_line_generic(this_district, var_type, index=3):
 
     top_line = []
     top_line.append('Date')
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
 
     #Get (previous midnight) beginning of time range (to expand if insufficient posts)
     beg_range = today - timedelta(days=index)
@@ -180,7 +183,7 @@ def get_hashrows_overview(distgroup):
     this_top_line = top_line_all(distgroup=distgroup, var_type='hashtags')
 
     #start with midnight of current day as endtime
-    end_date = str_today
+    end_date = str_today()
     shrt_end_date = date.today().strftime('%b %d')
 
     #Create container for individual rows
@@ -247,7 +250,7 @@ def get_hashrows_overview(distgroup):
 
     # get district row as object if exists
     check = db.session.query(District_graphs).\
-    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.reference_date==str_today()).\
     filter(District_graphs.district_name==distgroup).first()
 
     #IF district row for today already exists, update
@@ -261,7 +264,7 @@ def get_hashrows_overview(distgroup):
 
     else:
 
-        hash_add = District_graphs(str_today, distgroup, rows_pickled)
+        hash_add = District_graphs(str_today(), distgroup, rows_pickled)
 
         try:
             db.session.add(hash_add)
@@ -278,7 +281,7 @@ def get_hash_rows(this_district):
     this_top_line = top_line_generic(this_district, var_type='hashtags')
 
     #start with midnight of current day as endtime
-    end_date = str_today
+    end_date = str_today()
     shrt_end_date = date.today().strftime('%b %d')
 
     #Create container for individual rows
@@ -325,7 +328,7 @@ def get_hash_rows(this_district):
 
     # get district row as object if exists
     check = db.session.query(District_graphs).\
-    filter(District_graphs.reference_date==str_today).\
+    filter(District_graphs.reference_date==str_today()).\
     filter(District_graphs.district_name==this_district).first()
 
     #IF district row for today already exists, update
@@ -339,7 +342,7 @@ def get_hash_rows(this_district):
 
     else:
 
-        hash_add = District_graphs(str_today, this_district, rows_pickled)
+        hash_add = District_graphs(str_today(), this_district, rows_pickled)
 
         try:
             db.session.add(hash_add)
@@ -384,8 +387,10 @@ def botweather_chart():
 
     rows = []
 
-    #start with current time as endtime
-    end_date = str_today
+    #start with midnight of current date as endtime
+
+
+    end_date = str_today()
     shrt_end_date = date.today().strftime('%b %d')
 
     #Create container for individual rows
@@ -424,7 +429,7 @@ def botweather_chart():
 
     rows.append(this_top_line)
     rows.reverse()
-
+    print(rows)
     return rows
 
 
@@ -434,8 +439,8 @@ def scrname_chart(screen_name):
 
     rows = []
 
-    #start with current time as endtime
-    end_date = str_today
+    #start with midnight of current day as endtime
+    end_date = str_today()
     shrt_end_date = date.today().strftime('%b %d')
 
     #Create container for individual rows

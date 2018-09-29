@@ -58,6 +58,8 @@ skip_list = [
     "gaming"
     ]
 
+def today():
+    today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
 
 def str_today():
     #Set beginning of searches at midnight, so have full-day comparisons
