@@ -144,7 +144,7 @@ NOTE: CHANGE THIS
                         <tr>
                     </thead>
                     <tbody>
-                        {% for item in most_active_districts[0:20] %}
+                        {% for item in most_active_districts[0:10] %}
                         <tr>
                             <td><a href={{ url_for('district', dynamic=item[0], time_delta=time_delta) }}>
                                 {{ item[0] }}</a>
@@ -161,71 +161,6 @@ NOTE: CHANGE THIS
 </div>
 
 {% include '_tweet_table.html' %}
-
-{#
-    REDO THIS IF NEEDED
-<div>
-    <div class="table=responsive">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 id="favorited">Most-favorited Tweets</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Ranking</th>
-                            <th>Original poster (OP)</th>
-                            <th>OP's <a tabindex="0" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" data-content="According to the IUNI/CetS
-                                Botometer Project, &quot;the probability, according
-                                to our models, that this account is completely automated, i.e.,
-                                a bot.&quot; For details, see &quot;How to use this site&quot;
-                                (link above).">Botometer score</a> (%)</th>
-                            <th>Favorited (# of times)</th>
-                            <th>Tweet text</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in most_liked[0:5] %}
-
-                            <tr>
-                                <td>
-                                    {{ loop.index }}
-                                    <div id="{{ item[0] }}">
-
-                                    </div>
-
-                                </td>
-                                <td><a href={{ url_for('screen_name', dynamic=item[1], time_delta=time_delta) }}>{{ item[1] }}</a></td>
-                                <td>{{ item[2] }}</td>
-                                <td>{{ item[3] }}</td>
-                                <td>
-                                    <blockquote class="twitter-tweet">
-                                        {{ item[4] }}
-TO BE FIXED IN POSTGRES}
-
-                                        <a href="https://twitter.com/{{ item[1] }}/status/{{ item[5] }}">
-                                             {{ moment(get_tweet_datetime(item[4])).format('LL') }}
-                                        </a></blockquote>
-
-
-                                </td>
-
-
-
-
-
-
-                            </tr>
-
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
-#}
 
 
 
