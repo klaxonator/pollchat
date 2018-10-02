@@ -667,6 +667,15 @@ def botspy(dynamic):
     filter(Post.is_retweet == 0).\
     order_by(Post.retweet_count.desc()).all()
 
+    most_active_districts = db.session.query(District.district_name,\
+    func.count(District.district_name)).\
+    join(Post.user).join(Post.districts).\
+    filter(User.user_cap_perc >= 60.0).\
+    filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
+    group_by(District.district_name).\
+    order_by(func.count(District.district_name).desc()).all()
+
+
     most_retweeted_tweet_list = get_tweet_list_nodist(most_retweeted_tweets)
 
 
@@ -688,7 +697,8 @@ def botspy(dynamic):
     most_active=most_active, bot_hashtags=bot_hashtags, \
     most_retweeted_tweets=most_retweeted_tweets, popular_bot=popular_bot,\
     avg_bot=avg_bot, botchart=botchart, get_tweet=get_tweet, \
-    most_retweeted_tweet_list=most_retweeted_tweet_list)
+    most_retweeted_tweet_list=most_retweeted_tweet_list,\
+    most_active_districts=most_active_districts)
 
 @app.route('/about')
 def about():
