@@ -1512,6 +1512,21 @@ def cache_overviews():
             print("got url for {0}, time_delta={1}".format(group, figure))
             print(page.info().as_string())
 
+def cache_botspy():
+
+    time_list = [1, 2, 7, 14]
+    url_header = {"secret-header": "True"}
+
+    for figure in time_list:
+
+        url_visit = 'https://pollchatter.org/botspy/allbots?time_delta={}'.\
+            format(figure)
+        req = urllib.request.Request(url_visit, headers = url_header)
+        print(req.header_items())
+        page = urllib.request.urlopen(req)
+        print("got url for botspy time_delta={}".format(figure))
+        print(page.info().as_string())
+
 
 
 
