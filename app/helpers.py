@@ -744,6 +744,7 @@ dists = [
 ('ky06', 'Kansas 06'),
 ('me02', 'Maine 02'),
 ('mi01', 'Michigan 01'),
+('mi03', 'Michigan 03'),
 ('mi06', 'Michigan 06'),
 ('mi07', 'Michigan 07'),
 ('mi08', 'Michigan 08'),
@@ -773,6 +774,7 @@ dists = [
 ('ny01', 'New York 01'),
 ('ny11', 'New York 11'),
 ('ny19', 'New York 19'),
+('ny21', 'New York 21'),
 ('ny22', 'New York 22'),
 ('ny24', 'New York 24'),
 ('ny25', 'New York 25'),
@@ -855,7 +857,8 @@ distlist = ['az01', 'az02', 'az06', 'az09', 'ar02', 'ca04', 'ca07', 'ca10',
  'TXSen', 'NESen', 'MSSen', 'MTSen','NJSen', 'PASen', 'TNSen', 'MISen', 'MOSen',
  'MNSen', 'WISen', 'AZSen', 'FLSen', 'ohsen', 'insen', 'ndsen', 'wvsen', 'nvsen',
  'txsen', 'nesen', 'mssen', 'mtsen','njsen', 'pasen', 'tnsen', 'misen', 'mosen',
- 'mnsen', 'wisen', 'azsen', 'flsen','ny27','fl06', 'co03', 'ny25','tx31', 'mtal']
+ 'mnsen', 'wisen', 'azsen', 'flsen','ny27','fl06', 'co03', 'ny25','tx31', 'mtal'
+ 'mi03', 'ny21']
 
 
 
@@ -942,6 +945,7 @@ distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09']
              'nj07': ['nj07', 'nj-07', '#nj07', '#nj-07', '#nj7', 'nj 07'],
              'nj11': ['nj11', 'nj-11', '#nj11', '#nj-11', 'nj 11'],
              'ny19': ['ny19', 'ny-19', '#ny19', '#ny-19', 'ny 19'],
+             'ny21': ['ny21', 'ny-21', '#ny21', '#ny-21', 'ny 21'],
              'ny22': ['ny22', 'ny-22', '#ny22', '#ny-22', 'ny 22'],
              'oh12': ['oh12', 'oh-12', '#oh12', '#oh-12', 'oh 12'],
              'pa01': ['pa01', 'pa-01', '#pa01', '#pa-01', '#pa1', 'pa 01'],
@@ -985,6 +989,7 @@ distdict_short =  {'az09': ['az09', 'az-09', '#az09', '#az-09', '#az9', 'az 09']
              'il13': ['il13', 'il-13', '#il13', '#il-13', 'il 13'],
              'in02': ['in02', 'in-02', '#in02', '#in-02', '#in2', 'in 02'],
              'mi01': ['mi01', 'mi-01', '#mi01', '#mi-01', '#mi1', 'mi 01'],
+             'mi03': ['mi03', 'mi-03', '#mi03', '#mi-03', '#mi3', 'mi 03'],
              'mi06': ['mi06', 'mi-06', '#mi06', '#mi-06', 'mi 06'],
              'mi07': ['mi07', 'mi-07', '#mi07', '#mi-07', '#mi7', 'mi 07'],
              'mo02': ['mo02', 'mo-02', '#mo02', '#mo-02', '#mo2', 'mo 02'],
