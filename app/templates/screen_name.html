@@ -34,7 +34,15 @@
                     to our models, that this account is completely automated, i.e.,
                     a bot.&quot; For details, see &quot;How to use this site&quot;
                     (link above).">Botometer score</a>:
-                    <em>{{ user_obj.user_cap_perc }}%</em></p></h4>
+
+                    {% if user_obj.user_cap_perc == None %}
+                        <em>Not yet in database</em>
+                    {% else %}
+                    <em>{{ user_obj.user_cap_perc }}%</em>
+                    {% endif %}
+
+                </p></h4>
+                
                 <h4><p>Total Tweets (lifetime): <em>{{ user_obj.user_statuses }}</em></p></h4>
                 <h4><p>Number of followers): <em>{{ user_obj.user_followers }}</em></h4></p>
                 {% if retweeted_users_total %}
