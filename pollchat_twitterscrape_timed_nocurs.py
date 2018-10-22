@@ -409,26 +409,50 @@ def twitter_search(query):
             print("Error raised: {0}".format(err))
             time.sleep(5 * 60)
 
-
 def search_cong():
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
-    with open('app/comp_races_parsed.csv', 'r') as f:
+    with open('app/comp_races_parsed_new2.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
-            if row[4] != "":
+            if len(row) > 8:
+
                 query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                '"'+row[6]+'"' + ' OR ' + '"'+row[7]+'"' + ' OR ' + \
+                '"'+row[8]+'"'
             else:
                 query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                '"'+row[6]+'"' + ' OR ' + '"'+row[7]+'"'
+
+
             print("Starting district: {}".format(query))
 
             try:
                 twitter_search(query)
                 print("Finished with district: {}".format(query))
                 db.session.commit()
+                get_hash_rows(query[2:6])
+                print("got them hash rows for district {}".format(query[2:6]))
+
+                #visit district page to cache URL
+                time_list = [1, 2, 7, 14]
+                url_header = {"secret-header": "True"}
+
+                for figure in time_list:
+                    url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                            format(query[2:6], figure)
+                    req = urllib.request.Request(url_visit, headers = url_header)
+                    print(req.header_items())
+                    page = urllib.request.urlopen(req)
+                    print("got url for time_delta={}".format(figure))
+                    print(page.info().as_string())
+
+
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
@@ -445,10 +469,18 @@ def search_sen():
     with open('app/comp_races_parsed_sen.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
-            #Create search query with quotation marks, to limit to exact matches
-            query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
-                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
+            if len(row) > 8:
+                #Create search query with quotation marks, to limit to exact matches
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                    '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                    '"'+row[6]+'"'
+            else:
+                #Create search query with quotation marks, to limit to exact matches
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                    '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
+
             print(query)
             print(query[4:7])
 
@@ -456,6 +488,25 @@ def search_sen():
             try:
                 twitter_search(query)
                 db.session.commit()
+
+                get_hash_rows(query[2:7])
+                print("got them hash rows for district {}".format(query[2:7]))
+
+                #visit district page to cache URL
+
+
+                time_list = [1, 2, 7, 14]
+                url_header = {"secret-header": "True"}
+
+                for figure in time_list:
+                    url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                            format(query[2:7], figure)
+                    req = urllib.request.Request(url_visit, headers = url_header)
+                    print(req.header_items())
+                    page = urllib.request.urlopen(req)
+                    print("got url for time_delta={}".format(figure))
+                    print(page.info().as_string())
+
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
