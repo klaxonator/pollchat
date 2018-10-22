@@ -430,16 +430,24 @@ def twitter_search(query):
 def search_cong():
 
     #Open csv file of competitive districts, iterate through it, searching for each row/district
-    with open('app/comp_races_parsed.csv', 'r') as f:
+    with open('app/comp_races_parsed_new2.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             #Create search query with quotation marks, to limit to exact matches
-            if row[4] != "":
+            if len(row) > 8:
+
                 query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + '"'+row[4]+'"'
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                '"'+row[6]+'"' + ' OR ' + '"'+row[7]+'"' + ' OR ' + \
+                '"'+row[8]+'"'
             else:
                 query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"'
+                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                '"'+row[6]+'"' + ' OR ' + '"'+row[7]+'"'
+
+
             print("Starting district: {}".format(query))
 
             try:
@@ -479,10 +487,18 @@ def search_sen():
     with open('app/comp_races_parsed_sen.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
-            #Create search query with quotation marks, to limit to exact matches
-            query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
-                '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
-                '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
+            if len(row) > 8:
+                #Create search query with quotation marks, to limit to exact matches
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                    '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"' + ' OR ' + \
+                    '"'+row[6]+'"'
+            else:
+                #Create search query with quotation marks, to limit to exact matches
+                query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
+                    '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
+                    '"'+row[4]+'"' + ' OR ' + '"'+row[5]+'"'
+
             print(query)
             print(query[4:7])
 
