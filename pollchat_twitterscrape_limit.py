@@ -460,17 +460,21 @@ def search_cong():
                 #visit district page to cache URL
                 time_list = [1, 2, 7, 14]
                 url_header = {"secret-header": "True"}
+                this_dist = query[2:7]
+                try:
+                    for figure in time_list:
+                        url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                                format(query[2:6], figure)
+                        req = urllib.request.Request(url_visit, headers = url_header)
+                        print(req.header_items())
+                        page = urllib.request.urlopen(req)
+                        print("got url for time_delta={}".format(figure))
+                        print(page.info().as_string())
+                except HTTPError as e:
+                    with open('logs/twitterscrape_log.txt', 'a') as fw:
+                        fw.write('Got caching exception {0} for {1}\n'.format(e, this_dist))
 
-                for figure in time_list:
-                    url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
-                            format(query[2:6], figure)
-                    req = urllib.request.Request(url_visit, headers = url_header)
-                    print(req.header_items())
-                    page = urllib.request.urlopen(req)
-                    print("got url for time_delta={}".format(figure))
-                    print(page.info().as_string())
-
-
+                    print(e)
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
@@ -487,7 +491,7 @@ def search_sen():
     with open('app/comp_races_parsed_sen.csv', 'r') as f:
         reader = csv.reader(f)
         for row in reader:
-            if len(row) > 8:
+            if len(row) > 6:
                 #Create search query with quotation marks, to limit to exact matches
                 query = '"'+row[0]+'"' + ' OR ' + '"'+row[1]+'"' + ' OR ' + \
                     '"'+row[2]+'"' + ' OR ' + '"'+row[3]+'"' + ' OR ' + \
@@ -516,15 +520,21 @@ def search_sen():
                 time_list = [1, 2, 7, 14]
                 url_header = {"secret-header": "True"}
 
-                for figure in time_list:
-                    url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
-                            format(query[2:7], figure)
-                    req = urllib.request.Request(url_visit, headers = url_header)
-                    print(req.header_items())
-                    page = urllib.request.urlopen(req)
-                    print("got url for time_delta={}".format(figure))
-                    print(page.info().as_string())
 
+                try:
+                    for figure in time_list:
+                        url_visit = 'https://pollchatter.org/district/{0}?time_delta={1}'.\
+                                format(query[2:7], figure)
+                        req = urllib.request.Request(url_visit, headers = url_header)
+                        print(req.header_items())
+                        page = urllib.request.urlopen(req)
+                        print("got url for time_delta={}".format(figure))
+                        print(page.info().as_string())
+                except HTTPError as e:
+                    with open('logs/twitterscrape_log.txt', 'a') as fw:
+                        fw.write('Got caching exception {0} for {1}\n'.\
+                            format(e, query[2:7]))
+                    print(e)
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
