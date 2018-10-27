@@ -11,17 +11,18 @@ import csv
 
 
 
-# #Set beginning of searches at midnight, so have full-day comparisons
-# today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
-#
-# str_today = today.strftime("%Y-%m-%d %H:%M:%S")         # string version of midnight
-
 
 def get_beg_date(time_delta):
+
+    # get midnight of current day
     today = datetime.combine(date.today(), datetime.min.time())  #datetime object for midnight
+
+    # beg_date = midnight minus time_delta days
     beg_date = today - timedelta(days=time_delta)
+
     str_beg_date = beg_date.strftime("%Y-%m-%d %H:%M:%S")
     shrt_beg_date = beg_date.strftime('%b %d')
+
     results = [str_beg_date, shrt_beg_date]
     return results
 
@@ -449,15 +450,23 @@ def scrname_chart(screen_name):
 
     #Populate other rows with hashtag quantities by date
 
-    #Loop through week-long periods, starting from today
-    for x in range(7, 71, 7):
+    # Loop through day-long periods, starting from today
+    for x in range(1, 11):
         beg_date = get_beg_date(x)
-        last_chart_date = get_beg_date(1)
+        last_chart_date = str_today()
 
         #add short date version as first item of row
         new_row.append(shrt_end_date)
 
-        #Search for # of original posts between begdate and enddate
+    # #Loop through week-long periods, starting from today
+    # for x in range(7, 71, 7):
+    #     beg_date = get_beg_date(x)
+    #     last_chart_date = shrt_end_date
+    #
+    #     #add short date version as first item of row
+    #     new_row.append(shrt_end_date)
+    #
+    #     #Search for # of original posts between begdate and enddate
 
 
 
