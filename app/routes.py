@@ -648,13 +648,13 @@ def botspy(dynamic):
     most_active = db.session.query(User.user_scrname, User.user_cap_perc,\
     func.count(Post.post_id), User.user_id).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(User.user_id).order_by(func.count(Post.post_id).desc()).all()
 
     bot_hashtags = db.session.query(Hashtag.hashtag, func.count(Hashtag.hashtag)).\
     join(Post.user).join(Post.hashtags).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(Hashtag.hashtag).order_by(func.count(Hashtag.hashtag).desc()).all()
 
@@ -662,7 +662,7 @@ def botspy(dynamic):
     Post.retweet_count, Post.original_tweet_id, User.user_scrname, Post.tweet_html,\
     Post.text, Post.original_text).\
     join(Post.user).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     filter(Post.is_retweet == 0).\
     order_by(Post.retweet_count.desc()).all()
@@ -670,7 +670,7 @@ def botspy(dynamic):
     most_active_districts = db.session.query(District.district_name,\
     func.count(District.district_name)).\
     join(Post.user).join(Post.districts).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     filter(Post.created_at_dt >= str_time_range).filter(Post.created_at_dt < today).\
     group_by(District.district_name).\
     order_by(func.count(District.district_name).desc()).all()
@@ -681,11 +681,11 @@ def botspy(dynamic):
 
     popular_bot = db.session.query(User.user_scrname, User.user_followers,\
     User.user_id).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     group_by(User.user_id).order_by(User.user_followers.desc()).all()
 
     avg_bot_raw = db.session.query(func.avg(User.user_followers)).\
-    filter(User.user_cap_perc >= 60.0).\
+    filter(User.user_cap_perc >= 43.0).\
     first()
 
     avg_bot = int(avg_bot_raw[0])
