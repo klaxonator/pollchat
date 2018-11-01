@@ -475,6 +475,9 @@ def search_cong():
                         fw.write('Got caching exception {0} for {1}\n'.format(e, this_dist))
 
                     print(e)
+                    continue
+                except:
+                    continue
 
             except exc.SQLAlchemyError as e:
                 print("There's a dadgummed db error: {}".format(e))
@@ -528,7 +531,8 @@ def search_sen():
                         req = urllib.request.Request(url_visit, headers = url_header)
                         print(req.header_items())
                         page = urllib.request.urlopen(req)
-                        print("got url for time_delta={}".format(figure))
+                        print("got url for time_delta={0} for district {1}".\
+                        format(figure, query[2:7]))
                         print(page.info().as_string())
                 except HTTPError as e:
                     with open('logs/twitterscrape_log.txt', 'a') as fw:

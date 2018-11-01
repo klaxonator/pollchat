@@ -13,15 +13,15 @@ from app.helpers import stringtime
 
 from sqlalchemy import Column, Integer, String, Float, func
 
-
+pass_list = ['immelza']
 str_time_range = stringtime(14)
 
 #GET ALL USER OBJECTS, in order of posting volume last 14 days
-users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
-join(Post.user).\
-filter(Post.created_at >= str_time_range).\
-group_by(User.user_scrname).\
-order_by(func.count(User.user_scrname).desc()).all()
+# users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
+# join(Post.user).\
+# filter(Post.created_at >= str_time_range).\
+# group_by(User.user_scrname).\
+# order_by(func.count(User.user_scrname).desc()).all()
 
 # users = db.session.query(User.user_scrname, func.count(User.user_scrname)).\
 # join(Post.user).join(Post.districts).\
@@ -46,6 +46,9 @@ for item in users:
 
     # skip if already has a value
     if this_user.user_cap_perc != None:
+        continue
+
+    if this_user.user_scrname in pass_list:
         continue
 
     # format botometer search
