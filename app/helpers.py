@@ -439,7 +439,15 @@ def get_tweet_list_inperiod(db_search_object):
                 continue
         else:
             print("gonna add that missing tweet")
-            check = add_tweet(tweet[0])
+
+            # if referenced tweet isn't in database, get it
+            try:
+                check = add_tweet(tweet[0])
+
+            # if tweet not accessible, handle Tweepy error
+            except tweepy.error.TweepError as err:
+                check = False
+
             if check == False:
                 continue
             print("added it in, gonna look for it again")

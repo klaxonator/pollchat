@@ -228,23 +228,6 @@ def hashtag(dynamic):
     group_by(District.district_id).order_by(func.count(District.district_id).\
     desc()).all()
 
-    # conn = db.engine.connect()
-    # top_dist_q = '''SELECT res.district_name, count(res.district_name) as ct
-    #                      FROM (
-    #                         SELECT post_id, district_name
-    #                         FROM  Post_extended pe
-    #                         WHERE pe.hashtag = '{0}'
-    #                             and pe.created_at_dt >= '{1}') res
-    #                      GROUP BY res.district_name
-    #                      ORDER BY ct DESC;'''.format(dynamic, str_time_range)
-    # print(top_dist_q)
-    #
-    # top_districts = conn.execute(top_dist_q).fetchall()
-    #
-    # top_district = db.session.query(District.state_fullname, District.district).\
-    #             filter(District.district_name==top_districts[0][0]).first()
-
-    # conn.close()
 
     print("got top districts")
 

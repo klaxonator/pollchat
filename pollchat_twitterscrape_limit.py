@@ -470,7 +470,7 @@ def search_cong():
                         page = urllib.request.urlopen(req)
                         print("got url for time_delta={}".format(figure))
                         print(page.info().as_string())
-                except HTTPError as e:
+                except urllib.error.HTTPError as e:
                     with open('logs/twitterscrape_log.txt', 'a') as fw:
                         fw.write('Got caching exception {0} for {1}\n'.format(e, this_dist))
 
@@ -534,7 +534,7 @@ def search_sen():
                         print("got url for time_delta={0} for district {1}".\
                         format(figure, query[2:7]))
                         print(page.info().as_string())
-                except HTTPError as e:
+                except urllib.error.HTTPError as e:
                     with open('logs/twitterscrape_log.txt', 'a') as fw:
                         fw.write('Got caching exception {0} for {1}\n'.\
                             format(e, query[2:7]))
